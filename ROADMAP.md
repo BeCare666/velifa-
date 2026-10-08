@@ -106,7 +106,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | ✅ |
 | 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ✅ |
 | 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ✅ |
-| 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ⬜ |
+| 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ✅ |
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ⬜ |
 | 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ⬜ |
 | 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ⬜ |
@@ -295,4 +295,17 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
     langue `de`, champ inconnu, en-tête sans URL → 400 avec message explicite.
 - ⚠️ Limite : requêtes SQL et file Redis non exécutées sur une vraie base (pas de MySQL/Redis/Docker en local) ;
   à vérifier au premier import en environnement configuré (1.12).
+
+### 2026-10-08 — 1.8 Export prospects avec lien WhatsApp
+- `prospects/prospect-export.ts` : message de premier contact dans la langue de l'import (arabe par défaut) :
+  nom du prospect, site, score **mesuré** (« قياس Google Lighthouse »), lien du rapport gratuit, et une phrase
+  permettant de refuser les messages. Lien `wa.me/<numéro du prospect>?text=…` uniquement pour les audits terminés ;
+  vide sans téléphone ou si l'audit n'est pas terminé (aucun message avec un score inexistant).
+- CSV : BOM UTF-8 (arabe lisible dans Excel), colonnes url, nom, téléphone, pays, langue, statut, score, plateforme,
+  codes des points Golfe, lien rapport, lien WhatsApp, date. **Protection contre l'injection de formules** :
+  cellules commençant par `= + - @` préfixées (noms issus de fichiers externes), nombres purs intacts.
+- Route `GET /admin/prospects/export?batch=` (5000 lignes max) ; bouton « Exporter CSV » sur `/admin/prospects`.
+- Preuves : `npx jest` → **13 suites, 190 tests réussis** (+16) — dont décodage du lien `wa.me` identique au message
+  d'origine et relecture du CSV produit par le parseur ; `tsc` exit 0 ; `next build` exit 0 ;
+  API réelle : `/admin/prospects/export` sans jeton → 401 ; avec clé admin → 500 (pas de base locale, attendu).
 

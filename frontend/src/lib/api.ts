@@ -4,9 +4,9 @@ import type { SubscriptionInfo } from '@/types/subscription';
 const BASE_URL   = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
 /** Télécharge un export CSV admin avec le jeton Clerk (aucune clé dans l'URL). */
-async function downloadAdminExport(kind: 'users' | 'audits' | 'performance', token: string | null | undefined) {
+async function downloadAdminExport(kind: string, token: string | null | undefined, path = `/admin/export/${kind}`) {
   if (!token) throw new Error('Session expirée — reconnectez-vous.');
-  const res = await fetch(`${BASE_URL}/admin/export/${kind}`, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`Export impossible (${res.status})`);
@@ -114,5 +114,7 @@ export const api = {
       apiFetch<any>('/admin/prospects/import', { method: 'POST', body: JSON.stringify({ csv, locale }), authToken: token }),
     getProspects: (token: string | null | undefined, params: Record<string, string>) =>
       apiFetch<any>(`/admin/prospects?${new URLSearchParams(params)}`, { authToken: token }),
+    exportProspects: (token: string | null | undefined, batch?: string) =>
+      downloadAdminExport('prospects', token, `/admin/prospects/export${batch ? `?batch=${encodeURIComponent(batch)}` : ''}`),
   },
 };

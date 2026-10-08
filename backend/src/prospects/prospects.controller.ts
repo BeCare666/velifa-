@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Headers, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Headers, Query, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { requireAdmin } from '../admin/admin-auth';
 import { ProspectsService } from './prospects.service';
@@ -15,6 +16,20 @@ export class ProspectsController {
   async import(@Headers('authorization') auth: string | undefined, @Body() dto: ImportProspectsDto) {
     await requireAdmin(auth);
     return this.prospects.importCsv(dto.csv, dto.locale ?? 'ar');
+  }
+
+  /** GET /admin/prospects/export?batch= → CSV (lien WhatsApp pré-rempli par prospect) */
+  @Get('export')
+  async export(
+    @Headers('authorization') auth: string | undefined,
+    @Res() res: Response,
+    @Query('batch') batch?: string,
+  ) {
+    await requireAdmin(auth);
+    const csv = await this.prospects.exportCsv(batch || undefined);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="velifa_prospects_${Date.now()}.csv"`);
+    res.send(csv);
   }
 
   /** GET /admin/prospects?batch=&page=&limit= */

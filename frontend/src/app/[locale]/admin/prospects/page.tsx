@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Upload, RefreshCw, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, RefreshCw, ExternalLink, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { api } from '@/lib/api';
 
 const PAGE_SIZE = 50;
@@ -152,6 +152,13 @@ export default function AdminProspectsPage() {
             {loading ? '…' : `${data?.total ?? 0} prospect(s)`}{batch && ' — dernier import'}
           </span>
           {batch && <button type="button" style={btn} onClick={() => { setBatch(''); setPage(1); }}>Tous les prospects</button>}
+          <button type="button" style={btn} title="Lien WhatsApp pré-rempli (langue de l’import) pour chaque audit terminé"
+            onClick={async () => {
+              try { await api.admin.exportProspects(await getToken(), batch || undefined); }
+              catch (e: any) { setError(e.message ?? 'Export impossible'); }
+            }}>
+            <Download style={{ width: 13, height: 13 }} /> Exporter CSV{batch ? ' (dernier import)' : ''}
+          </button>
           <button type="button" style={{ ...btn, width: 36, padding: 0, justifyContent: 'center' }} onClick={() => load()} aria-label="Rafraîchir">
             <RefreshCw style={{ width: 14, height: 14 }} />
           </button>

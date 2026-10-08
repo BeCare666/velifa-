@@ -8,6 +8,7 @@ import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { assertPublicHost } from '../common/validators/url.validator';
 import type { AnalysisJobPayload } from '../analyses/analyses.worker';
 import { parseProspectCsv, ProspectCsvIssue, ProspectRow } from './prospect-csv';
+import { buildProspectsCsv } from './prospect-export';
 
 export const PROSPECT_LOCALES = ['ar', 'en', 'fr'] as const;
 export type ProspectLocale = (typeof PROSPECT_LOCALES)[number];
@@ -27,6 +28,7 @@ export interface ProspectImportResult {
 }
 
 const DNS_CONCURRENCY = 10;
+const EXPORT_MAX_ROWS = 5000;
 
 /**
  * Délais (ms) pour `count` audits espacés de `intervalMs`, à la suite des audits de prospects
@@ -142,5 +144,11 @@ export class ProspectsService {
     const page = Math.max(opts.page, 1);
     const { rows, total } = await this.db.listProspects({ batchId: opts.batchId, limit, offset: (page - 1) * limit });
     return { prospects: rows, total, page, limit };
+  }
+
+  /** Export CSV (5000 prospects max, plus récents d'abord) avec lien WhatsApp pré-rempli par prospect. */
+  async exportCsv(batchId?: string): Promise<string> {
+    const { rows } = await this.db.listProspects({ batchId, limit: EXPORT_MAX_ROWS, offset: 0 });
+    return buildProspectsCsv(rows);
   }
 }
