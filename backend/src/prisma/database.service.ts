@@ -27,6 +27,14 @@ export interface Analysis {
   unusedResources: any;
   reportJson: any;
   technologies: any | null;
+  /** Plateforme e-commerce détectée (Salla, Zid, Shopify…) */
+  platform: string | null;
+  /** Données réelles des visiteurs (CrUX) */
+  fieldData: any | null;
+  /** Recommandations priorisées (ids d'audits Lighthouse) */
+  recommendations: any | null;
+  /** Contrôles langue / confidentialité */
+  siteChecks: any | null;
   screenshotUrl: string | null;
   cloudinaryPublicId: string | null;
   whatsappLink: string | null;
@@ -77,6 +85,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         // Certains drivers MySQL ne supportent pas IF NOT EXISTS sur ALTER COLUMN
         // → on ignore silencieusement si la colonne existe déjà
       });
+
+      // Phase 1 : plateforme, données terrain, recommandations, contrôles langue/confidentialité
+      for (const ddl of [
+        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS platform VARCHAR(40) NULL`,
+        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS field_data JSON NULL`,
+        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS recommendations JSON NULL`,
+        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS site_checks JSON NULL`,
+      ]) {
+        await this.pool.query(ddl).catch((e: any) => this.logger.warn(`Migration skipped: ${e?.message}`));
+      }
 
       await this.pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -153,6 +171,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       unusedResources:     this.parseJson(row.unused_resources),
       reportJson:          this.parseJson(row.report_json),
       technologies:        this.parseJson(row.technologies),
+      platform:            row.platform ?? null,
+      fieldData:           this.parseJson(row.field_data),
+      recommendations:     this.parseJson(row.recommendations),
+      siteChecks:          this.parseJson(row.site_checks),
       screenshotUrl:       row.screenshot_url,
       cloudinaryPublicId:  row.cloudinary_public_id,
       whatsappLink:        row.whatsapp_link,
@@ -224,7 +246,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       fcpDesktop: 'fcp_desktop', ttfbDesktop: 'ttfb_desktop',
       imagesToOptimize: 'images_to_optimize', blockingScripts: 'blocking_scripts',
       unusedResources: 'unused_resources', reportJson: 'report_json',
-      technologies: 'technologies',
+      technologies: 'technologies', platform: 'platform', fieldData: 'field_data',
+      recommendations: 'recommendations', siteChecks: 'site_checks',
       screenshotUrl: 'screenshot_url', cloudinaryPublicId: 'cloudinary_public_id',
       whatsappLink: 'whatsapp_link', reportUrl: 'report_url',
       locale: 'locale', source: 'source', clerkUserId: 'clerk_user_id', ipAddress: 'ip_address',

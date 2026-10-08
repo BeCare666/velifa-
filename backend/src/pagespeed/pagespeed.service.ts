@@ -1,6 +1,7 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { AuditItem, ParsedLighthouse, parseLighthouse } from './lighthouse-parse';
 
 export type PageSpeedStrategy = 'mobile' | 'desktop';
 
@@ -12,26 +13,13 @@ export interface CoreWebVitals {
   ttfb: number | null;  // Time to First Byte (ms)
 }
 
-export interface PageSpeedResult {
+export interface PageSpeedResult extends ParsedLighthouse {
   strategy: PageSpeedStrategy;
-  scorePerformance: number;
-  scoreAccessibility: number;
-  scoreSeo: number;
-  scoreBestPractices: number;
   coreWebVitals: CoreWebVitals;
-  imagesToOptimize: AuditItem[];
-  blockingScripts: AuditItem[];
-  unusedResources: AuditItem[];
   rawJson: Record<string, unknown>;
 }
 
-export interface AuditItem {
-  url?: string;
-  title: string;
-  description?: string;
-  savingsBytes?: number;
-  savingsMs?: number;
-}
+export type { AuditItem };
 
 const PAGESPEED_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const CATEGORIES = ['PERFORMANCE', 'ACCESSIBILITY', 'SEO', 'BEST_PRACTICES'];
@@ -89,51 +77,7 @@ export class PageSpeedService {
     }
   }
 
-  private parseResponse(
-    data: any,
-    strategy: PageSpeedStrategy,
-  ): PageSpeedResult {
-    const cats = data.lighthouseResult?.categories ?? {};
-    const audits = data.lighthouseResult?.audits ?? {};
-
-    return {
-      strategy,
-      scorePerformance:   this.toScore(cats.performance?.score),
-      scoreAccessibility: this.toScore(cats.accessibility?.score),
-      scoreSeo:           this.toScore(cats.seo?.score),
-      scoreBestPractices: this.toScore(cats['best-practices']?.score),
-      coreWebVitals: {
-        lcp:  this.toMs(audits['largest-contentful-paint']?.numericValue),
-        cls:  audits['cumulative-layout-shift']?.numericValue ?? null,
-        tbt:  this.toMs(audits['total-blocking-time']?.numericValue),
-        fcp:  this.toMs(audits['first-contentful-paint']?.numericValue),
-        ttfb: this.toMs(audits['server-response-time']?.numericValue),
-      },
-      imagesToOptimize:  this.parseAuditItems(audits['uses-optimized-images']),
-      blockingScripts:   this.parseAuditItems(audits['render-blocking-resources']),
-      unusedResources:   this.parseAuditItems(audits['unused-javascript']),
-      rawJson: data,
-    };
-  }
-
-  private toScore(raw: number | null | undefined): number {
-    if (raw == null) return 0;
-    return Math.round(raw * 100);
-  }
-
-  private toMs(raw: number | null | undefined): number | null {
-    if (raw == null) return null;
-    return Math.round(raw);
-  }
-
-  private parseAuditItems(audit: any): AuditItem[] {
-    if (!audit?.details?.items) return [];
-    return (audit.details.items as any[]).slice(0, 10).map((item) => ({
-      url:          item.url ?? item.label ?? '',
-      title:        audit.title ?? '',
-      description:  audit.description ?? '',
-      savingsBytes: item.totalBytes ?? item.wastedBytes ?? undefined,
-      savingsMs:    item.wastedMs ?? undefined,
-    }));
+  private parseResponse(data: any, strategy: PageSpeedStrategy): PageSpeedResult {
+    return { strategy, ...parseLighthouse(data), rawJson: data };
   }
 }

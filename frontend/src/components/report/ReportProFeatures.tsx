@@ -5,13 +5,14 @@ import {
   Sparkles, Lock, Download, Server, Code2, Globe2,
   Megaphone, Share2, Tag, Wifi, LayoutGrid,
   Layers, Pencil, BarChart2, CheckCircle2,
-  AlertCircle, Minus, Gem, Microscope, Clock,
+  AlertCircle, Minus, Gem, Microscope, Clock, ShoppingCart,
 } from 'lucide-react';
 import { useSubscription } from '@/context/SubscriptionContext';
 import type { DetectedTech, TechCategory } from '@/types/analysis';
 
 // ── Icônes par catégorie ───────────────────────────────────────────────────
 const CATEGORY_ICON: Record<TechCategory, React.ReactNode> = {
+  'E-commerce':   <ShoppingCart className="w-4 h-4" />,
   'CMS':          <Pencil      className="w-4 h-4" />,
   'Framework JS': <Code2       className="w-4 h-4" />,
   'Analytics':    <BarChart2   className="w-4 h-4" />,
@@ -19,18 +20,21 @@ const CATEGORY_ICON: Record<TechCategory, React.ReactNode> = {
 };
 
 const CATEGORY_COLOR: Record<TechCategory, string> = {
+  'E-commerce':   'rgba(212,175,55,0.15)',   // or
   'CMS':          'rgba(139,92,246,0.15)',   // violet
   'Framework JS': 'rgba(59,130,246,0.15)',   // bleu
   'Analytics':    'rgba(16,185,129,0.15)',   // vert
   'Serveur':      'rgba(245,158,11,0.15)',   // ambre
 };
 const CATEGORY_BORDER: Record<TechCategory, string> = {
+  'E-commerce':   'rgba(212,175,55,0.40)',
   'CMS':          'rgba(139,92,246,0.35)',
   'Framework JS': 'rgba(59,130,246,0.35)',
   'Analytics':    'rgba(16,185,129,0.35)',
   'Serveur':      'rgba(245,158,11,0.35)',
 };
 const CATEGORY_TEXT: Record<TechCategory, string> = {
+  'E-commerce':   '#D4AF37',
   'CMS':          '#a78bfa',
   'Framework JS': '#60a5fa',
   'Analytics':    '#34d399',
@@ -385,7 +389,7 @@ export default function ReportProFeatures({
         ) : (
           <div className="space-y-5">
             {/* Par catégorie dans l'ordre : CMS → Framework → Analytics → Serveur */}
-            {(['CMS', 'Framework JS', 'Analytics', 'Serveur'] as TechCategory[])
+            {(['E-commerce', 'CMS', 'Framework JS', 'Analytics', 'Serveur'] as TechCategory[])
               .filter((cat) => byCategory[cat]?.length)
               .map((cat) => (
                 <div key={cat}>

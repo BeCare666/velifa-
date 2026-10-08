@@ -99,11 +99,11 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 
 | ID | Tâche | Critère d'acceptation | Statut |
 |---|---|---|---|
-| 1.1 | Détection plateformes : Salla, Zid, WooCommerce, Magento, BigCommerce (signatures vérifiées sur de vrais sites) | Tests unitaires avec des extraits HTML réels | ⬜ |
-| 1.2 | Contrôles arabe/bilingue : `lang`, `dir`, `hreflang`, liens de version alternative | Tests unitaires | ⬜ |
-| 1.3 | Indicateurs confidentialité : traceurs présents dans le HTML initial, présence d'un outil de consentement connu, lien politique de confidentialité | Tests unitaires ; libellé « indicateur, pas un avis juridique » | ⬜ |
-| 1.4 | Données terrain CrUX (vrais visiteurs) extraites de la réponse PageSpeed et stockées | Test unitaire du parseur | ⬜ |
-| 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | ⬜ |
+| 1.1 | Détection plateformes : Salla, Zid, WooCommerce, Magento, BigCommerce (signatures vérifiées sur de vrais sites) | Tests unitaires avec des extraits HTML réels | ✅ |
+| 1.2 | Contrôles arabe/bilingue : `lang`, `dir`, `hreflang`, liens de version alternative | Tests unitaires | ✅ |
+| 1.3 | Indicateurs confidentialité : traceurs présents dans le HTML initial, présence d'un outil de consentement connu, lien politique de confidentialité | Tests unitaires ; libellé « indicateur, pas un avis juridique » | ✅ (libellés : 1.5) |
+| 1.4 | Données terrain CrUX (vrais visiteurs) extraites de la réponse PageSpeed et stockées | Test unitaire du parseur | ✅ |
+| 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | 🔄 calcul ✅, affichage traduit ⬜ |
 | 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ⬜ |
 | 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ⬜ |
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ⬜ |
@@ -227,3 +227,25 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : backend `npx jest` → **7 suites, 97 tests réussis**, `tsc` exit 0 ;
   frontend `tsc --noEmit` exit 0, **`next build` exit 0** (Next 15.5.26, toutes les routes générées).
 - Limite : aucun test de bout en bout (pas de BDD/Redis locaux ; vos clés réelles ne sont pas utilisées sans votre accord).
+
+### 2026-10-08 — Phase 1 : détection, contrôles Golfe, données terrain
+- 1.1 ✅ Signatures vérifiées sur **27 boutiques réelles** (classements StoreLeads SA/AE) via le service compilé :
+  Salla 5/5, Zid 5/5, WooCommerce 4/4, Magento 3/3, BigCommerce 5/5, Shopify 5/5 → **27/27**.
+  - Magento « headless » (nahdionline.com, alsaifgallery.com : façade Next.js) non détectable depuis le HTML → attendu, Next.js affiché.
+  - Faux positif corrigé : boutique Salla réelle (3saf.com) hébergeant des images sur `cdn.shopify.com` → une seule plateforme retenue (priorité).
+  - **Bug corrigé** : l'ancien détecteur échouait sur toute page > 500 Ko (`maxContentLength`) ; 2 boutiques Zid sur 5
+    pèsent 2,1 Mo et 11 Mo. Lecture en flux limitée à 1,5 Mo désormais.
+  - Pixels du Golfe ajoutés : Snapchat, TikTok, Meta. Signatures trop larges retirées (`/wordpress/i`, `G-[A-Z0-9]{10}`, `wix\.com`).
+- 1.2 / 1.3 ✅ `site-checks/site-checks.ts` : langue, RTL (attribut, classe, `rtl.css`), hreflang, liens de langue,
+  traceurs, outils de consentement connus (Cookiebot, OneTrust, CookieYes, Didomi, Usercentrics…), lien de politique.
+  Vérifié sur 10 boutiques Salla/Zid réelles ; 3 faux positifs trouvés et corrigés :
+  page anti-robot 403 (2 boutiques), RTL par classe sur `<body>` (dkhoonemirates.com), page tronquée (lien en pied de page).
+  Constat : 7 boutiques sur 8 accessibles chargent des traceurs sans outil de consentement reconnu dans le HTML initial.
+- 1.4 ✅ Appel réel PageSpeed (amazon.sa, clé du projet, 1 requête) : structure CrUX confirmée (`percentile`, `category`,
+  CLS × 100, repli `originLoadingExperience`). **Bug majeur trouvé** : Lighthouse 13.5 a supprimé
+  `uses-optimized-images` et `render-blocking-resources` → la section « Opportunités » des rapports était **toujours vide**.
+  `pagespeed/lighthouse-parse.ts` lit `image-delivery-insight` / `render-blocking-insight` (repli sur les anciens).
+  Échantillon réel réduit enregistré : `pagespeed/__fixtures__/psi-amazon-sa-mobile.json`.
+- 1.5 (calcul) ✅ `parseRecommendations` : audits actionnables uniquement, triés par impact et gain estimé, 8 max.
+- Base : colonnes `platform`, `field_data`, `recommendations`, `site_checks` (ALTER au démarrage, comme l'existant ; → 1.11).
+- Preuves : `npx jest` → **10 suites, 142 tests réussis** ; `tsc` exit 0 ; scripts de vérification réelle (27/27, 10/10).

@@ -10,7 +10,8 @@ import { BrevoService } from '../brevo/brevo.service';
 import { SseService } from '../sse/sse.service';
 import { ConfigService } from '@nestjs/config';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
-import { TechDetectorService } from '../tech-detector/tech-detector.service';
+import { TechDetectorService, primaryPlatform } from '../tech-detector/tech-detector.service';
+import type { SiteChecks } from '../site-checks/site-checks';
 import { buildWhatsappLink, buildReportUrl, toReportLocale } from '../i18n/report-texts';
 
 export interface AnalysisJobPayload {
@@ -61,15 +62,16 @@ export class AnalysisWorker {
       let screenshotUrl: string | null = null;
       let cloudinaryPublicId: string | null = null;
       let technologies: any[] = [];
+      let siteChecks: SiteChecks | null = null;
 
-      // Screenshot et détection de technologies en parallèle (tous deux non-bloquants)
+      // Screenshot et inspection de la page en parallèle (tous deux non-bloquants)
       const [screenshotResult, techResult] = await Promise.allSettled([
         (async () => {
           const buffer = await this.screenshot.capture(url);
           if (!buffer) return { url: null, publicId: null };
           return this.cloudinary.uploadBuffer(buffer, 'velifa/screenshots', `analysis_${analysisId}`);
         })(),
-        this.techDetector.detect(url),
+        this.techDetector.inspect(url),
       ]);
 
       if (screenshotResult.status === 'fulfilled' && screenshotResult.value?.url) {
@@ -81,7 +83,8 @@ export class AnalysisWorker {
       }
 
       if (techResult.status === 'fulfilled') {
-        technologies = techResult.value;
+        technologies = techResult.value.technologies;
+        siteChecks   = techResult.value.siteChecks;
         this.logger.log(`[${analysisId}] Technologies: ${technologies.map((t: any) => t.name).join(', ') || 'none'}`);
       } else {
         this.logger.warn(`[${analysisId}] TechDetector failed (non-blocking): ${techResult.reason?.message}`);
@@ -116,6 +119,10 @@ export class AnalysisWorker {
         unusedResources:   mobile.unusedResources,
         reportJson:        mobile.rawJson,
         technologies:      technologies.length ? technologies : null,
+        platform:          primaryPlatform(technologies),
+        fieldData:         mobile.fieldData,
+        recommendations:   mobile.recommendations,
+        siteChecks,
         screenshotUrl,
         cloudinaryPublicId,
         whatsappLink,

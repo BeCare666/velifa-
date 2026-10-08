@@ -1,6 +1,6 @@
 export type AnalysisStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
-export type TechCategory   = 'CMS' | 'Framework JS' | 'Analytics' | 'Serveur';
+export type TechCategory   = 'E-commerce' | 'CMS' | 'Framework JS' | 'Analytics' | 'Serveur';
 export type TechConfidence = 'high' | 'medium' | 'low';
 
 export interface DetectedTech {
