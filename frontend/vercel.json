@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@velifa_api_url",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "@velifa_turnstile_key"
+  }
+}

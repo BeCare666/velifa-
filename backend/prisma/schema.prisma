@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum AnalysisStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model Analysis {
+  id        String         @id @default(cuid())
+  urlSite   String         @map("url_site") @db.VarChar(2048)
+  urlHash   String         @map("url_hash") @db.VarChar(64)
+  email     String         @map("email_client") @db.VarChar(255)
+  status    AnalysisStatus @default(pending)
+
+  // Lighthouse scores (0-100)
+  scorePerformance   Int? @map("score_performance")
+  scoreAccessibility Int? @map("score_accessibility")
+  scoreSeo           Int? @map("score_seo")
+  scoreBestPractices Int? @map("score_best_practices")
+
+  // Core Web Vitals — mobile
+  lcpMobile  Float? @map("lcp_mobile")
+  clsMobile  Float? @map("cls_mobile")
+  tbtMobile  Float? @map("tbt_mobile")
+  fcpMobile  Float? @map("fcp_mobile")
+  ttfbMobile Float? @map("ttfb_mobile")
+
+  // Core Web Vitals — desktop
+  lcpDesktop  Float? @map("lcp_desktop")
+  clsDesktop  Float? @map("cls_desktop")
+  tbtDesktop  Float? @map("tbt_desktop")
+  fcpDesktop  Float? @map("fcp_desktop")
+  ttfbDesktop Float? @map("ttfb_desktop")
+
+  // Diagnostics (JSON arrays)
+  imagesToOptimize     Json? @map("images_to_optimize")
+  blockingScripts      Json? @map("blocking_scripts")
+  unusedResources      Json? @map("unused_resources")
+  reportJson           Json? @map("report_json")
+
+  // Assets
+  screenshotUrl      String? @map("screenshot_url") @db.Text
+  cloudinaryPublicId String? @map("cloudinary_public_id") @db.VarChar(255)
+
+  // Conversion
+  whatsappLink String? @map("whatsapp_link") @db.Text
+  reportUrl    String? @map("report_url") @db.Text
+
+  // Metadata
+  locale    String  @default("fr") @db.VarChar(5)
+  source    String  @default("web") @db.VarChar(50)
+  ipAddress String? @map("ip_address") @db.VarChar(45)
+  userAgent String? @map("user_agent") @db.Text
+
+  // RGPD
+  deletedAt    DateTime? @map("deleted_at")
+  anonymizedAt DateTime? @map("anonymized_at")
+
+  // Error tracking
+  errorMessage String? @map("error_message") @db.Text
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  completedAt DateTime? @map("completed_at")
+  failedAt    DateTime? @map("failed_at")
+
+  @@index([urlHash])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@index([email])
+  @@index([urlHash, createdAt(sort: Desc)])
+  @@index([deletedAt])
+  @@map("analyses")
+}

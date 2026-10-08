@@ -1,0 +1,270 @@
+/* =========================================================================
+   VELIFA — DESIGN SYSTEM
+   "Performance Beyond Limits"
+   -------------------------------------------------------------------------
+   Source of truth for the whole product. CSS variables drive everything;
+   the Tailwind config simply maps these tokens to utility classes.
+
+   Theme: tech-luxury. Deep black canvas, targeted gold accents, sharp
+   geometric type. Default is DARK (faithful to the logo); a LIGHT theme
+   is provided for dashboards / reports / print.
+   ========================================================================= */
+
+/* ---- Fonts ----
+   ORBITRON   → brand wordmark + hero numbers (matches the logo's wide caps)
+   CHAKRA PETCH → headings & UI titles (angular, technical)
+   SORA       → body text (clean, highly readable)                         */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Chakra+Petch:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+/* =========================================================================
+   1. BRAND PALETTE (raw, theme-independent)
+   ========================================================================= */
+:root {
+  /* Gold — the Velifa signature. Used as a gradient and as solid accents. */
+  --velifa-gold-50:  #FCF3D9;
+  --velifa-gold-100: #F8E6AE;
+  --velifa-gold-200: #F4D88A;   /* light gold — top of the logo gradient   */
+  --velifa-gold-300: #E9C462;
+  --velifa-gold-400: #D4AF37;   /* core gold — primary accent              */
+  --velifa-gold-500: #C0991F;
+  --velifa-gold-600: #A87B1E;   /* deep gold — readable on light bg        */
+  --velifa-gold-700: #87611A;   /* bronze — bottom of the logo gradient    */
+  --velifa-gold-800: #5E430F;
+
+  /* Signature gradient (lift it straight from the logo) */
+  --velifa-gradient-gold: linear-gradient(135deg, #F4D88A 0%, #D4AF37 45%, #A87B1E 100%);
+  --velifa-gradient-gold-soft: linear-gradient(135deg, #E9C462 0%, #C0991F 100%);
+
+  /* Neutral ink scale */
+  --velifa-black:   #0A0A0A;
+  --velifa-ink-900: #121212;
+  --velifa-ink-800: #1A1A1A;
+  --velifa-ink-700: #242424;
+  --velifa-ink-600: #2E2E2E;
+  --velifa-ink-500: #3A3A3A;
+  --velifa-gray-400: #6E6E6E;
+  --velifa-gray-300: #9A9A9A;
+  --velifa-gray-200: #C9C9C9;
+  --velifa-gray-100: #E8E8E6;
+  --velifa-white:   #FFFFFF;
+
+  /* Performance / score semantics (aligned with Lighthouse & PageSpeed) */
+  --velifa-score-good:    #0CCE6B;   /* 90–100  */
+  --velifa-score-average: #FFA400;   /* 50–89   */
+  --velifa-score-poor:    #FF4E42;   /* 0–49    */
+  --velifa-score-good-bg:    rgba(12, 206, 107, 0.12);
+  --velifa-score-average-bg: rgba(255, 164, 0, 0.12);
+  --velifa-score-poor-bg:    rgba(255, 78, 66, 0.12);
+
+  /* Type scale tokens */
+  --velifa-font-brand:   'Orbitron', sans-serif;
+  --velifa-font-heading: 'Chakra Petch', sans-serif;
+  --velifa-font-body:    'Sora', system-ui, sans-serif;
+
+  /* Radii */
+  --velifa-radius-sm: 6px;
+  --velifa-radius-md: 10px;
+  --velifa-radius-lg: 16px;
+  --velifa-radius-xl: 24px;
+  --velifa-radius-full: 9999px;
+
+  /* Motion */
+  --velifa-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --velifa-dur-fast: 140ms;
+  --velifa-dur: 240ms;
+  --velifa-dur-slow: 420ms;
+}
+
+/* =========================================================================
+   2. SEMANTIC TOKENS — DARK THEME (default)
+   ========================================================================= */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg:            var(--velifa-black);
+  --bg-subtle:     var(--velifa-ink-900);
+  --surface:       var(--velifa-ink-800);
+  --surface-raised:var(--velifa-ink-700);
+  --surface-hover: var(--velifa-ink-600);
+
+  --border:        var(--velifa-ink-600);
+  --border-strong: var(--velifa-ink-500);
+
+  --text:          var(--velifa-white);
+  --text-muted:    var(--velifa-gray-300);
+  --text-subtle:   var(--velifa-gray-400);
+  --text-on-gold:  var(--velifa-black);
+
+  --accent:        var(--velifa-gold-400);
+  --accent-hover:  var(--velifa-gold-300);
+  --accent-soft:   rgba(212, 175, 55, 0.14);
+  --accent-ring:   rgba(212, 175, 55, 0.45);
+  --gradient-accent: var(--velifa-gradient-gold);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+  --shadow-lg: 0 24px 60px rgba(0,0,0,0.6);
+  --shadow-gold: 0 8px 30px rgba(212, 175, 55, 0.22);
+
+  /* Atmospheric backdrop: subtle gold glow on black */
+  --bg-image:
+    radial-gradient(1200px 600px at 75% -10%, rgba(212,175,55,0.10), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(168,123,30,0.08), transparent 55%);
+}
+
+/* =========================================================================
+   3. SEMANTIC TOKENS — LIGHT THEME
+   ========================================================================= */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg:            #FBFAF7;
+  --bg-subtle:     #F4F2EC;
+  --surface:       #FFFFFF;
+  --surface-raised:#FFFFFF;
+  --surface-hover: #F4F2EC;
+
+  --border:        #E7E3D8;
+  --border-strong: #D6D0BF;
+
+  --text:          var(--velifa-black);
+  --text-muted:    #5A5650;
+  --text-subtle:   #8A857B;
+  --text-on-gold:  var(--velifa-black);
+
+  --accent:        var(--velifa-gold-600);   /* deeper gold for contrast */
+  --accent-hover:  var(--velifa-gold-700);
+  --accent-soft:   rgba(168, 123, 30, 0.12);
+  --accent-ring:   rgba(168, 123, 30, 0.40);
+  --gradient-accent: var(--velifa-gradient-gold-soft);
+
+  --shadow-sm: 0 1px 2px rgba(20,16,8,0.06);
+  --shadow-md: 0 8px 24px rgba(20,16,8,0.10);
+  --shadow-lg: 0 24px 60px rgba(20,16,8,0.14);
+  --shadow-gold: 0 8px 30px rgba(168, 123, 30, 0.20);
+
+  --bg-image:
+    radial-gradient(1100px 560px at 80% -10%, rgba(212,175,55,0.10), transparent 60%);
+}
+
+/* =========================================================================
+   4. BASE / RESET
+   ========================================================================= */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image: var(--bg-image);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--velifa-font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--velifa-font-heading);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5em;
+}
+
+/* =========================================================================
+   5. SIGNATURE UTILITIES
+   ========================================================================= */
+
+/* Brand wordmark / logo text */
+.velifa-wordmark {
+  font-family: var(--velifa-font-brand);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--velifa-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slogan / eyebrow label (wide tracked caps, à la "PERFORMANCE BEYOND LIMITS") */
+.velifa-eyebrow {
+  font-family: var(--velifa-font-heading);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Gold gradient text for emphasis */
+.velifa-gold-text {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Hairline gold divider (echoes the line under the logo) */
+.velifa-divider {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+/* Primary button */
+.velifa-btn {
+  font-family: var(--velifa-font-heading);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--velifa-radius-md);
+  border: 0;
+  cursor: pointer;
+  background: var(--velifa-gradient-gold);
+  color: var(--text-on-gold);
+  box-shadow: var(--shadow-gold);
+  transition: transform var(--velifa-dur) var(--velifa-ease),
+              box-shadow var(--velifa-dur) var(--velifa-ease),
+              filter var(--velifa-dur) var(--velifa-ease);
+}
+.velifa-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.velifa-btn:active { transform: translateY(0); }
+
+.velifa-btn--ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--border-strong);
+  box-shadow: none;
+}
+.velifa-btn--ghost:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+/* Card / panel */
+.velifa-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--velifa-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* Score ring color helpers (drive with inline style or class) */
+.score-good    { color: var(--velifa-score-good); }
+.score-average { color: var(--velifa-score-average); }
+.score-poor    { color: var(--velifa-score-poor); }
+
+/* Focus ring — accessible & on-brand */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}

@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: velifa-backend
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: cd backend && npm install && npm run prisma:generate && npm run build
+    startCommand: cd backend && node dist/main
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: PAGESPEED_API_KEY
+        sync: false
+      - key: BROWSERLESS_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_TEMPLATE_ID
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        sync: false
+      - key: WHATSAPP_NUMBER
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

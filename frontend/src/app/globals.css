@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .score-ring { stroke-dasharray: 283; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+}
