@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import Providers from '@/components/Providers';
+import { fontVariables } from '../fonts';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import ClientLayout from '@/components/layout/ClientLayout';
@@ -37,13 +39,20 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  setRequestLocale(locale);
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      <HtmlDirectionSetter />
-      <ClientLayout>{children}</ClientLayout>
-      <ClientFooter />
-    </NextIntlClientProvider>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} data-theme="dark" className={fontVariables}>
+      <body className="antialiased">
+        <Providers>
+          <NextIntlClientProvider messages={messages}>
+            <HtmlDirectionSetter />
+            <ClientLayout>{children}</ClientLayout>
+            <ClientFooter />
+          </NextIntlClientProvider>
+        </Providers>
+      </body>
+    </html>
   );
 }

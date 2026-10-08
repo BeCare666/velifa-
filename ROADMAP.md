@@ -88,7 +88,7 @@ Constaté dans le code avant toute modification (commit `1d7d7d2`) :
 | 0.12 | **F2** Langue de l'utilisateur transmise à l'audit ; email + message WhatsApp en AR/EN/FR | Tests unitaires des gabarits (3 langues, `dir="rtl"` en arabe) | ✅ |
 | 0.13 | `.env.example` complets et documentés (backend + frontend) | Toutes les variables lues par le code sont listées | ✅ |
 | 0.14 | Résiliation : accès conservé jusqu'à la fin de la période payée (`subscription_cancelled` ≠ `subscription_expired`) | Tests `entitlements.spec.ts` | ✅ |
-| 0.15 | Page rapport `/analyse/[id]` entièrement traduite (aujourd'hui textes FR en dur) | Build + revue des 3 langues | ⬜ → fait en 1.5 |
+| 0.15 | Page rapport `/analyse/[id]` entièrement traduite (aujourd'hui textes FR en dur) | Build + revue des 3 langues | ✅ (via 1.5) |
 
 ---
 
@@ -103,8 +103,8 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.2 | Contrôles arabe/bilingue : `lang`, `dir`, `hreflang`, liens de version alternative | Tests unitaires | ✅ |
 | 1.3 | Indicateurs confidentialité : traceurs présents dans le HTML initial, présence d'un outil de consentement connu, lien politique de confidentialité | Tests unitaires ; libellé « indicateur, pas un avis juridique » | ✅ (libellés : 1.5) |
 | 1.4 | Données terrain CrUX (vrais visiteurs) extraites de la réponse PageSpeed et stockées | Test unitaire du parseur | ✅ |
-| 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | 🔄 calcul ✅, affichage traduit ⬜ |
-| 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ⬜ |
+| 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | ✅ |
+| 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ✅ |
 | 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ⬜ |
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ⬜ |
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ⬜ |
@@ -249,3 +249,28 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - 1.5 (calcul) ✅ `parseRecommendations` : audits actionnables uniquement, triés par impact et gain estimé, 8 max.
 - Base : colonnes `platform`, `field_data`, `recommendations`, `site_checks` (ALTER au démarrage, comme l'existant ; → 1.11).
 - Preuves : `npx jest` → **10 suites, 142 tests réussis** ; `tsc` exit 0 ; scripts de vérification réelle (27/27, 10/10).
+
+### 2026-10-08 — 1.5 affichage traduit (+ 0.15) et 1.6 impact business
+- 1.5 ✅ Page rapport `/analyse/[id]` entièrement traduite (espace `reportPage`, FR/EN/AR, 228 clés chacune) :
+  données terrain CrUX, recommandations priorisées (titre + « comment corriger » pour les 24 identifiants),
+  conseils adaptés aux plateformes hébergées (Salla, Zid, Shopify, BigCommerce), contrôles Golfe, mesures labo.
+  - Backend : doublons supprimés (`layout-shifts`/`cls-culprits-insight` affichaient deux fois le même problème) ;
+    impact basé sur le gain mesuré (avant : 8 recommandations sur 8 « fort » sur la réponse réelle amazon.sa).
+  - `<html lang dir>` rendu par langue (`[locale]/layout.tsx`, polices dans `app/fonts.ts`, layout `(auth)` pour Clerk) :
+    la page arabe est réellement en RTL ; en-tête/pied du site vitrine masqués dans le rapport (`appSections.ts`).
+  - Corrigé à la revue : « : » codé en dur (« Overall assessment : » en anglais) → ponctuation dans les traductions ;
+    infobulle « Disponible prochainement » en dur dans `ReportProFeatures` → traduite.
+  - Constat hors périmètre : clés `audits.scoreExcellent/Improve/Critical` absentes en EN mais utilisées nulle part.
+- 0.15 ✅ couverte par 1.5.
+- 1.6 ✅ Bloc « Pourquoi la vitesse compte » : étude « Milliseconds Make Millions » (Deloitte/55, commandée par Google,
+  37 marques, 0,1 s sur mobile → +8,4 % de conversions en commerce de détail), présentée comme une **corrélation**
+  et non une garantie, lien vers la source. Chiffres vérifiés sur web.dev/case-studies/milliseconds-make-millions.
+- Preuves :
+  - backend `npx jest` → **10 suites, 144 tests réussis** ;
+  - script de cohérence i18n : 0 clé `reportPage` manquante, mêmes paramètres `{…}` dans les 3 langues,
+    traduction présente pour les 24 identifiants de recommandation et les 7 codes de contrôle ;
+  - frontend `tsc --noEmit` sans erreur dans `src/`, **`next build` exit 0** (72 pages) ;
+  - rendu réel (`next start` + API simulée servant les parseurs backend appliqués à la fixture PageSpeed réelle) :
+    `/fr|en|ar/analyse/demo` → 200, `<html dir="rtl">` en arabe, aucune clé brute ni identifiant technique affiché ;
+    variante sans données terrain → message « pas assez de visites réelles » dans les 3 langues.
+

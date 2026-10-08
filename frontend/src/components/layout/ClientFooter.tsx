@@ -1,22 +1,12 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/navigation';
 import Footer from './Footer';
+import { isAppSection } from './appSections';
 
-/**
- * Wrapper client pour le Footer — le masque sur les pages
- * du dashboard et des rapports (qui ont leur propre sidebar).
- */
+/** Masque le Footer sur les sections applicatives (chemin sans préfixe de langue). */
 export default function ClientFooter() {
   const pathname = usePathname();
-  const isDashboardRoute =
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/analyse/')  ||
-    pathname.startsWith('/audits')    ||
-    pathname.startsWith('/settings')  ||
-    pathname.startsWith('/billing')   ||
-    pathname.startsWith('/support')   ||
-    pathname.startsWith('/admin');
-  if (isDashboardRoute) return null;
+  if (isAppSection(pathname)) return null;
   return <Footer />;
 }

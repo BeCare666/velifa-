@@ -575,5 +575,233 @@
     "s12Email": "Email:",
     "s12Whatsapp": "WhatsApp:",
     "backHome": "← Back to home"
+  },
+  "reportPage": {
+    "viewSite": "Visit site",
+    "mobilePerformance": "Mobile performance",
+    "platform": "Platform: {platform}",
+    "scoreLabel": {
+      "excellent": "Excellent",
+      "needsWork": "Needs improvement",
+      "critical": "Critical"
+    },
+    "scoreSentence": "Your site scores {score}/100 on mobile (Lighthouse measurement).",
+    "scoreUrgent": "Urgent improvements are needed.",
+    "scoreMedium": "Several optimisations can improve your visitors’ experience.",
+    "scoreGood": "Great work: your site performs very well.",
+    "whatsappCta": "Get help on WhatsApp",
+    "stickyCta": "Improve my score",
+    "field": {
+      "title": "What your real visitors experience",
+      "subtitleUrl": "Real data from Chrome users on this page (last 28 days, Chrome UX Report).",
+      "subtitleOrigin": "Not enough traffic on this page: average for your whole domain (last 28 days, Chrome UX Report).",
+      "none": "Google does not yet have enough real visits for this site. The measurements below are simulations.",
+      "overall": "Overall assessment:",
+      "lcp": "Loading (LCP)",
+      "inp": "Responsiveness (INP)",
+      "cls": "Stability (CLS)",
+      "fcp": "First paint (FCP)",
+      "ttfb": "Server response (TTFB)",
+      "FAST": "Good",
+      "AVERAGE": "Needs improvement",
+      "SLOW": "Slow"
+    },
+    "lab": {
+      "title": "Core Web Vitals (simulation)",
+      "note": "Lighthouse lab measurement: simulated phone on a slow mobile network.",
+      "lcp": "Largest Contentful Paint",
+      "cls": "Cumulative Layout Shift",
+      "tbt": "Total Blocking Time",
+      "fcp": "First Contentful Paint"
+    },
+    "scores": {
+      "title": "Lighthouse scores",
+      "performance": "Performance",
+      "accessibility": "Accessibility",
+      "seo": "SEO",
+      "bestPractices": "Best practices"
+    },
+    "recs": {
+      "title": "What to fix first",
+      "subtitle": "Ranked by estimated impact on speed. Savings are Lighthouse estimates.",
+      "none": "No major issue detected by Lighthouse.",
+      "impact": {
+        "high": "High impact",
+        "medium": "Medium impact",
+        "low": "Low impact"
+      },
+      "savings": "Estimated saving: {value}",
+      "items": "{count} item(s) affected",
+      "tipOn": "On {platform}:",
+      "list": {
+        "render-blocking-insight": {
+          "title": "Files are blocking the page from displaying",
+          "how": "The browser waits for CSS/JavaScript files before showing anything. Defer or reduce them."
+        },
+        "render-blocking-resources": {
+          "title": "Files are blocking the page from displaying",
+          "how": "The browser waits for CSS/JavaScript files before showing anything. Defer or reduce them."
+        },
+        "image-delivery-insight": {
+          "title": "Images are too heavy or in the wrong format",
+          "how": "Compress images, use WebP/AVIF and size them for the screen."
+        },
+        "uses-optimized-images": {
+          "title": "Images are too heavy or in the wrong format",
+          "how": "Compress images, use WebP/AVIF and size them for the screen."
+        },
+        "modern-image-formats": {
+          "title": "Images are too heavy or in the wrong format",
+          "how": "Compress images, use WebP/AVIF and size them for the screen."
+        },
+        "offscreen-images": {
+          "title": "Images are too heavy or in the wrong format",
+          "how": "Compress images, use WebP/AVIF and size them for the screen."
+        },
+        "lcp-discovery-insight": {
+          "title": "The main image is loaded too late",
+          "how": "The most visible element (often the banner) should be discovered and loaded first."
+        },
+        "cache-insight": {
+          "title": "Files are not cached long enough",
+          "how": "Returning visitors re-download files that have not changed."
+        },
+        "document-latency-insight": {
+          "title": "The server is slow to respond",
+          "how": "The first server response delays the rest of the page."
+        },
+        "server-response-time": {
+          "title": "The server is slow to respond",
+          "how": "The first server response delays the rest of the page."
+        },
+        "third-parties-insight": {
+          "title": "Heavy third-party apps and scripts",
+          "how": "Third-party tools (chat, ad pixels, reviews…) are slowing the page down."
+        },
+        "unused-javascript": {
+          "title": "JavaScript loaded but not used",
+          "how": "Part of the downloaded JavaScript is not used on this page."
+        },
+        "unused-css-rules": {
+          "title": "Unused CSS styles",
+          "how": "Part of the downloaded CSS is not used on this page."
+        },
+        "legacy-javascript-insight": {
+          "title": "Unnecessarily large legacy JavaScript",
+          "how": "Compatibility code for old browsers makes the page heavier."
+        },
+        "duplicated-javascript-insight": {
+          "title": "Duplicated JavaScript",
+          "how": "The same libraries are loaded more than once."
+        },
+        "bootup-time": {
+          "title": "JavaScript takes too long to run",
+          "how": "The visitor’s phone is busy and the page reacts slowly to taps."
+        },
+        "mainthread-work-breakdown": {
+          "title": "The browser is overloaded",
+          "how": "Too much work (scripts, layout) before the page becomes usable."
+        },
+        "layout-shifts": {
+          "title": "The page moves while loading",
+          "how": "Elements shift around and cause mis-taps."
+        },
+        "cls-culprits-insight": {
+          "title": "The page moves while loading",
+          "how": "Elements shift around and cause mis-taps."
+        },
+        "unsized-images": {
+          "title": "Images without declared dimensions",
+          "how": "Without width/height, the page shifts when the image arrives."
+        },
+        "font-display-insight": {
+          "title": "Fonts delay text display",
+          "how": "Text stays invisible until the font has loaded."
+        },
+        "total-byte-weight": {
+          "title": "Page is too heavy",
+          "how": "The total download size is high, especially costly on mobile."
+        },
+        "dom-size-insight": {
+          "title": "Page is too complex",
+          "how": "A very large number of elements slows rendering and interactions."
+        },
+        "crawlable-anchors": {
+          "title": "Links Google cannot crawl",
+          "how": "Some links cannot be followed by search engines."
+        }
+      },
+      "tips": {
+        "images": "Compress and resize your images before adding them to the store (WebP if possible).",
+        "apps": "Review installed apps and tracking codes: remove the ones you no longer use.",
+        "theme": "This mostly depends on the theme: compare with a lighter theme or contact the theme developer.",
+        "server": "Server and caching are managed by the platform: this cannot be fixed from your store."
+      }
+    },
+    "gulf": {
+      "title": "Arabic language and privacy",
+      "subtitle": "Checks tailored to Gulf markets, computed from the page code.",
+      "disclaimer": "Automated technical indicators, not legal advice. They do not replace a compliance review (e.g. Saudi PDPL).",
+      "blocked": "The site blocked our robot: these checks could not be performed.",
+      "ok": "No issue detected on these points.",
+      "consentTool": "Consent tool detected: {name}",
+      "trackers": "Tracking tools detected: {list}",
+      "issues": {
+        "lang_missing": "The page language is not declared (lang attribute).",
+        "arabic_without_rtl": "Arabic content but the page is not set to right-to-left (RTL).",
+        "arabic_lang_without_rtl": "Page declared as Arabic without right-to-left direction.",
+        "hreflang_missing": "Several languages are available, but Google is not told about the versions (hreflang).",
+        "no_arabic_version": "No Arabic version found, while Gulf markets are mostly Arabic-speaking.",
+        "trackers_without_consent_tool": "Tracking tools load without a recognised consent tool in the initial page code.",
+        "privacy_policy_link_missing": "No link to a privacy policy found on the page."
+      }
+    },
+    "impact": {
+      "title": "Why speed matters for your sales",
+      "body": "According to the “Milliseconds Make Millions” study (Deloitte, commissioned by Google, 2020), a 0.1 s mobile speed improvement was associated with +8.4% conversions on retail sites.",
+      "caveat": "This is a correlation observed across 37 brands, not a guarantee for your site.",
+      "source": "Source: web.dev/case-studies/milliseconds-make-millions"
+    },
+    "opportunities": {
+      "title": "Files involved",
+      "saving": "Potential saving: {value}",
+      "blocking": "Blocking: {value}"
+    }
+  },
+  "emailModal": {
+    "title": "Get your report",
+    "subtitle": "Choose how you want to receive your analysis.",
+    "byEmail": "By email",
+    "byWhatsapp": "By WhatsApp",
+    "emailPlaceholder": "you@email.com",
+    "phonePlaceholder": "Number",
+    "other": "Other",
+    "send": "Send",
+    "sending": "Sending…",
+    "noThanks": "No thanks",
+    "close": "Close",
+    "sentBoth": "Report sent by email and opened in WhatsApp",
+    "sentEmail": "Report sent by email",
+    "sentWhatsapp": "Report opened in WhatsApp",
+    "sentGeneric": "Report sent",
+    "checkInbox": "Check your inbox / WhatsApp in a few seconds.",
+    "error": "Sending failed. Please try again.",
+    "whatsappMessage": "Your Velifa report is ready\n\nWebsite: {site}\nPerformance score: {score}/100\n\nFull report:\n{url}"
+  },
+  "reportPro": {
+    "unlockTitle": "Unlock the full report with Velifa Pro",
+    "unlockDesc": "Automatic technology detection (CMS, frameworks, analytics), third-party services and unlimited history.",
+    "seePlans": "See plans",
+    "badgePro": "Pro report",
+    "badgeBusiness": "Business report",
+    "advanced": "Advanced analysis enabled",
+    "techTitle": "Technology detection",
+    "found": "{count} found",
+    "noTech": "No technology detected automatically for this site.",
+    "noTechHint": "The site may use technologies our signatures do not recognise.",
+    "thirdParties": "Third-party services (Lighthouse)",
+    "pdf": "Export to PDF",
+    "pdfDesc": "Full report ready to share",
+    "soon": "Soon"
   }
 }

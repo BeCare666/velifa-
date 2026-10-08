@@ -76,6 +76,19 @@ describe('parseRecommendations', () => {
     expect(recs[0].savingsMs).toBeGreaterThanOrEqual(1900);
   });
 
+  it('pas de doublon pour un même problème (layout-shifts / cls-culprits-insight)', () => {
+    const ids = recs.map((r) => r.id);
+    expect(ids.filter((i) => i === 'layout-shifts' || i === 'cls-culprits-insight')).toHaveLength(1);
+  });
+
+  it('impact fondé sur le gain mesuré : tout n’est pas « fort »', () => {
+    const byId = Object.fromEntries(recs.map((r) => [r.id, r.impact]));
+    expect(byId['render-blocking-insight']).toBe('high'); // 1,9 s
+    expect(byId['layout-shifts']).toBe('high');           // CLS 0,224
+    expect(byId['bootup-time']).toBe('medium');           // 300 ms
+    expect(recs.some((r) => r.impact !== 'high')).toBe(true);
+  });
+
   it('ignore les audits réussis (score ≥ 0,9) et les audits non actionnables', () => {
     const ids = recs.map((r) => r.id);
     expect(ids).not.toContain('third-parties-insight'); // score 1 sur ce site

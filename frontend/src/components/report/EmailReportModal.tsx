@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
+import { useLocale, useTranslations } from 'next-intl';
 import { Mail, X, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -14,23 +15,18 @@ interface Props {
   reportUrl?: string;
 }
 
-const COUNTRY_CODES = [
-  { code: '+229', label: '🇧🇯 Bénin (+229)' },
-  { code: '+33',  label: '🇫🇷 France (+33)' },
-  { code: '+971', label: '🇦🇪 UAE (+971)' },
-  { code: '+966', label: '🇸🇦 Saudi Arabia (+966)' },
-  { code: '+1',   label: '🇺🇸 USA (+1)' },
-  { code: '+225', label: '🇨🇮 Côte d\'Ivoire (+225)' },
-  { code: '+221', label: '🇸🇳 Sénégal (+221)' },
-  { code: '', label: '🌍 Autre' },
-];
+// Golfe d'abord (marché prioritaire), puis autres marchés ; '' = saisie libre avec indicatif.
+const COUNTRY_CODES = ['+966', '+971', '+974', '+965', '+973', '+968', '+20', '+212', '+33', '+1', '+229', '+225', '+221', ''];
+const DEFAULT_CODE: Record<string, string> = { ar: '+966', en: '+971', fr: '+33' };
 
 export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl }: Props) {
   const { user } = useUser();
   const { getToken, isSignedIn } = useAuth();
+  const t = useTranslations('emailModal');
+  const locale = useLocale();
   const [visible, setVisible]   = useState(false);
   const [email, setEmail]       = useState('');
-  const [countryCode, setCountryCode] = useState('+229');
+  const [countryCode, setCountryCode] = useState(DEFAULT_CODE[locale] ?? '+966');
   const [whatsapp, setWhatsapp] = useState('');
   const [sending, setSending]   = useState(false);
   const [sent, setSent]         = useState(false);
@@ -79,16 +75,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
 
     const reportLink = reportUrl ?? (typeof window !== 'undefined' ? window.location.href : '');
 
-    const message =
-`🚀 Votre rapport Velifa est prêt !
-
-Site analysé : ${siteUrl ?? ''}
-Score de performance : ${score ?? '—'}/100
-
-📊 Voir le rapport complet :
-${reportLink}
-
-— L'équipe Velifa`;
+    const message = t('whatsappMessage', { site: siteUrl ?? '', score: score ?? '—', url: reportLink });
 
     return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
   }
@@ -117,18 +104,18 @@ ${reportLink}
       }
 
       if (emailOk && whatsappOk) {
-        setSentMessage('✅ Rapport envoyé par email et WhatsApp !');
+        setSentMessage(t('sentBoth'));
       } else if (emailOk) {
-        setSentMessage('✅ Rapport envoyé par email !');
+        setSentMessage(t('sentEmail'));
       } else if (whatsappOk) {
-        setSentMessage('✅ Rapport ouvert dans WhatsApp !');
+        setSentMessage(t('sentWhatsapp'));
       }
 
       setSent(true);
       localStorage.setItem(LS_PREFIX + analysisId, 'true');
       setTimeout(() => setVisible(false), 2500);
     } catch (err: any) {
-      setError(err?.message ?? 'Erreur lors de l\'envoi. Réessayez.');
+      setError(err?.message ?? t('error'));
     } finally {
       setSending(false);
     }
@@ -164,11 +151,11 @@ ${reportLink}
           {/* Bouton fermer */}
           <button
             onClick={dismiss}
-            className="absolute top-4 right-4 p-1.5 rounded-[8px] text-text-subtle transition-colors"
+            className="absolute top-4 end-4 p-1.5 rounded-[8px] text-text-subtle transition-colors"
             style={{ color: 'rgba(255,255,255,0.40)' }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.80)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.40)'; }}
-            aria-label="Fermer"
+            aria-label={t('close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -185,10 +172,10 @@ ${reportLink}
                 </div>
                 <div>
                   <p className="font-heading font-bold text-base" style={{ color: '#0CCE6B' }}>
-                    {sentMessage || 'Rapport envoyé !'}
+                    {sentMessage || t('sentGeneric')}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                    Vérifiez votre boîte mail / WhatsApp dans quelques secondes.
+                    {t('checkInbox')}
                   </p>
                 </div>
               </div>
@@ -205,10 +192,10 @@ ${reportLink}
                   </div>
                   <div>
                     <h2 className="font-heading font-bold text-base" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                      📬 Recevoir votre rapport
+                      {t('title')}
                     </h2>
                     <p className="text-sm mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                      Choisissez comment recevoir votre analyse.
+                      {t('subtitle')}
                     </p>
                   </div>
                 </div>
@@ -218,14 +205,15 @@ ${reportLink}
                   {/* Champ email */}
                   <div>
                     <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      📧 Par email
+                      {t('byEmail')}
                     </label>
                     <input
                       ref={inputRef}
                       type="email"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                      placeholder="votre@email.com"
+                      placeholder={t('emailPlaceholder')}
+                      dir="ltr"
                       disabled={sending}
                       className="w-full px-4 py-3 rounded-[10px] text-sm outline-none transition-all disabled:opacity-50"
                       style={{
@@ -241,9 +229,9 @@ ${reportLink}
                   {/* Champ WhatsApp */}
                   <div>
                     <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                      💬 Par WhatsApp
+                      {t('byWhatsapp')}
                     </label>
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-1.5" dir="ltr">
                       <select
                         value={countryCode}
                         onChange={(e) => setCountryCode(e.target.value)}
@@ -257,8 +245,8 @@ ${reportLink}
                         }}
                       >
                         {COUNTRY_CODES.map((c) => (
-                          <option key={c.label} value={c.code} style={{ background: '#1a1a1a' }}>
-                            {c.code || '🌍'}
+                          <option key={c || 'other'} value={c} style={{ background: '#1a1a1a' }}>
+                            {c || t('other')}
                           </option>
                         ))}
                       </select>
@@ -266,7 +254,7 @@ ${reportLink}
                         type="tel"
                         value={whatsapp}
                         onChange={(e) => { setWhatsapp(e.target.value); setError(''); }}
-                        placeholder="+229 XX XX XX XX"
+                        placeholder={t('phonePlaceholder')}
                         disabled={sending}
                         className="w-full px-4 py-3 rounded-[10px] text-sm outline-none transition-all disabled:opacity-50"
                         style={{
@@ -298,8 +286,8 @@ ${reportLink}
                     }}
                   >
                     {sending
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
-                      : <><Send className="w-4 h-4" /> Envoyer</>
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('sending')}</>
+                      : <><Send className="w-4 h-4" /> {t('send')}</>
                     }
                   </button>
                   <button
@@ -315,7 +303,7 @@ ${reportLink}
                     onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.80)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
                   >
-                    Non merci
+                    {t('noThanks')}
                   </button>
                 </div>
               </form>

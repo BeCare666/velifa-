@@ -578,5 +578,233 @@
     "s12Email": "Email :",
     "s12Whatsapp": "WhatsApp :",
     "backHome": "← Retour à l'accueil"
+  },
+  "reportPage": {
+    "viewSite": "Voir le site",
+    "mobilePerformance": "Performance mobile",
+    "platform": "Plateforme : {platform}",
+    "scoreLabel": {
+      "excellent": "Excellent",
+      "needsWork": "À améliorer",
+      "critical": "Critique"
+    },
+    "scoreSentence": "Votre site obtient un score de {score}/100 sur mobile (mesure Lighthouse).",
+    "scoreUrgent": "Des améliorations urgentes sont nécessaires.",
+    "scoreMedium": "Plusieurs optimisations peuvent améliorer l’expérience de vos visiteurs.",
+    "scoreGood": "Excellent travail : votre site est très performant.",
+    "whatsappCta": "Obtenir de l’aide via WhatsApp",
+    "stickyCta": "Améliorer mon score",
+    "field": {
+      "title": "Ce que vivent vos vrais visiteurs",
+      "subtitleUrl": "Données réelles des utilisateurs de Chrome sur cette page (28 derniers jours, Chrome UX Report).",
+      "subtitleOrigin": "Pas assez de trafic sur cette page : moyenne de tout votre domaine (28 derniers jours, Chrome UX Report).",
+      "none": "Google ne dispose pas encore d’assez de visites réelles pour ce site. Les mesures ci-dessous sont des simulations.",
+      "overall": "Évaluation globale :",
+      "lcp": "Chargement (LCP)",
+      "inp": "Réactivité (INP)",
+      "cls": "Stabilité (CLS)",
+      "fcp": "Premier affichage (FCP)",
+      "ttfb": "Réponse serveur (TTFB)",
+      "FAST": "Bon",
+      "AVERAGE": "À améliorer",
+      "SLOW": "Lent"
+    },
+    "lab": {
+      "title": "Core Web Vitals (simulation)",
+      "note": "Mesure de laboratoire Lighthouse : téléphone simulé sur réseau mobile lent.",
+      "lcp": "Largest Contentful Paint",
+      "cls": "Cumulative Layout Shift",
+      "tbt": "Total Blocking Time",
+      "fcp": "First Contentful Paint"
+    },
+    "scores": {
+      "title": "Scores Lighthouse",
+      "performance": "Performance",
+      "accessibility": "Accessibilité",
+      "seo": "SEO",
+      "bestPractices": "Bonnes pratiques"
+    },
+    "recs": {
+      "title": "Ce qu’il faut corriger en priorité",
+      "subtitle": "Classé par impact estimé sur la vitesse. Les gains sont des estimations Lighthouse.",
+      "none": "Aucun problème majeur détecté par Lighthouse.",
+      "impact": {
+        "high": "Impact fort",
+        "medium": "Impact moyen",
+        "low": "Impact faible"
+      },
+      "savings": "Gain estimé : {value}",
+      "items": "{count} élément(s) concerné(s)",
+      "tipOn": "Sur {platform} :",
+      "list": {
+        "render-blocking-insight": {
+          "title": "Des fichiers bloquent l’affichage de la page",
+          "how": "Le navigateur attend des fichiers CSS/JavaScript avant d’afficher quoi que ce soit. Chargez-les en différé ou réduisez-les."
+        },
+        "render-blocking-resources": {
+          "title": "Des fichiers bloquent l’affichage de la page",
+          "how": "Le navigateur attend des fichiers CSS/JavaScript avant d’afficher quoi que ce soit. Chargez-les en différé ou réduisez-les."
+        },
+        "image-delivery-insight": {
+          "title": "Images trop lourdes ou au mauvais format",
+          "how": "Compressez les images, utilisez WebP/AVIF et adaptez leur taille à l’écran."
+        },
+        "uses-optimized-images": {
+          "title": "Images trop lourdes ou au mauvais format",
+          "how": "Compressez les images, utilisez WebP/AVIF et adaptez leur taille à l’écran."
+        },
+        "modern-image-formats": {
+          "title": "Images trop lourdes ou au mauvais format",
+          "how": "Compressez les images, utilisez WebP/AVIF et adaptez leur taille à l’écran."
+        },
+        "offscreen-images": {
+          "title": "Images trop lourdes ou au mauvais format",
+          "how": "Compressez les images, utilisez WebP/AVIF et adaptez leur taille à l’écran."
+        },
+        "lcp-discovery-insight": {
+          "title": "L’image principale est chargée trop tard",
+          "how": "L’élément le plus visible (souvent la bannière) doit être découvert et chargé en priorité."
+        },
+        "cache-insight": {
+          "title": "Les fichiers ne sont pas gardés en cache assez longtemps",
+          "how": "Les visiteurs qui reviennent retéléchargent des fichiers qui n’ont pas changé."
+        },
+        "document-latency-insight": {
+          "title": "Le serveur met du temps à répondre",
+          "how": "La première réponse du serveur retarde tout le reste de la page."
+        },
+        "server-response-time": {
+          "title": "Le serveur met du temps à répondre",
+          "how": "La première réponse du serveur retarde tout le reste de la page."
+        },
+        "third-parties-insight": {
+          "title": "Applications et scripts externes lourds",
+          "how": "Des outils tiers (chat, pixels publicitaires, avis clients…) ralentissent la page."
+        },
+        "unused-javascript": {
+          "title": "Code JavaScript chargé mais inutilisé",
+          "how": "Une partie du JavaScript téléchargé ne sert pas sur cette page."
+        },
+        "unused-css-rules": {
+          "title": "Styles CSS inutilisés",
+          "how": "Une partie du CSS téléchargé ne sert pas sur cette page."
+        },
+        "legacy-javascript-insight": {
+          "title": "JavaScript ancien inutilement volumineux",
+          "how": "Du code de compatibilité pour vieux navigateurs alourdit la page."
+        },
+        "duplicated-javascript-insight": {
+          "title": "Code JavaScript en double",
+          "how": "Les mêmes bibliothèques sont chargées plusieurs fois."
+        },
+        "bootup-time": {
+          "title": "Le JavaScript met trop de temps à s’exécuter",
+          "how": "Le téléphone du visiteur est occupé et la page réagit lentement aux clics."
+        },
+        "mainthread-work-breakdown": {
+          "title": "Le navigateur est surchargé",
+          "how": "Trop de travail (scripts, mise en page) avant que la page soit utilisable."
+        },
+        "layout-shifts": {
+          "title": "La page bouge pendant le chargement",
+          "how": "Des éléments se déplacent et font cliquer au mauvais endroit."
+        },
+        "cls-culprits-insight": {
+          "title": "La page bouge pendant le chargement",
+          "how": "Des éléments se déplacent et font cliquer au mauvais endroit."
+        },
+        "unsized-images": {
+          "title": "Images sans dimensions déclarées",
+          "how": "Sans largeur/hauteur, la page se décale quand l’image arrive."
+        },
+        "font-display-insight": {
+          "title": "Les polices retardent l’affichage du texte",
+          "how": "Le texte reste invisible tant que la police n’est pas chargée."
+        },
+        "total-byte-weight": {
+          "title": "Page trop lourde",
+          "how": "Le volume total téléchargé est élevé, surtout pénalisant sur mobile."
+        },
+        "dom-size-insight": {
+          "title": "Page trop complexe",
+          "how": "Un très grand nombre d’éléments ralentit l’affichage et les interactions."
+        },
+        "crawlable-anchors": {
+          "title": "Liens non explorables par Google",
+          "how": "Certains liens ne peuvent pas être suivis par les moteurs de recherche."
+        }
+      },
+      "tips": {
+        "images": "Compressez et redimensionnez vos images avant de les ajouter à la boutique (WebP si possible).",
+        "apps": "Passez en revue les applications et codes de suivi installés : supprimez ceux que vous n’utilisez plus.",
+        "theme": "Ce point dépend surtout du thème : comparez avec un thème plus léger ou contactez le développeur du thème.",
+        "server": "Le serveur et le cache sont gérés par la plateforme : ce point ne se corrige pas depuis votre boutique."
+      }
+    },
+    "gulf": {
+      "title": "Langue arabe et confidentialité",
+      "subtitle": "Contrôles adaptés aux marchés du Golfe, calculés sur le code de la page.",
+      "disclaimer": "Indicateurs techniques automatiques, pas un avis juridique. Ils ne remplacent pas une vérification de conformité (ex. PDPL saoudienne).",
+      "blocked": "Le site a bloqué notre robot : ces contrôles n’ont pas pu être réalisés.",
+      "ok": "Aucun problème détecté sur ces points.",
+      "consentTool": "Outil de consentement détecté : {name}",
+      "trackers": "Outils de suivi détectés : {list}",
+      "issues": {
+        "lang_missing": "La langue de la page n’est pas déclarée (attribut lang).",
+        "arabic_without_rtl": "Contenu en arabe mais page non configurée de droite à gauche (RTL).",
+        "arabic_lang_without_rtl": "Page déclarée en arabe sans sens d’écriture de droite à gauche.",
+        "hreflang_missing": "Plusieurs langues disponibles, mais Google n’est pas informé des versions (hreflang).",
+        "no_arabic_version": "Aucune version arabe repérée, alors que le marché du Golfe est majoritairement arabophone.",
+        "trackers_without_consent_tool": "Des outils de suivi se chargent sans outil de consentement reconnu dans le code initial de la page.",
+        "privacy_policy_link_missing": "Aucun lien vers une politique de confidentialité repéré sur la page."
+      }
+    },
+    "impact": {
+      "title": "Pourquoi la vitesse compte pour vos ventes",
+      "body": "Selon l’étude « Milliseconds Make Millions » (Deloitte, commandée par Google, 2020), une amélioration de 0,1 s de la vitesse mobile était associée à +8,4 % de conversions sur les sites de commerce.",
+      "caveat": "Il s’agit d’une corrélation observée sur 37 marques, pas d’une garantie pour votre site.",
+      "source": "Source : web.dev/case-studies/milliseconds-make-millions"
+    },
+    "opportunities": {
+      "title": "Fichiers concernés",
+      "saving": "Économie potentielle : {value}",
+      "blocking": "Bloquant : {value}"
+    }
+  },
+  "emailModal": {
+    "title": "Recevoir votre rapport",
+    "subtitle": "Choisissez comment recevoir votre analyse.",
+    "byEmail": "Par email",
+    "byWhatsapp": "Par WhatsApp",
+    "emailPlaceholder": "votre@email.com",
+    "phonePlaceholder": "Numéro",
+    "other": "Autre",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "noThanks": "Non merci",
+    "close": "Fermer",
+    "sentBoth": "Rapport envoyé par email et ouvert dans WhatsApp",
+    "sentEmail": "Rapport envoyé par email",
+    "sentWhatsapp": "Rapport ouvert dans WhatsApp",
+    "sentGeneric": "Rapport envoyé",
+    "checkInbox": "Vérifiez votre boîte mail / WhatsApp dans quelques secondes.",
+    "error": "Erreur lors de l’envoi. Réessayez.",
+    "whatsappMessage": "Votre rapport Velifa est prêt\n\nSite analysé : {site}\nScore de performance : {score}/100\n\nRapport complet :\n{url}"
+  },
+  "reportPro": {
+    "unlockTitle": "Débloquez le rapport complet avec Velifa Pro",
+    "unlockDesc": "Détection automatique des technologies (CMS, frameworks, analytics), services tiers et historique illimité.",
+    "seePlans": "Voir les plans",
+    "badgePro": "Rapport Pro",
+    "badgeBusiness": "Rapport Business",
+    "advanced": "Analyse avancée activée",
+    "techTitle": "Détection des technologies",
+    "found": "{count} trouvée(s)",
+    "noTech": "Aucune technologie détectée automatiquement pour ce site.",
+    "noTechHint": "Le site peut utiliser des technologies non reconnues par nos signatures.",
+    "thirdParties": "Services tiers (Lighthouse)",
+    "pdf": "Exporter en PDF",
+    "pdfDesc": "Rapport complet prêt à partager",
+    "soon": "Bientôt"
   }
 }

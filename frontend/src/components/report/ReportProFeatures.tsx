@@ -7,6 +7,7 @@ import {
   Layers, Pencil, BarChart2, CheckCircle2,
   AlertCircle, Minus, Gem, Microscope, Clock, ShoppingCart,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useSubscription } from '@/context/SubscriptionContext';
 import type { DetectedTech, TechCategory } from '@/types/analysis';
 
@@ -265,6 +266,7 @@ export default function ReportProFeatures({
   analysisId:   string;
 }) {
   const { isActive, plan } = useSubscription();
+  const t = useTranslations('reportPro');
 
   // ── Bannière gratuit ──────────────────────────────────────────────────
   if (!isActive) {
@@ -285,16 +287,15 @@ export default function ReportProFeatures({
         </div>
         <div className="flex-1">
           <p className="font-heading font-semibold text-base" style={{ color: 'var(--accent)' }}>
-            Débloquez le rapport complet avec Velifa Pro
+            {t('unlockTitle')}
           </p>
           <p className="text-text-muted text-sm mt-1 leading-relaxed">
-            Détection automatique des technologies (CMS, frameworks, analytics),
-            services tiers et historique illimité.
+            {t('unlockDesc')}
           </p>
         </div>
         <Link href="/tarifs" className="velifa-btn flex-shrink-0 flex items-center gap-2 text-sm">
           <Sparkles className="w-4 h-4" />
-          Voir les plans
+          {t('seePlans')}
         </Link>
       </div>
     );
@@ -331,7 +332,7 @@ export default function ReportProFeatures({
             }}
           >
             <Gem className="w-3 h-3" />
-            Rapport Business
+            {t('badgeBusiness')}
           </span>
         ) : (
           <span
@@ -344,10 +345,10 @@ export default function ReportProFeatures({
             }}
           >
             <Sparkles className="w-3 h-3" />
-            Rapport Pro
+            {t('badgePro')}
           </span>
         )}
-        <span className="text-text-subtle text-xs">Analyse avancée activée</span>
+        <span className="text-text-subtle text-xs">{t('advanced')}</span>
       </div>
 
       {/* ── Section technologies détectées ─────────────────────── */}
@@ -363,14 +364,14 @@ export default function ReportProFeatures({
         <div className="flex items-center gap-2 mb-5">
           <Layers className="w-4 h-4" style={{ color: 'var(--accent)' }} strokeWidth={1.75} />
           <h2 className="font-heading font-semibold text-text text-base">
-            Détection des technologies
+            {t('techTitle')}
           </h2>
           {hasTech && (
             <span
               className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
               style={{ background: 'rgba(212,175,55,0.12)', color: 'var(--accent)' }}
             >
-              {technologies!.length} trouvée{technologies!.length > 1 ? 's' : ''}
+              {t('found', { count: technologies!.length })}
             </span>
           )}
         </div>
@@ -380,10 +381,10 @@ export default function ReportProFeatures({
           <div className="flex flex-col items-center gap-2 py-6 text-center">
             <Globe2 className="w-7 h-7 text-text-subtle" strokeWidth={1.5} />
             <p className="text-text-muted text-sm">
-              Aucune technologie détectée automatiquement pour ce site.
+              {t('noTech')}
             </p>
             <p className="text-text-subtle text-xs max-w-xs">
-              Le site peut utiliser des technologies obfusquées ou non reconnues par nos signatures.
+              {t('noTechHint')}
             </p>
           </div>
         ) : (
@@ -416,7 +417,7 @@ export default function ReportProFeatures({
             <div className="flex items-center gap-2 mb-3">
               <Globe2 className="w-3.5 h-3.5 text-text-subtle" />
               <span className="text-[10px] font-bold tracking-widest uppercase text-text-subtle">
-                Services tiers (Lighthouse)
+                {t('thirdParties')}
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -454,17 +455,17 @@ export default function ReportProFeatures({
         <div className="flex items-center gap-3">
           <Download className="w-4 h-4 text-accent" strokeWidth={1.75} />
           <div>
-            <p className="text-sm font-medium text-text">Exporter en PDF</p>
-            <p className="text-xs text-text-muted">Rapport complet prêt à partager</p>
+            <p className="text-sm font-medium text-text">{t('pdf')}</p>
+            <p className="text-xs text-text-muted">{t('pdfDesc')}</p>
           </div>
         </div>
         <button
           disabled
           className="velifa-btn text-xs opacity-60 cursor-not-allowed flex items-center gap-2"
-          title="Disponible prochainement"
+          title={t('soon')}
         >
           <Download className="w-3.5 h-3.5" />
-          Bientôt
+          {t('soon')}
         </button>
       </div>
 

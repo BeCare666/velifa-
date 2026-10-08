@@ -82,6 +82,28 @@ export const RECOMMENDATION_IDS = [
 
 const MAX_RECOMMENDATIONS = 8;
 
+/**
+ * Audits qui décrivent le même problème : on n'en garde qu'un (le premier présent en échec).
+ * Constaté sur une réponse réelle : « layout-shifts » et « cls-culprits-insight » affichaient deux fois
+ * « La page bouge pendant le chargement ».
+ */
+const SAME_PROBLEM: string[][] = [
+  ['layout-shifts', 'cls-culprits-insight'],
+  ['document-latency-insight', 'server-response-time'],
+  ['render-blocking-insight', 'render-blocking-resources'],
+  ['image-delivery-insight', 'uses-optimized-images', 'modern-image-formats', 'offscreen-images'],
+];
+
+/**
+ * Impact = gain mesuré par Lighthouse. Un audit en échec sans gain chiffré n'est pas « fort »
+ * (constaté : 8 recommandations sur 8 classées « fort » avec l'ancienne règle basée sur score = 0).
+ */
+function impactOf(savingsMs: number, savingsCls: number, score: number): Recommendation['impact'] {
+  if (savingsMs >= 1000 || savingsCls >= 0.1) return 'high';
+  if (savingsMs >= 150 || savingsCls >= 0.025 || score < 0.5) return 'medium';
+  return 'low';
+}
+
 function toMs(raw: number | null | undefined): number | null {
   return raw == null ? null : Math.round(raw);
 }
@@ -139,11 +161,11 @@ export function parseRecommendations(audits: Record<string, any>): Recommendatio
     if (a.scoreDisplayMode === 'notApplicable' || a.scoreDisplayMode === 'informative' || a.scoreDisplayMode === 'manual') continue;
     if (a.score >= 0.9) continue;
     const s = a.metricSavings ?? {};
+    const group = SAME_PROBLEM.find((g) => g.includes(id));
+    if (group && recs.some((r) => group.includes(r.id))) continue;
     const savingsMs = Math.round((s.LCP ?? 0) + (s.FCP ?? 0) + (s.TBT ?? 0) + (s.INP ?? 0));
     const savingsCls = Math.round((s.CLS ?? 0) * 1000) / 1000;
-    const impact: Recommendation['impact'] =
-      savingsMs >= 1000 || savingsCls >= 0.1 || a.score === 0 ? 'high'
-        : savingsMs >= 300 || a.score < 0.5 ? 'medium' : 'low';
+    const impact = impactOf(savingsMs, savingsCls, a.score);
     recs.push({
       id,
       score: a.score,

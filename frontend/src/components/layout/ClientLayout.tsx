@@ -1,27 +1,19 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/navigation';
 import Header from './Header';
+import { isAppSection } from './appSections';
 
 /**
  * Layout client racine.
- * Le Header est masqué sur /dashboard et /analyse/* qui ont
- * leur propre sidebar de navigation.
+ * Le Header est masqué sur les sections applicatives (dashboard, rapport…) qui ont
+ * leur propre navigation. usePathname de next-intl renvoie le chemin sans /fr|/en|/ar.
  */
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hiddenHeader =
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/analyse/')  ||
-    pathname.startsWith('/audits')    ||
-    pathname.startsWith('/settings')  ||
-    pathname.startsWith('/billing')   ||
-    pathname.startsWith('/support')   ||
-    pathname.startsWith('/admin');
-
   return (
     <>
-      {!hiddenHeader && <Header />}
+      {!isAppSection(pathname) && <Header />}
       {children}
     </>
   );
