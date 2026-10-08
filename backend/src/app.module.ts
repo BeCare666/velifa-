@@ -8,6 +8,7 @@ import { RedisModule } from './redis/redis.module';
 import { AnalysesModule } from './analyses/analyses.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
+import { ProspectsModule } from './prospects/prospects.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HealthController } from './health/health.controller';
@@ -30,6 +31,7 @@ import { HealthController } from './health/health.controller';
     AnalysesModule,
     PaymentsModule,
     AdminModule,
+    ProspectsModule,
   ],
   controllers: [HealthController],
   providers: [

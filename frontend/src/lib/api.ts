@@ -110,5 +110,9 @@ export const api = {
     exportUsers:       (token: string | null | undefined) => downloadAdminExport('users', token),
     exportAudits:      (token: string | null | undefined) => downloadAdminExport('audits', token),
     exportPerformance: (token: string | null | undefined) => downloadAdminExport('performance', token),
+    importProspects: (token: string | null | undefined, csv: string, locale: 'ar' | 'en' | 'fr') =>
+      apiFetch<any>('/admin/prospects/import', { method: 'POST', body: JSON.stringify({ csv, locale }), authToken: token }),
+    getProspects: (token: string | null | undefined, params: Record<string, string>) =>
+      apiFetch<any>(`/admin/prospects?${new URLSearchParams(params)}`, { authToken: token }),
   },
 };

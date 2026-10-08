@@ -53,6 +53,24 @@ export interface Analysis {
   failedAt: Date | null;
 }
 
+export interface ProspectWithAudit {
+  id: string;
+  batchId: string;
+  urlSite: string;
+  name: string | null;
+  phone: string | null;
+  country: string | null;
+  locale: string;
+  analysisId: string | null;
+  createdAt: Date;
+  status: Analysis['status'] | null;
+  scorePerformance: number | null;
+  platform: string | null;
+  siteChecks: any | null;
+  reportUrl: string | null;
+  errorMessage: string | null;
+}
+
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
@@ -126,6 +144,26 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       `);
       this.logger.log('Migration: admin_notifications table ready');
+
+      // Prospects (audit en lot, admin) : une ligne par boutique, liée à son audit
+      await this.pool.query(`
+        CREATE TABLE IF NOT EXISTS prospects (
+          id          VARCHAR(36)   NOT NULL,
+          batch_id    VARCHAR(36)   NOT NULL,
+          url_site    VARCHAR(2048) NOT NULL,
+          url_hash    CHAR(64)      NOT NULL,
+          name        VARCHAR(255)  NULL,
+          phone       VARCHAR(20)   NULL,
+          country     CHAR(2)       NULL,
+          locale      VARCHAR(5)    NOT NULL,
+          analysis_id VARCHAR(36)   NULL,
+          created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          UNIQUE KEY uq_prospects_url_hash (url_hash),
+          KEY idx_prospects_batch (batch_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      `);
+      this.logger.log('Migration: prospects table ready');
     } catch (err: any) {
       this.logger.error('Migration failed', err?.message);
     }
@@ -368,6 +406,67 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       subscriptionPlan:    rows[0].subscription_plan    ?? null,
       subscriptionStatus:  rows[0].subscription_status  ?? null,
       lemonSubscriptionId: rows[0].lemon_subscription_id ?? null,
+    };
+  }
+
+  // ── Prospects (audit en lot) ───────────────────────────────────────────
+
+  /** Parmi ces empreintes d'URL, celles déjà importées comme prospects. */
+  async findExistingProspectHashes(urlHashes: string[]): Promise<Set<string>> {
+    if (!urlHashes.length) return new Set();
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT url_hash FROM prospects WHERE url_hash IN (?)',
+      [urlHashes],
+    );
+    return new Set(rows.map((r) => r.url_hash as string));
+  }
+
+  async insertProspect(p: {
+    id: string; batchId: string; urlSite: string; urlHash: string; name: string | null;
+    phone: string | null; country: string | null; locale: string; analysisId: string;
+  }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO prospects (id, batch_id, url_site, url_hash, name, phone, country, locale, analysis_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [p.id, p.batchId, p.urlSite, p.urlHash, p.name, p.phone, p.country, p.locale, p.analysisId],
+    );
+  }
+
+  /** Prospects avec l'état et les résultats de leur audit (plus récents d'abord). */
+  async listProspects(opts: { batchId?: string; limit: number; offset: number }): Promise<{ rows: ProspectWithAudit[]; total: number }> {
+    const where = opts.batchId ? 'WHERE p.batch_id = ?' : '';
+    const params: any[] = opts.batchId ? [opts.batchId] : [];
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT p.*, a.status, a.score_performance, a.platform, a.site_checks, a.report_url, a.error_message
+         FROM prospects p LEFT JOIN analyses a ON a.id = p.analysis_id
+         ${where}
+        ORDER BY p.created_at DESC, p.id
+        LIMIT ? OFFSET ?`,
+      [...params, opts.limit, opts.offset],
+    );
+    const [[count]] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT COUNT(*) AS cnt FROM prospects p ${where}`,
+      params,
+    );
+    return {
+      total: Number(count?.cnt ?? 0),
+      rows: rows.map((r) => ({
+        id:               r.id,
+        batchId:          r.batch_id,
+        urlSite:          r.url_site,
+        name:             r.name ?? null,
+        phone:            r.phone ?? null,
+        country:          r.country ?? null,
+        locale:           r.locale,
+        analysisId:       r.analysis_id ?? null,
+        createdAt:        r.created_at,
+        status:           r.status ?? null,
+        scorePerformance: r.score_performance ?? null,
+        platform:         r.platform ?? null,
+        siteChecks:       this.parseJson(r.site_checks),
+        reportUrl:        r.report_url ?? null,
+        errorMessage:     r.error_message ?? null,
+      })),
     };
   }
 

@@ -38,6 +38,7 @@ class EnvironmentVariables {
   @IsOptional() @IsString() LEMONSQUEEZY_PRO_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_BUSINESS_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_WEBHOOK_SECRET?: string;
+  @IsOptional() @IsInt() @Min(5000) PROSPECT_AUDIT_INTERVAL_MS?: number;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -78,6 +79,8 @@ export default () => ({
     fromName:   process.env.BREVO_FROM_NAME ?? 'VELIFA',
   },
   whatsapp: { number: process.env.WHATSAPP_NUMBER ?? '' },
+  // Audit en lot : écart entre deux audits de prospects (2 appels PageSpeed + 1 capture par audit)
+  prospects: { auditIntervalMs: parseInt(process.env.PROSPECT_AUDIT_INTERVAL_MS ?? '30000', 10) },
   security: {
     turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY ?? '',
     jwtSecret:          process.env.JWT_SECRET ?? '',

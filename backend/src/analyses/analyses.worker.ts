@@ -19,6 +19,8 @@ export interface AnalysisJobPayload {
   url: string;
   email: string;
   locale: string;
+  /** Audit en lot (prospection) : sert à espacer les audits programmés. */
+  prospect?: boolean;
 }
 
 @Processor(BULL_ANALYSES_QUEUE)

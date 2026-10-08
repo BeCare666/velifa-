@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useClerk, useUser, useAuth } from '@clerk/nextjs';
 import {
   LayoutDashboard, Users, BarChart2, DollarSign,
-  Server, LogOut, Zap, Shield, Menu, X, TrendingUp, Bell,
+  Server, LogOut, Zap, Shield, Menu, X, TrendingUp, Bell, Target,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -14,6 +14,7 @@ const NAV = [
   { href: '/admin',             icon: LayoutDashboard, label: 'Vue generale'   },
   { href: '/admin/users',       icon: Users,           label: 'Utilisateurs'   },
   { href: '/admin/audits',      icon: BarChart2,       label: 'Audits'         },
+  { href: '/admin/prospects',   icon: Target,          label: 'Prospects'      },
   { href: '/admin/performance', icon: TrendingUp,      label: 'Performance'    },
   { href: '/admin/revenue',     icon: DollarSign,      label: 'Revenus'        },
   { href: '/admin/system',      icon: Server,          label: 'Systeme'        },

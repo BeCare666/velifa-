@@ -105,7 +105,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.4 | Données terrain CrUX (vrais visiteurs) extraites de la réponse PageSpeed et stockées | Test unitaire du parseur | ✅ |
 | 1.5 | Recommandations priorisées et traduites (AR/EN/FR) à partir des audits Lighthouse | Tests unitaires | ✅ |
 | 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ✅ |
-| 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ⬜ |
+| 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ✅ |
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ⬜ |
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ⬜ |
 | 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ⬜ |
@@ -273,4 +273,26 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   - rendu réel (`next start` + API simulée servant les parseurs backend appliqués à la fixture PageSpeed réelle) :
     `/fr|en|ar/analyse/demo` → 200, `<html dir="rtl">` en arabe, aucune clé brute ni identifiant technique affiché ;
     variante sans données terrain → message « pas assez de visites réelles » dans les 3 langues.
+
+### 2026-10-08 — 1.7 Audit en lot (admin)
+- `prospects/prospect-csv.ts` : en-têtes FR/EN/AR (ordre libre) ou sans en-tête (url, nom, téléphone, pays),
+  séparateur `,` `;` (Excel FR) ou tabulation, guillemets RFC 4180, BOM, 500 lignes max, doublons détectés.
+  URL sans schéma → `https://` puis `validateUrl` (mêmes règles anti-SSRF que l'audit public).
+  Téléphones → format international wa.me : `+`/`00`, « 0 » national pour SA/AE, numéros à 8 chiffres pour QA/KW/BH/OM ;
+  numéro local sans pays → refusé (ligne gardée sans téléphone, signalée) plutôt que deviné.
+- `prospects/prospects.service.ts` : boutiques déjà importées ignorées (`url_hash` unique), contrôle DNS
+  `assertPublicHost` (10 en parallèle), un audit `source='prospect'` **sans email** par boutique, ligne `prospects` liée.
+  **Débit limité** : audits espacés par `delay` Bull (`PROSPECT_AUDIT_INTERVAL_MS`, 30 s par défaut, min 5 s) ;
+  un nouvel import se place après les audits de prospects encore programmés. Les audits clients ne sont jamais
+  bloqués derrière un lot (une seule tâche de prospect prête à la fois).
+- Routes : `POST /admin/prospects/import` (`{ csv, locale }`), `GET /admin/prospects?batch=&page=&limit=` (Clerk admin).
+- Table `prospects` créée au démarrage (comme l'existant → 1.11). Page admin `/admin/prospects` (import fichier ou
+  collage, langue des rapports, résultat ligne par ligne, liste avec statut, score, plateforme, points Golfe, lien rapport).
+- Preuves :
+  - `npx jest` → **12 suites, 174 tests réussis** (+30 : parseur 21, service 9) ; `tsc` exit 0 ; `next build` exit 0 ;
+  - Bull 4.16.5 vérifié dans `node_modules` : `job.timestamp` + `opts.delay` = heure d'exécution utilisée ;
+  - API réelle démarrée (`node dist/main`, sans vraies clés) : sans jeton / mauvaise clé → 401 ; csv absent,
+    langue `de`, champ inconnu, en-tête sans URL → 400 avec message explicite.
+- ⚠️ Limite : requêtes SQL et file Redis non exécutées sur une vraie base (pas de MySQL/Redis/Docker en local) ;
+  à vérifier au premier import en environnement configuré (1.12).
 
