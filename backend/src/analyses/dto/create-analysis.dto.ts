@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateAnalysisDto {
@@ -19,12 +19,14 @@ export class CreateAnalysisDto {
   )
   email?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  cfTurnstileToken: string = '';
-
-  @IsString()
+  /** Obligatoire pour les visiteurs anonymes (vérifié dans le service), ignoré si connecté. */
   @IsOptional()
+  @IsString()
+  @MaxLength(4096)
+  cfTurnstileToken?: string;
+
+  @IsOptional()
+  @IsIn(['fr', 'en', 'ar'])
   locale?: string = 'fr';
 
   @IsOptional()

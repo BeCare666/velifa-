@@ -119,7 +119,7 @@ export class AnalysisWorker {
         reportUrl,
       });
 
-      try {
+      if (email) try {
         await this.brevo.sendReportEmail({
           toEmail:           email,
           urlSite:           url,

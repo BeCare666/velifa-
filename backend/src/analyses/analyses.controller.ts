@@ -13,7 +13,7 @@ import {
   Headers,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ThrottlerGuard, SkipThrottle } from '@nestjs/throttler';
+import { ThrottlerGuard, SkipThrottle, Throttle } from '@nestjs/throttler';
 import { Observable, map } from 'rxjs';
 import { AnalysesService } from './analyses.service';
 import { SseService } from '../sse/sse.service';
@@ -82,13 +82,15 @@ export class AnalysesController {
    * Pas de throttle — action utilisateur explicite unique.
    */
   @Post(':id/send-email')
-  @SkipThrottle()
+  @Throttle({ short: { limit: 3, ttl: 3_600_000 } })   // 3 envois / heure / IP
   @HttpCode(HttpStatus.OK)
   async sendEmail(
     @Param('id') id: string,
     @Body() dto: SendReportEmailDto,
+    @Headers('authorization') authHeader: string | undefined,
   ) {
-    await this.analysesService.sendReportForAnalysis(id, dto.email);
+    const callerId = await verifyClerkToken(authHeader);
+    await this.analysesService.sendReportForAnalysis(id, dto.email, callerId);
     return { sent: true };
   }
 

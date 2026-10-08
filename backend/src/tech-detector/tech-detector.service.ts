@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
+import { safeHttpAgent, safeHttpsAgent } from '../common/validators/url.validator';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -143,6 +144,9 @@ export class TechDetectorService {
         },
         // Ne suit pas les redirections infinies
         maxRedirects: 5,
+        // Chaque connexion (redirections comprises) refuse les adresses internes
+        httpAgent:  safeHttpAgent,
+        httpsAgent: safeHttpsAgent,
         // Retourne quand même les 4xx/5xx pour lire les headers
         validateStatus: (s) => s < 600,
       });

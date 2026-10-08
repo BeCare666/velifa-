@@ -8,9 +8,10 @@ import {
   RefreshCw, Eye, X, Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { useAuth, useUser } from '@clerk/nextjs';
+import { useCaptcha } from '@/hooks/useCaptcha';
 
 // ── Formulaire d'audit ───────────────────────────────────────────────────────
 function AuditForm() {
@@ -18,6 +19,8 @@ function AuditForm() {
   const { getToken, isSignedIn } = useAuth();
   const { user } = useUser();
   const t = useTranslations('hero');
+  const locale = useLocale();
+  const captcha = useCaptcha(!isSignedIn, locale);
   const [url, setUrl]     = useState('');
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
@@ -38,8 +41,8 @@ function AuditForm() {
       const res = await api.createAnalysis({
         url,
         email: clerkEmail,   // undefined si non connecté → modal email après
-        cfTurnstileToken: 'dev-bypass',
-        locale: 'fr',
+        cfTurnstileToken: captcha.token ?? undefined,
+        locale,
         force,
       }, authToken);
       const { id, cached } = res.data;
@@ -56,6 +59,7 @@ function AuditForm() {
       }
     } finally {
       setLoading(false);
+      captcha.reset();   // un jeton Turnstile n'est valable qu'une fois
     }
   }
 
@@ -177,9 +181,11 @@ function AuditForm() {
         </div>
       )}
 
+      {captcha.widget && <div className="flex justify-center">{captcha.widget}</div>}
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !captcha.ready}
         className="velifa-btn w-full flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {loading ? (

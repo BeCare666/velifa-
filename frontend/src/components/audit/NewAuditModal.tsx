@@ -7,7 +7,9 @@ import {
   X, Zap, Loader2, ArrowRight, RefreshCw, Eye,
   Sparkles, Clock,
 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { api } from '@/lib/api';
+import { useCaptcha } from '@/hooks/useCaptcha';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface CachedInfo { id: string }
@@ -22,6 +24,8 @@ export default function NewAuditModal({ onClose }: Props) {
   const { getToken, isSignedIn } = useAuth();
   const { user } = useUser();
   const inputRef = useRef<HTMLInputElement>(null);
+  const locale = useLocale();
+  const captcha = useCaptcha(!isSignedIn, locale);
 
   const [url, setUrl]               = useState('');
   const [loading, setLoading]       = useState(false);
@@ -56,8 +60,8 @@ export default function NewAuditModal({ onClose }: Props) {
       const res = await api.createAnalysis({
         url:               url.trim(),
         email:             clerkEmail,
-        cfTurnstileToken:  'dev-bypass',
-        locale:            'fr',
+        cfTurnstileToken:  captcha.token ?? undefined,
+        locale,
         force,
       }, authToken);
       const { id, cached } = res.data;
@@ -75,6 +79,7 @@ export default function NewAuditModal({ onClose }: Props) {
       }
     } finally {
       setLoading(false);
+      captcha.reset();
     }
   }
 
@@ -286,10 +291,13 @@ export default function NewAuditModal({ onClose }: Props) {
               )}
 
               {/* Bouton submit */}
+              {!cachedInfo && !rateLimited && captcha.widget && (
+                <div className="flex justify-center">{captcha.widget}</div>
+              )}
               {!cachedInfo && !rateLimited && (
                 <button
                   type="submit"
-                  disabled={loading || !url.trim()}
+                  disabled={loading || !url.trim() || !captcha.ready}
                   className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[12px] text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
                   style={{
                     background:  'linear-gradient(135deg, #D4AF37 0%, #A87B1E 100%)',

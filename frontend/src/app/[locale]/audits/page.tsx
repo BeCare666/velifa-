@@ -144,6 +144,7 @@ export default function AuditsPage() {
   const router = useRouter();
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const t = useTranslations('audits');
+  const locale = useLocale();
   const formatDate = useFormatDate();
 
   const SCORE_LABEL: Record<ScoreBucket, string> = {
@@ -215,7 +216,8 @@ export default function AuditsPage() {
     setRelaunch(audit.id);
     try {
       const token = await getToken();
-      await api.createAnalysis({ url: audit.url, email: '', cfTurnstileToken: '', force: true }, token);
+      // Utilisateur connecté : pas de CAPTCHA (le serveur vérifie le jeton Clerk)
+      await api.createAnalysis({ url: audit.url, locale, force: true }, token);
       const res = await api.getMine(token!);
       setAudits(res.data);
     } catch {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 import { Mail, X, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -27,6 +27,7 @@ const COUNTRY_CODES = [
 
 export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl }: Props) {
   const { user } = useUser();
+  const { getToken, isSignedIn } = useAuth();
   const [visible, setVisible]   = useState(false);
   const [email, setEmail]       = useState('');
   const [countryCode, setCountryCode] = useState('+229');
@@ -103,7 +104,7 @@ ${reportLink}
 
     try {
       if (email.trim()) {
-        await api.sendReportEmail(analysisId, email.trim());
+        await api.sendReportEmail(analysisId, email.trim(), isSignedIn ? await getToken() : null);
         emailOk = true;
       }
 

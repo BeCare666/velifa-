@@ -80,10 +80,14 @@ export default function AdminPerformancePage() {
             <button onClick={() => load()} style={{ height: 34, width: 34, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.40)' }}>
               <RefreshCw style={{ width: 14, height: 14 }} />
             </button>
-            <a href={api.admin.exportPerformance()} download
+            <button type="button"
+              onClick={async () => {
+                try { await api.admin.exportPerformance(await getToken()); }
+                catch (e: any) { setError(e.message ?? 'Export impossible'); }
+              }}
               style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
               <Download style={{ width: 13, height: 13 }} /> Exporter CSV
-            </a>
+            </button>
           </div>
         </div>
 

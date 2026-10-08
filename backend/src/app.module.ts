@@ -10,6 +10,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     PaymentsModule,
     AdminModule,
   ],
+  controllers: [HealthController],
   providers: [
     { provide: APP_FILTER,      useClass: GlobalExceptionFilter },
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },

@@ -132,10 +132,14 @@ export default function AdminUsersPage() {
                 {data ? `${data.total} utilisateurs au total` : '...'}
               </p>
             </div>
-            <a href={api.admin.exportUsers()} download
+            <button type="button"
+              onClick={async () => {
+                try { await api.admin.exportUsers(await getToken()); }
+                catch (e: any) { toast(e.message ?? 'Export impossible', 'error'); }
+              }}
               style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
               <Download style={{ width: 13, height: 13 }} /> Exporter CSV
-            </a>
+            </button>
           </div>
 
           <SubscribersTable />

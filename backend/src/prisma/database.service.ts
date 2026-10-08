@@ -266,10 +266,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return rows.map((row) => this.rowToAnalysis(row));
   }
 
-  async findCachedAnalysis(urlHash: string, cutoff: Date): Promise<Analysis | null> {
+  /** Dernier audit récent de cette URL pour le même propriétaire (ou anonyme ↔ anonyme). */
+  async findCachedAnalysis(urlHash: string, cutoff: Date, clerkUserId: string | null): Promise<Analysis | null> {
     const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
-      `SELECT * FROM analyses WHERE url_hash = ? AND status = 'completed' AND created_at >= ? AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 1`,
-      [urlHash, cutoff],
+      `SELECT * FROM analyses WHERE url_hash = ? AND status = 'completed' AND created_at >= ? AND deleted_at IS NULL
+         AND clerk_user_id <=> ?
+       ORDER BY created_at DESC LIMIT 1`,
+      [urlHash, cutoff, clerkUserId],
     );
     return rows[0] ? this.rowToAnalysis(rows[0]) : null;
   }

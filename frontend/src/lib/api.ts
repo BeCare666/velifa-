@@ -2,22 +2,39 @@ import type { Analysis, CreateAnalysisResponse, MyAudit } from '@/types/analysis
 import type { SubscriptionInfo } from '@/types/subscription';
 
 const BASE_URL   = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
-const ADMIN_KEY  = process.env.NEXT_PUBLIC_ADMIN_API_KEY ?? 'velifa_admin_internal_2026';
+
+/** Télécharge un export CSV admin avec le jeton Clerk (aucune clé dans l'URL). */
+async function downloadAdminExport(kind: 'users' | 'audits' | 'performance', token: string | null | undefined) {
+  if (!token) throw new Error('Session expirée — reconnectez-vous.');
+  const res = await fetch(`${BASE_URL}/admin/export/${kind}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Export impossible (${res.status})`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `velifa_${kind}_${Date.now()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 interface ApiFetchOptions extends RequestInit {
   authToken?: string | null;
 }
 
 async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (options?.authToken) {
-    headers['Authorization'] = `Bearer ${options.authToken}`;
+  const { authToken, headers: extraHeaders, ...rest } = options ?? {};
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(extraHeaders as Record<string, string> | undefined),
+  };
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
   }
-  const { authToken, ...rest } = options ?? {};
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { ...headers, ...rest?.headers },
-    ...rest,
-  });
+  const res = await fetch(`${BASE_URL}${path}`, { ...rest, headers });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const apiErr = new Error((body as any).message ?? `API error ${res.status}`) as Error & { statusCode: number };
@@ -29,7 +46,7 @@ async function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> 
 
 export const api = {
   createAnalysis: (body: {
-    url: string; email?: string; cfTurnstileToken: string; locale?: string; force?: boolean;
+    url: string; email?: string; cfTurnstileToken?: string; locale?: string; force?: boolean;
   }, authToken?: string | null) =>
     apiFetch<CreateAnalysisResponse>('/analyses', {
       method: 'POST',
@@ -52,45 +69,46 @@ export const api = {
   getMyPlan: (authToken: string) =>
     apiFetch<{ data: SubscriptionInfo }>('/payments/me', { authToken }),
 
-  sendReportEmail: (id: string, email: string) =>
+  sendReportEmail: (id: string, email: string, authToken?: string | null) =>
     apiFetch<{ data: { sent: boolean } }>(`/analyses/${id}/send-email`, {
       method: 'POST',
       body: JSON.stringify({ email }),
+      authToken,
     }),
 
-  // ── Admin ──────────────────────────────────────────────────────────────────
+  // ── Admin (jeton Clerk obligatoire ; l'accès est vérifié côté serveur) ─────────
   admin: {
-    getStats:    (token?: string | null) => apiFetch<any>('/admin/stats',    { authToken: token || ADMIN_KEY }),
-    getActivity: (token?: string | null) => apiFetch<any>('/admin/activity', { authToken: token || ADMIN_KEY }),
+    getStats:    (token?: string | null) => apiFetch<any>('/admin/stats',    { authToken: token }),
+    getActivity: (token?: string | null) => apiFetch<any>('/admin/activity', { authToken: token }),
     getUsers:    (token: string | null | undefined, params: Record<string, string>) =>
-      apiFetch<any>(`/admin/users?${new URLSearchParams(params)}`, { authToken: token || ADMIN_KEY }),
-    getSubscribers: (token?: string | null) => apiFetch<any>('/admin/users/subscribers', { authToken: token || ADMIN_KEY }),
+      apiFetch<any>(`/admin/users?${new URLSearchParams(params)}`, { authToken: token }),
+    getSubscribers: (token?: string | null) => apiFetch<any>('/admin/users/subscribers', { authToken: token }),
     getUserDetails: (token: string | null | undefined, clerkId: string) =>
-      apiFetch<any>(`/admin/users/${clerkId}/details`, { authToken: token || ADMIN_KEY }),
+      apiFetch<any>(`/admin/users/${encodeURIComponent(clerkId)}/details`, { authToken: token }),
     getAudits:   (token: string | null | undefined, params: Record<string, string>) =>
-      apiFetch<any>(`/admin/audits?${new URLSearchParams(params)}`, { authToken: token || ADMIN_KEY }),
-    getPerformance: (token?: string | null) => apiFetch<any>('/admin/performance', { authToken: token || ADMIN_KEY }),
-    getRevenue:  (token?: string | null) => apiFetch<any>('/admin/revenue', { authToken: token || ADMIN_KEY }),
-    getSystem:   (token?: string | null) => apiFetch<any>('/admin/system',  { authToken: token || ADMIN_KEY }),
-    getNotifications: (token?: string | null) => apiFetch<any>('/admin/notifications', { authToken: token || ADMIN_KEY }),
+      apiFetch<any>(`/admin/audits?${new URLSearchParams(params)}`, { authToken: token }),
+    getPerformance: (token?: string | null) => apiFetch<any>('/admin/performance', { authToken: token }),
+    getRevenue:  (token?: string | null) => apiFetch<any>('/admin/revenue', { authToken: token }),
+    getSystem:   (token?: string | null) => apiFetch<any>('/admin/system',  { authToken: token }),
+    getNotifications: (token?: string | null) => apiFetch<any>('/admin/notifications', { authToken: token }),
     markAllRead: (token: string) =>
       apiFetch<any>('/admin/notifications/read-all', { method: 'POST', authToken: token }),
     updatePlan:  (token: string, clerkId: string, plan: string) =>
-      apiFetch<any>(`/admin/users/${clerkId}/plan`, {
+      apiFetch<any>(`/admin/users/${encodeURIComponent(clerkId)}/plan`, {
         method: 'PATCH', body: JSON.stringify({ plan }), authToken: token,
       }),
     banUser:     (token: string, clerkId: string) =>
-      apiFetch<any>(`/admin/users/${clerkId}/ban`, { method: 'PATCH', authToken: token }),
+      apiFetch<any>(`/admin/users/${encodeURIComponent(clerkId)}/ban`, { method: 'PATCH', authToken: token }),
     suspendUser: (token: string, clerkId: string) =>
-      apiFetch<any>(`/admin/users/${clerkId}/suspend`, { method: 'PATCH', authToken: token }),
+      apiFetch<any>(`/admin/users/${encodeURIComponent(clerkId)}/suspend`, { method: 'PATCH', authToken: token }),
     unsuspendUser: (token: string, clerkId: string) =>
-      apiFetch<any>(`/admin/users/${clerkId}/unsuspend`, { method: 'PATCH', authToken: token }),
+      apiFetch<any>(`/admin/users/${encodeURIComponent(clerkId)}/unsuspend`, { method: 'PATCH', authToken: token }),
     testEmail:   (token: string) =>
       apiFetch<any>('/admin/test-email', { method: 'POST', authToken: token }),
     clearCache:  (token: string) =>
       apiFetch<any>('/admin/clear-cache', { method: 'POST', authToken: token }),
-    exportUsers:       () => `${BASE_URL}/admin/export/users?key=${ADMIN_KEY}`,
-    exportAudits:      () => `${BASE_URL}/admin/export/audits?key=${ADMIN_KEY}`,
-    exportPerformance: () => `${BASE_URL}/admin/export/performance?key=${ADMIN_KEY}`,
+    exportUsers:       (token: string | null | undefined) => downloadAdminExport('users', token),
+    exportAudits:      (token: string | null | undefined) => downloadAdminExport('audits', token),
+    exportPerformance: (token: string | null | undefined) => downloadAdminExport('performance', token),
   },
 };

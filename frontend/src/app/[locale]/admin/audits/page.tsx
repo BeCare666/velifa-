@@ -73,10 +73,14 @@ export default function AdminAuditsPage() {
               {userFilter && <span style={{ marginLeft: 8, color: '#D4AF37', fontSize: 11 }}>filtre: {userFilter.slice(-12)}</span>}
             </p>
           </div>
-          <a href={api.admin.exportAudits()} download
+          <button type="button"
+            onClick={async () => {
+              try { await api.admin.exportAudits(await getToken()); }
+              catch (e: any) { setError(e.message ?? 'Export impossible'); }
+            }}
             style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
             <Download style={{ width: 13, height: 13 }} /> Exporter CSV
-          </a>
+          </button>
         </div>
 
         {/* Stats rapides */}

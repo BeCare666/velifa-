@@ -12,10 +12,11 @@ import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../prisma/database.service';
 import { CreateAnalysisDto } from './dto/create-analysis.dto';
 import { AnalysisJobPayload } from './analyses.worker';
-import { validateUrl, hashUrl } from '../common/validators/url.validator';
+import { validateUrl, hashUrl, assertPublicHost } from '../common/validators/url.validator';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { BrevoService } from '../brevo/brevo.service';
-import axios from 'axios';
+import { verifyTurnstile } from '../common/security/turnstile';
+import { checkEmailSend, toPublicAnalysis } from './analysis-access';
 
 const CACHE_TTL_HOURS  = 24;
 const FREE_USER_LIMIT  = 3;   // audits / 24h pour un utilisateur gratuit connecté
@@ -33,13 +34,22 @@ export class AnalysesService {
   ) {}
 
   async create(dto: CreateAnalysisDto, ipAddress: string, clerkUserId: string | null = null) {
-    await this.verifyCaptcha(dto.cfTurnstileToken, ipAddress);
+    // Visiteur anonyme → CAPTCHA obligatoire. Utilisateur connecté (jeton Clerk vérifié) →
+    // déjà authentifié et limité par son compte, pas de CAPTCHA.
+    if (!clerkUserId) {
+      await this.verifyCaptcha(dto.cfTurnstileToken ?? '', ipAddress);
+    }
 
     const validation = validateUrl(dto.url);
     if (!validation.valid) {
       throw new BadRequestException(validation.reason);
     }
     const normalizedUrl = validation.normalized!;
+    try {
+      await assertPublicHost(new URL(normalizedUrl).hostname);
+    } catch (err: any) {
+      throw new BadRequestException(err.message);
+    }
     const urlHash = hashUrl(normalizedUrl);
 
     // ── Rate limiting ───────────────────────────────────────────────────
@@ -91,7 +101,7 @@ export class AnalysesService {
     }
 
     // ── Cache check ─────────────────────────────────────────────────────
-    const cached = dto.force ? null : await this.db.findCachedAnalysis(urlHash, cutoff24h);
+    const cached = dto.force ? null : await this.db.findCachedAnalysis(urlHash, cutoff24h, clerkUserId);
     if (cached) {
       this.logger.log(`Cache hit for ${normalizedUrl} → ${cached.id}`);
       return cached;
@@ -123,7 +133,7 @@ export class AnalysesService {
   async findById(id: string) {
     const analysis = await this.db.findAnalysisById(id);
     if (!analysis) throw new NotFoundException(`Analysis ${id} not found`);
-    return analysis;
+    return toPublicAnalysis(analysis);
   }
 
   async findByUser(clerkUserId: string) {
@@ -142,26 +152,12 @@ export class AnalysesService {
   }
 
   private async verifyCaptcha(token: string, ip: string): Promise<void> {
-    const secretKey = this.config.get<string>('security.turnstileSecretKey', '');
-    if (
-      !secretKey ||
-      secretKey === 'your_turnstile_secret' ||
-      process.env.NODE_ENV === 'development' ||
-      token === 'dev-bypass-token'
-    ) {
-      this.logger.warn('Turnstile bypassed in development mode');
-      return;
-    }
-    try {
-      const { data } = await axios.post(
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-        new URLSearchParams({ secret: secretKey, response: token, remoteip: ip }).toString(),
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 5000 },
-      );
-      if (!data.success) throw new BadRequestException('CAPTCHA verification failed');
-    } catch (error: any) {
-      if (error instanceof BadRequestException) throw error;
-      this.logger.warn(`Turnstile error (bypassing): ${error.message}`);
+    const outcome = await verifyTurnstile(token, ip, {
+      secret:  this.config.get<string>('security.turnstileSecretKey', ''),
+      nodeEnv: this.config.get<string>('nodeEnv', 'development'),
+    });
+    if (outcome === 'bypassed-dev') {
+      this.logger.warn('Turnstile bypassed (development, no secret or Cloudflare unreachable)');
     }
   }
 
@@ -169,11 +165,14 @@ export class AnalysesService {
    * POST /analyses/:id/send-email
    * Renvoie le rapport existant par email (sans relancer l'audit).
    */
-  async sendReportForAnalysis(id: string, toEmail: string): Promise<void> {
+  async sendReportForAnalysis(id: string, toEmail: string, callerId: string | null = null): Promise<void> {
     const analysis = await this.db.findAnalysisById(id);
     if (!analysis) throw new NotFoundException(`Analysis ${id} not found`);
     if (analysis.status !== 'completed') {
       throw new BadRequestException('Le rapport n\'est pas encore disponible.');
+    }
+    if (checkEmailSend(analysis, callerId, toEmail) === 'capture') {
+      await this.db.updateAnalysis(id, { email: toEmail.trim().toLowerCase() });
     }
 
     const frontendUrl = this.config.get<string>('frontendUrl', 'http://localhost:3000');

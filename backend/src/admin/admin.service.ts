@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { DatabaseService } from '../prisma/database.service';
+import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import * as mysql from 'mysql2/promise';
 import * as os from 'os';
 import { randomUUID } from 'crypto';
@@ -13,7 +16,10 @@ export class AdminService {
   private readonly logger = new Logger(AdminService.name);
   private readonly startedAt = new Date();
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    @InjectQueue(BULL_ANALYSES_QUEUE) private readonly queue: Queue,
+  ) {}
 
   // ── Global stats ──────────────────────────────────────────────────────────
 
@@ -721,18 +727,18 @@ export class AdminService {
     }
   }
 
-  // ── Clear Redis cache ─────────────────────────────────────────────────────
+  // ── Nettoyage de la file d'audits ─────────────────────────────────────────
+  // Redis ne contient que la file BullMQ : on supprime uniquement l'historique des
+  // tâches terminées/échouées. Les audits en attente ou en cours ne sont jamais touchés.
 
   async clearCache() {
     try {
-      const Redis = (await import('ioredis')).default;
-      const client = new Redis(process.env.REDIS_URL ?? '');
-      await client.flushdb();
-      await client.quit();
-      this.logger.log('Admin cleared Redis cache');
-      return { cleared: true };
+      const completed = await this.queue.clean(0, 'completed');
+      const failed    = await this.queue.clean(0, 'failed');
+      this.logger.log(`Admin cleaned queue history: ${completed.length} completed, ${failed.length} failed`);
+      return { cleared: true, removedCompleted: completed.length, removedFailed: failed.length };
     } catch (e: any) {
-      this.logger.error('Clear cache failed', e.message);
+      this.logger.error('Queue clean failed', e.message);
       return { cleared: false, reason: e.message };
     }
   }
