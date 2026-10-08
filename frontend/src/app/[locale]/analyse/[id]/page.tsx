@@ -18,8 +18,9 @@ async function getAnalysis(id: string) {
   }
 }
 
-export default async function ReportPage({ params }: { params: { id: string } }) {
-  const analysis = await getAnalysis(params.id);
+export default async function ReportPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
+  const { id } = await params;
+  const analysis = await getAnalysis(id);
   if (!analysis || analysis.status !== 'completed') notFound();
 
   const score = analysis.scorePerformance ?? 0;
@@ -234,12 +235,12 @@ export default async function ReportPage({ params }: { params: { id: string } })
       )}
       {/* Modal email — Client Component, s'affiche 1.5s après le chargement */}
       <EmailReportModal
-        analysisId={params.id}
+        analysisId={id}
         siteUrl={analysis.urlSite}
         score={score}
         reportUrl={typeof process !== 'undefined' && process.env.NEXT_PUBLIC_APP_URL
-          ? `${process.env.NEXT_PUBLIC_APP_URL}/analyse/${params.id}`
-          : `/analyse/${params.id}`}
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/analyse/${id}`
+          : `/analyse/${id}`}
       />
     </main>
   );

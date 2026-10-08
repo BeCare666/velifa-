@@ -3,7 +3,10 @@
 import { useCallback, useState } from 'react';
 import Turnstile from 'react-turnstile';
 
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+// Clés Cloudflare : « 0x… » (production) ou « 1x/2x/3x… » (clés de test officielles).
+// Une valeur d'exemple comme « your_turnstile_site_key » est ignorée.
+const RAW_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+const SITE_KEY = /^[0-3]x[A-Za-z0-9_-]+$/.test(RAW_SITE_KEY) ? RAW_SITE_KEY : '';
 
 /** Jeton attendu par le backend en développement quand aucune clé n'est configurée. */
 export const DEV_BYPASS_TOKEN = 'dev-bypass';

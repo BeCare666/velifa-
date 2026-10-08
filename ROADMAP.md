@@ -75,18 +75,20 @@ Constaté dans le code avant toute modification (commit `1d7d7d2`) :
 | ID | Tâche | Critère d'acceptation | Statut |
 |---|---|---|---|
 | 0.1 | Initialiser git + commit de référence | `git log` montre le commit initial | ✅ |
-| 0.2 | Configurer Jest côté backend | `npm test` s'exécute | ⬜ |
-| 0.3 | **S1** Supprimer la clé admin par défaut ; accès admin uniquement via Clerk + email admin ; clé interne optionnelle côté serveur seulement ; exports CSV via requête authentifiée | Aucune occurrence de la clé dans le code ; test : requête avec l'ancienne clé → 401/403 | ⬜ |
-| 0.4 | **S2** Protection SSRF : résolution DNS + blocage des plages privées/réservées (IPv4/IPv6), appliquée aussi aux redirections | Tests unitaires : toutes les URL internes du test initial bloquées, `https://example.com` acceptée | ⬜ |
-| 0.5 | **S3** CAPTCHA cohérent : widget Turnstile réel si clé configurée ; contournement seulement hors production sans clé ; échec fermé en production | Tests unitaires des 4 cas (dev sans clé, prod sans clé, jeton invalide, jeton valide simulé) | ⬜ |
-| 0.6 | **S4** Envoi d'email : limite stricte + interdiction d'envoyer le rapport d'un autre utilisateur | Tests unitaires | ⬜ |
-| 0.7 | **S5** Réponse publique d'une analyse sans données personnelles (email, IP, user-agent) | Test unitaire sur la fonction de sérialisation | ⬜ |
-| 0.8 | **S6** Route `GET /api/v1/health` (BDD + Redis) | Test unitaire du contrôleur | ⬜ |
-| 0.9 | **S7** Résoudre le conflit Next/Clerk (montée de version de Next compatible) | `npm ci` sans `--legacy-peer-deps` + `next build` OK | ⬜ |
-| 0.10 | **S8** Rendre publiques les pages rapport et chargement | Route matcher mis à jour ; build OK | ⬜ |
-| 0.11 | **F1** Retirer/étiqueter « Bientôt » les fonctions factices ; aligner la page tarifs sur ce qui existe | Aucune promesse tarifaire sans implémentation serveur | ⬜ |
-| 0.12 | **F2** Langue de l'utilisateur transmise à l'audit ; email + message WhatsApp en AR/EN/FR | Tests unitaires des gabarits (3 langues, `dir="rtl"` en arabe) | ⬜ |
-| 0.13 | `.env.example` complets et documentés (backend + frontend) | Toutes les variables lues par le code sont listées | ⬜ |
+| 0.2 | Configurer Jest côté backend | `npm test` s'exécute | ✅ |
+| 0.3 | **S1** Supprimer la clé admin par défaut ; accès admin uniquement via Clerk + email admin ; clé interne optionnelle côté serveur seulement ; exports CSV via requête authentifiée | Aucune occurrence de la clé dans le code ; test : requête avec l'ancienne clé → 401/403 | ✅ |
+| 0.4 | **S2** Protection SSRF : résolution DNS + blocage des plages privées/réservées (IPv4/IPv6), appliquée aussi aux redirections | Tests unitaires : toutes les URL internes du test initial bloquées, `https://example.com` acceptée | ✅ |
+| 0.5 | **S3** CAPTCHA cohérent : widget Turnstile réel si clé configurée ; contournement seulement hors production sans clé ; échec fermé en production | Tests unitaires des 4 cas (dev sans clé, prod sans clé, jeton invalide, jeton valide simulé) | ✅ |
+| 0.6 | **S4** Envoi d'email : limite stricte + interdiction d'envoyer le rapport d'un autre utilisateur | Tests unitaires | ✅ |
+| 0.7 | **S5** Réponse publique d'une analyse sans données personnelles (email, IP, user-agent) | Test unitaire sur la fonction de sérialisation | ✅ |
+| 0.8 | **S6** Route `GET /api/v1/health` (BDD + Redis) | Test unitaire du contrôleur | ✅ |
+| 0.9 | **S7** Résoudre le conflit Next/Clerk (montée de version de Next compatible) | `npm ci` sans `--legacy-peer-deps` + `next build` OK | ✅ |
+| 0.10 | **S8** Rendre publiques les pages rapport et chargement | Route matcher mis à jour ; build OK | ✅ |
+| 0.11 | **F1** Retirer/étiqueter « Bientôt » les fonctions factices ; aligner la page tarifs sur ce qui existe | Aucune promesse tarifaire sans implémentation serveur | ✅ |
+| 0.12 | **F2** Langue de l'utilisateur transmise à l'audit ; email + message WhatsApp en AR/EN/FR | Tests unitaires des gabarits (3 langues, `dir="rtl"` en arabe) | ✅ |
+| 0.13 | `.env.example` complets et documentés (backend + frontend) | Toutes les variables lues par le code sont listées | ✅ |
+| 0.14 | Résiliation : accès conservé jusqu'à la fin de la période payée (`subscription_cancelled` ≠ `subscription_expired`) | Tests `entitlements.spec.ts` | ✅ |
+| 0.15 | Page rapport `/analyse/[id]` entièrement traduite (aujourd'hui textes FR en dur) | Build + revue des 3 langues | ⬜ → fait en 1.5 |
 
 ---
 
@@ -127,6 +129,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ⬜ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
 | 2.8 | 🔒 Créer les produits/variantes Lemon Squeezy en USD ; vérifier versement vers votre pays | Action de votre part | 🔒 |
+| 2.9 | Préférences de notification enregistrées côté serveur et respectées par le worker (section retirée en 0.11 car sans effet) | Tests | ⬜ |
 
 ---
 
@@ -173,4 +176,54 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Installation backend : OK. Compilation backend (`tsc`, `nest build`) : OK.
 - Installation frontend `npm ci` : **échec** (S7) ; installée avec `--legacy-peer-deps` pour l'analyse ; `tsc --noEmit` : OK.
 - Test SSRF (script) : 5 URL internes acceptées sur 8 (S2).
-- 0.1 ✅ `git init` + commit `1d7d7d2` (état d'origine).
+- 0.1 ✅ `git init` + commit de référence.
+
+### 2026-10-08 — Secrets trouvés dans le projet (action requise)
+- `backend/env` et `frontend/env.local` (sans point initial, donc non ignorés par `.gitignore`) contiennent de
+  **vraies clés** : TiDB, Redis, PageSpeed, Browserless, Cloudinary, Clerk (`sk_test_…`), Lemon Squeezy, Brevo, Turnstile.
+- Fait : ajoutés au `.gitignore`, retirés du commit de référence, historique local purgé
+  (`git log --all -p | Select-String 'sk_test_7juc'` → 0 résultat). Les fichiers restent sur le disque.
+- ⚠️ Ces noms de fichiers ne sont **pas lus** par NestJS/Next.js (qui lisent `.env` / `.env.local`).
+- 🔒 **Recommandé** : si ces fichiers ont déjà été partagés ou poussés sur GitHub, régénérer toutes ces clés.
+- ⚠️ `backend/env` contient `NODE_TLS_REJECT_UNAUTHORIZED=0` : désactive la vérification TLS de **toutes**
+  les connexions sortantes. À supprimer. Le pool MySQL a aussi `ssl.rejectUnauthorized: false`
+  (`database.service.ts`) : à passer à `true` **après test** sur votre base TiDB (non testé, pas d'accès BDD).
+- ⚠️ `ADMIN_API_KEY` y fait 26 caractères : désormais **désactivée** (minimum 32). Accès admin via Clerk.
+
+### 2026-10-08 — Phase 0 backend (commit `b0af393`)
+- 0.2 ✅ Jest configuré (`package.json`, ts-jest) + `@types/jest`.
+- 0.3 ✅ `admin/admin-auth.ts` : plus de valeur par défaut, comparaison à temps constant, emails **vérifiés** Clerk,
+  exports CSV par `fetch` + jeton (frontend `lib/api.ts`). Tests : `admin-auth.spec.ts` (ancienne clé → 401).
+- 0.4 ✅ `url.validator.ts` : `BlockList` IPv4/IPv6, IPv6 mappées, DNS (`assertPublicHost`), `safeLookup`
+  sur les agents HTTP du détecteur (couvre les redirections). Tests : `url.validator.spec.ts`.
+  Bug corrigé au passage : l'ancienne normalisation mettait le **chemin** en minuscules (mauvaise page auditée).
+- 0.5 ✅ `common/security/turnstile.ts` (9 cas testés). CAPTCHA exigé pour les anonymes uniquement.
+  Frontend : `hooks/useCaptcha.tsx` (widget réel si `NEXT_PUBLIC_TURNSTILE_SITE_KEY`).
+  Bug corrigé : « Relancer » dans *Mes audits* envoyait un jeton vide → toujours 400.
+- 0.6 ✅ `analyses/analysis-access.ts` `checkEmailSend` + `@Throttle` 3/h. Rapport anonyme → une seule adresse (capturée).
+- 0.7 ✅ `toPublicAnalysis` ; cache 24 h restreint au même propriétaire (`clerk_user_id <=> ?`).
+- 0.8 ✅ `health/health.controller.ts` (BDD + Redis, 503 si dégradé).
+- Bonus : « Vider le cache » admin faisait `flushdb` (supprimait les audits en attente) → remplacé par `queue.clean` des tâches terminées/échouées.
+- Preuve : `npx jest` → **5 suites, 75 tests réussis** ; `npx tsc --noEmit` → exit 0.
+
+### 2026-10-08 — Phase 0 terminée
+- 0.9 ✅ `next` 14.2.3 → **15.5.26** (compatible `@clerk/nextjs@7` ; version choisie ≥ 2 semaines d'ancienneté).
+  `npm install` **sans** `--legacy-peer-deps` → OK. Page rapport migrée vers `params` asynchrone (Next 15).
+  Bug de build préexistant corrigé : `className` multi-lignes dans `settings/page.tsx` (chaîne non terminée après styled-jsx).
+- 0.10 ✅ `middleware.ts` inversé : seules `dashboard`, `audits`, `billing`, `settings` exigent une connexion
+  (avec ou sans préfixe de langue). Avant, `/tarifs` ou `/analyse/:id` sans préfixe renvoyaient vers la connexion.
+- 0.11 ✅ Tableau de bord : sections multi-sites / alertes / clé API (localStorage) remplacées par un encart « Bientôt ».
+  Tarifs FR/EN/AR : fonctions Business inexistantes marquées « Bientôt ». Textes corrigés : « rapport PDF par email »
+  (faux, c'est du HTML), « FID » (remplacé par INP chez Google en 2024 ; l'outil mesure TBT),
+  « centaines de sites optimisés » (invérifiable), FAQ support. Préférences de notification sans effet retirées (→ 2.9).
+  Bouton admin « email de test » : utilisait un audit client et une adresse codés en dur → route `/admin/test-email`.
+- 0.12 ✅ `i18n/report-texts.ts` + `brevo/report-email.template.ts` : email et WhatsApp FR/EN/AR, `dir="rtl"`,
+  lien de rapport préfixé par la langue, URL du site échappée (injection HTML possible avant), liens non http(s) refusés.
+  Bloc réseaux sociaux retiré de l'email (comptes non vérifiés).
+- 0.13 ✅ `.env.example` backend et frontend réécrits (toutes les variables lues par le code, avertissements secrets/TLS).
+  `useCaptcha` ignore une clé d'exemple non conforme.
+- 0.14 ✅ `payments/entitlements.ts` : `subscription_cancelled` garde l'accès, `subscription_expired` le retire ;
+  `GET /payments/me` renvoie `has_access` utilisé par le frontend.
+- Preuves : backend `npx jest` → **7 suites, 97 tests réussis**, `tsc` exit 0 ;
+  frontend `tsc --noEmit` exit 0, **`next build` exit 0** (Next 15.5.26, toutes les routes générées).
+- Limite : aucun test de bout en bout (pas de BDD/Redis locaux ; vos clés réelles ne sont pas utilisées sans votre accord).

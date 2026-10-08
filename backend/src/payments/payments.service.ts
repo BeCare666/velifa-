@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../prisma/database.service';
+import { hasPaidAccess } from './entitlements';
 
 /** Lemon Squeezy REST API base URL */
 const LS_API = 'https://api.lemonsqueezy.com/v1';
@@ -238,11 +239,13 @@ export class PaymentsService {
   async getMyPlan(clerkUserId: string): Promise<{
     subscription_plan:   'pro' | 'business' | null;
     subscription_status: string | null;
+    has_access:          boolean;
   }> {
     const user = await this.db.findUserByClerkId(clerkUserId);
     return {
       subscription_plan:   (user?.subscriptionPlan as 'pro' | 'business' | null) ?? null,
       subscription_status: user?.subscriptionStatus ?? null,
+      has_access:          hasPaidAccess(user?.subscriptionPlan, user?.subscriptionStatus),
     };
   }
 
@@ -286,13 +289,25 @@ export class PaymentsService {
         break;
 
       case 'subscription_cancelled':
+        // Résiliation : l'accès reste ouvert jusqu'à la fin de la période payée.
         await this.db.upsertUser({
           clerkUserId,
-          subscriptionPlan:   null,
+          subscriptionPlan:   plan,
           subscriptionStatus: 'cancelled',
           lemonSubscriptionId: lemonSubId,
         });
-        this.logger.log(`[subscription_cancelled] user=${clerkUserId}`);
+        this.logger.log(`[subscription_cancelled] user=${clerkUserId} (accès jusqu'à la fin de période)`);
+        break;
+
+      case 'subscription_expired':
+        // Fin réelle de la période payée → retour au plan gratuit.
+        await this.db.upsertUser({
+          clerkUserId,
+          subscriptionPlan:   null,
+          subscriptionStatus: 'expired',
+          lemonSubscriptionId: lemonSubId,
+        });
+        this.logger.log(`[subscription_expired] user=${clerkUserId}`);
         break;
 
       default:

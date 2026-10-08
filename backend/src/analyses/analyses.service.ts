@@ -17,6 +17,8 @@ import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { BrevoService } from '../brevo/brevo.service';
 import { verifyTurnstile } from '../common/security/turnstile';
 import { checkEmailSend, toPublicAnalysis } from './analysis-access';
+import { buildReportUrl, toReportLocale } from '../i18n/report-texts';
+import { hasPaidAccess } from '../payments/entitlements';
 
 const CACHE_TTL_HOURS  = 24;
 const FREE_USER_LIMIT  = 3;   // audits / 24h pour un utilisateur gratuit connecté
@@ -66,8 +68,7 @@ export class AnalysesService {
       }
       // Utilisateur connecté → vérifie son plan
       const userInfo = await this.db.findUserByClerkId(clerkUserId);
-      const isPremium = userInfo?.subscriptionPlan === 'pro'
-                     || userInfo?.subscriptionPlan === 'business';
+      const isPremium = hasPaidAccess(userInfo?.subscriptionPlan, userInfo?.subscriptionStatus);
 
       if (!isPremium) {
         // Plan gratuit → limite à FREE_USER_LIMIT audits / 24h
@@ -175,10 +176,11 @@ export class AnalysesService {
       await this.db.updateAnalysis(id, { email: toEmail.trim().toLowerCase() });
     }
 
-    const frontendUrl = this.config.get<string>('frontendUrl', 'http://localhost:3000');
-    const reportUrl   = `${frontendUrl}/analyse/${id}`;
+    const locale    = toReportLocale(analysis.locale);
+    const reportUrl = buildReportUrl(this.config.get<string>('frontendUrl', 'http://localhost:3000'), locale, id);
 
     await this.brevo.sendReportEmail({
+      locale,
       toEmail,
       urlSite:          analysis.urlSite,
       scorePerformance: analysis.scorePerformance ?? 0,

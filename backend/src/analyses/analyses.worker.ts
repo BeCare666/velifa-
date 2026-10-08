@@ -11,6 +11,7 @@ import { SseService } from '../sse/sse.service';
 import { ConfigService } from '@nestjs/config';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { TechDetectorService } from '../tech-detector/tech-detector.service';
+import { buildWhatsappLink, buildReportUrl, toReportLocale } from '../i18n/report-texts';
 
 export interface AnalysisJobPayload {
   analysisId: string;
@@ -86,9 +87,11 @@ export class AnalysisWorker {
         this.logger.warn(`[${analysisId}] TechDetector failed (non-blocking): ${techResult.reason?.message}`);
       }
 
-      const frontendUrl = this.config.get<string>('frontendUrl', '');
-      const reportUrl = `${frontendUrl}/analyse/${analysisId}`;
-      const whatsappLink = this.buildWhatsappLink(url, mobile.scorePerformance, reportUrl);
+      const reportLocale = toReportLocale(locale);
+      const reportUrl = buildReportUrl(this.config.get<string>('frontendUrl', ''), reportLocale, analysisId);
+      const whatsappLink = buildWhatsappLink(
+        this.config.get<string>('whatsapp.number', ''), reportLocale, url, mobile.scorePerformance, reportUrl,
+      );
 
       this.logger.log(`[${analysisId}] Saving results...`);
       await this.db.updateAnalysis(analysisId, {
@@ -130,6 +133,7 @@ export class AnalysisWorker {
           reportUrl,
           whatsappUrl:       whatsappLink,
           screenshotUrl,
+          locale:            reportLocale,
         });
       } catch (err: any) {
         this.logger.warn(`[${analysisId}] Email failed (non-blocking): ${err.message}`);
@@ -157,16 +161,5 @@ export class AnalysisWorker {
 
       throw error;
     }
-  }
-
-  private buildWhatsappLink(urlSite: string, score: number, reportUrl: string): string {
-    const number = this.config.get<string>('whatsapp.number', '');
-    const msg = [
-      `Bonjour, j'ai analysé mon site ${urlSite}`,
-      `Score performance : ${score}/100`,
-      `Rapport complet : ${reportUrl}`,
-      `Pouvez-vous m'aider à améliorer ces métriques ?`,
-    ].join('\n');
-    return `https://wa.me/${number}?text=${encodeURIComponent(msg)}`;
   }
 }

@@ -5,26 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-// Routes qui ne nécessitent PAS d'authentification
-const isPublicRoute = createRouteMatcher([
-  '/:locale',
-  '/:locale/sign-in(.*)',
-  '/:locale/sign-up(.*)',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/:locale/admin(.*)',           // Protection gérée côté composant uniquement
-  '/:locale/tarifs(.*)',
-  '/:locale/support(.*)',
-  '/:locale/faq(.*)',
-  '/:locale/a-propos(.*)',
-  '/:locale/contact(.*)',
-  '/:locale/fonctionnalites(.*)',
-  '/:locale/mentions-legales(.*)',
-  '/:locale/confidentialite(.*)',
-  '/:locale/design(.*)',
-  '/api/webhooks/(.*)',
-  '/api/v1/(.*)',
-]);
+// Seules ces routes exigent une connexion (avec ou sans préfixe de langue).
+// Tout le reste est public : accueil, tarifs, rapport partagé (/analyse/:id), pages légales…
+// L'espace admin est protégé côté serveur (API) ; la page vérifie aussi côté composant.
+const PRIVATE_SECTIONS = ['dashboard', 'audits', 'billing', 'settings'];
+const isPrivateRoute = createRouteMatcher(
+  PRIVATE_SECTIONS.flatMap((s) => [`/${s}(.*)`, `/:locale/${s}(.*)`]),
+);
 
 // Chemins à exclure du routing i18n (Clerk, assets, api)
 function shouldSkipI18n(pathname: string): boolean {
@@ -41,20 +28,15 @@ function shouldSkipI18n(pathname: string): boolean {
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
-  // Passer le routing i18n pour les pages d'auth Clerk et l'API
-  if (shouldSkipI18n(pathname)) {
-    if (!isPublicRoute(req)) {
-      await auth.protect();
-    }
-    return NextResponse.next();
-  }
-
-  // Protéger les routes privées
-  if (!isPublicRoute(req)) {
+  if (isPrivateRoute(req)) {
     await auth.protect();
   }
 
-  // Appliquer le middleware i18n (détection locale, redirections)
+  if (shouldSkipI18n(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Applique le middleware i18n (détection locale, redirections)
   return intlMiddleware(req);
 });
 

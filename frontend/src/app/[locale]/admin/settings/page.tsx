@@ -53,13 +53,10 @@ export default function AdminSettingsPage() {
     try {
       const token = await getToken();
       if (!token) return;
-      // Utilise le premier audit disponible pour tester
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyses/cOuX8eAQWC0u8pIKYPBLWu8Z4G/send-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ email: 'academytechs3@gmail.com' }),
-      });
-      setEmailResult('✓ Email de test envoyé');
+      // Email de test envoyé au premier email de ADMIN_EMAILS (route admin dédiée)
+      const res = await api.admin.testEmail(token);
+      const result = res?.data ?? res;
+      setEmailResult(result?.sent ? '✓ Email de test envoyé' : `✗ Échec : ${result?.reason ?? 'inconnu'}`);
     } catch {
       setEmailResult('✗ Échec de l\'envoi');
     } finally { setEmailSending(false); }

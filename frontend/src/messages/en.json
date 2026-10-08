@@ -51,18 +51,18 @@
     },
     "coreWebVitals": {
       "title": "Core Web Vitals Measured",
-      "description": "LCP, CLS, FID — Google's essential metrics",
-      "detail": "We measure the 3 Core Web Vitals required by Google: LCP (loading), CLS (visual stability), TBT/FID (interactivity). These metrics directly impact your SEO ranking."
+      "description": "LCP, CLS, TBT — the speed metrics measured by Google Lighthouse",
+      "detail": "We measure LCP (loading), CLS (visual stability) and TBT (blocking time, a lab proxy for interactivity). Core Web Vitals are part of the page experience signals used by Google."
     },
     "emailReport": {
       "title": "Email Report",
-      "description": "Detailed PDF report in your inbox",
+      "description": "A summary of your report straight to your inbox",
       "detail": "Receive a complete report by email with all your scores, identified issues, and a prioritized list of improvements. Shareable with your development team."
     },
     "screenshot": {
       "title": "Integrated Screenshot",
       "description": "Visual capture of your site",
-      "detail": "Each analysis includes an automatic screenshot of your site as seen by Google robots. Identify visual issues and track your site's appearance over time."
+      "detail": "Each analysis includes an automatic screenshot of your page, taken with a headless Chrome browser."
     }
   },
   "keyFeatures": {
@@ -133,7 +133,7 @@
   },
   "cta": {
     "title": "Ready to boost your site?",
-    "subtitle": "Join hundreds of sites already optimized with Velifa",
+    "subtitle": "Get your free report in under a minute",
     "button": "Analyze my site now"
   },
   "footer": {
@@ -202,12 +202,9 @@
       "desc": "For teams and agencies managing multiple web projects.",
       "features": [
         "Everything in Pro",
-        "Up to 10 simultaneously tracked sites",
-        "Performance alerts by email",
-        "Scheduled automatic audits",
-        "PDF report export",
-        "Dedicated API access (API key)",
-        "Advanced priority support"
+        "In-depth analysis of Lighthouse metrics",
+        "Advanced priority support",
+        "Coming soon: multi-site tracking, alerts, scheduled audits, PDF export, API"
       ]
     },
     "perMonth": "/month",
@@ -253,7 +250,7 @@
     "hiddenAudits": "hidden audits",
     "goPro": "Go Pro",
     "businessAccess": "Business Access — Unlimited",
-    "businessDesc": "Multi-sites, performance alerts and API access included.",
+    "businessDesc": "In-depth analysis and priority support. Multi-site, alerts and API: coming soon.",
     "businessFeature": "Business Feature",
     "businessFeatureDesc": "is reserved for the Business plan.",
     "upgradeBusiness": "Upgrade to Business",
@@ -315,7 +312,7 @@
     "a9_proDesc": "plan adds a personal account with audit history and score trend tracking.",
     "a9_business": "The",
     "a9_businessPlan": "Business",
-    "a9_businessDesc": "plan includes multiple sites, scheduled automatic audits, PDF export and API access.",
+    "a9_businessDesc": "adds in-depth analysis and priority support. Multi-site, scheduled audits, PDF export and API are in development.",
     "a9_link": "See pricing",
     "ctaTitle": "Another question?",
     "ctaDesc": "Feel free to contact us — we usually respond within a few hours.",
@@ -351,9 +348,9 @@
     "f6Desc": "Recurring automatic analyses to monitor your performance continuously.",
     "f7Title": "Multi-site",
     "f7Desc": "Manage multiple projects and websites from a single dashboard.",
-    "f8Title": "PDF export",
+    "f8Title": "PDF export (coming soon)",
     "f8Desc": "Generate complete PDF reports to share your results with your teams or clients.",
-    "f9Title": "API access",
+    "f9Title": "API access (coming soon)",
     "f9Desc": "Integrate Velifa into your workflows with full API access and documentation.",
     "howEyebrow": "How it works",
     "howTitle": "Your report in 3 steps",
@@ -469,7 +466,7 @@
     "notificationsTitle": "Notifications",
     "notif1Label": "Receive reports by email",
     "notif1Desc": "A summary email after each completed audit.",
-    "notif2Label": "Performance alerts",
+    "notif2Label": "Performance alerts (coming soon)",
     "notif2Desc": "Notification if a score drops below your configured threshold.",
     "notif3Label": "Velifa Newsletter",
     "notif3Desc": "News, SEO tips and new features.",

@@ -120,7 +120,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => { fetchPlan(); }, [fetchPlan]);
 
-  const isActive = info.subscription_plan != null && info.subscription_status === 'active';
+  // Le serveur fait foi (has_access) ; repli sur l'ancien calcul si l'API ne le renvoie pas.
+  const isActive = info.has_access
+    ?? (info.subscription_plan != null && info.subscription_status === 'active');
 
   return (
     <SubscriptionContext.Provider value={{

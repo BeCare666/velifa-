@@ -169,37 +169,8 @@ export default function SettingsPage() {
             </Section>
           </div>
 
-          {/* Notifications */}
-          <div className="fade-up" style={{ animationDelay: '100ms' }}>
-            <Section title={t('notificationsTitle')} icon={Bell}>
-              <Toggle
-                on={prefs.emailReports}
-                onToggle={() => toggle('emailReports')}
-                label={t('notif1Label')}
-                description={t('notif1Desc')}
-                enableLabel={t('enable')}
-                disableLabel={t('disable')}
-              />
-              <Toggle
-                on={prefs.perfAlerts}
-                onToggle={() => toggle('perfAlerts')}
-                label={t('notif2Label')}
-                description={t('notif2Desc')}
-                enableLabel={t('enable')}
-                disableLabel={t('disable')}
-              />
-              <div className="py-4">
-                <Toggle
-                  on={prefs.newsletter}
-                  onToggle={() => toggle('newsletter')}
-                  label={t('notif3Label')}
-                  description={t('notif3Desc')}
-                  enableLabel={t('enable')}
-                  disableLabel={t('disable')}
-                />
-              </div>
-            </Section>
-          </div>
+          {/* Préférences de notification : retirées tant qu'elles ne sont pas enregistrées
+              et appliquées côté serveur (ROADMAP 2.9). Les anciens interrupteurs n'avaient aucun effet. */}
 
           {/* Danger zone */}
           <div className="fade-up" style={{ animationDelay: '140ms' }}>
@@ -225,9 +196,7 @@ export default function SettingsPage() {
                     {t('deleteAccount')}
                   </button>
                   <div
-                    className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
-                               px-2.5 py-1.5 text-xs rounded-[8px] whitespace-nowrap
-                               opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 text-xs rounded-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
                     style={{
                       background: 'var(--surface-raised)',
                       color: 'var(--text)',

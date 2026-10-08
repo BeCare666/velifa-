@@ -12,11 +12,11 @@ import { useSubscription } from '@/context/SubscriptionContext';
 const FAQ = [
   {
     q: 'Comment fonctionne un audit Velifa ?',
-    a: "Velifa analyse votre URL avec Lighthouse (Google) et extrait les métriques de performance (LCP, CLS, FID), le score SEO, les technologies détectées et les recommandations d'amélioration. L'analyse prend généralement 20 à 40 secondes.",
+    a: "Velifa analyse votre URL avec Lighthouse (Google) et extrait les métriques de performance (LCP, CLS, TBT), le score SEO, les technologies détectées et les recommandations d'amélioration. L'analyse prend généralement 20 à 40 secondes.",
   },
   {
     q: 'Quelle est la différence entre les plans Gratuit, Pro et Business ?',
-    a: 'Le plan Gratuit donne accès à 3 audits et un historique limité. Le plan Pro offre des audits illimités, l\'historique complet et les rapports détaillés. Le plan Business ajoute le suivi multi-sites, les alertes de performance et l\'accès API.',
+    a: 'Le plan Gratuit donne accès à 3 audits par 24 h et un historique limité. Le plan Pro offre des audits illimités, l\'historique complet et les rapports détaillés. Le plan Business ajoute l\'analyse approfondie et le support prioritaire ; le suivi multi-sites, les alertes et l\'accès API sont en cours de développement.',
   },
   {
     q: 'Mes données sont-elles sécurisées ?',

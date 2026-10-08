@@ -285,7 +285,7 @@ export default function ReportProFeatures({
           </p>
           <p className="text-text-muted text-sm mt-1 leading-relaxed">
             Détection automatique des technologies (CMS, frameworks, analytics),
-            services tiers, export PDF et historique illimité.
+            services tiers et historique illimité.
           </p>
         </div>
         <Link href="/tarifs" className="velifa-btn flex-shrink-0 flex items-center gap-2 text-sm">

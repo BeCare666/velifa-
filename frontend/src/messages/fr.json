@@ -51,18 +51,18 @@
     },
     "coreWebVitals": {
       "title": "Core Web Vitals mesurés",
-      "description": "LCP, CLS, FID — les métriques essentielles de Google",
-      "detail": "Nous mesurons les 3 Core Web Vitals exigés par Google : LCP (chargement), CLS (stabilité visuelle), TBT/FID (interactivité). Ces métriques impactent directement votre positionnement SEO."
+      "description": "LCP, CLS, TBT — les métriques de vitesse mesurées par Google Lighthouse",
+      "detail": "Nous mesurons LCP (chargement), CLS (stabilité visuelle) et TBT (blocage, indicateur de laboratoire lié à l'interactivité). Les Core Web Vitals font partie des signaux d'expérience de page utilisés par Google."
     },
     "emailReport": {
       "title": "Rapport par email",
-      "description": "Rapport PDF détaillé dans votre boîte mail",
+      "description": "Un résumé de votre rapport directement dans votre boîte mail",
       "detail": "Recevez un rapport complet par email avec tous vos scores, les problèmes identifiés et une liste priorisée d'améliorations. Partageable avec votre équipe de développement."
     },
     "screenshot": {
       "title": "Capture d'écran intégrée",
       "description": "Capture visuelle de votre site",
-      "detail": "Chaque analyse inclut une capture d'écran automatique de votre site tel que vu par les robots Google. Identifiez les problèmes visuels et suivez l'apparence de votre site dans le temps."
+      "detail": "Chaque analyse inclut une capture d'écran automatique de votre page, réalisée avec un navigateur Chrome sans interface."
     }
   },
   "keyFeatures": {
@@ -133,7 +133,7 @@
   },
   "cta": {
     "title": "Prêt à booster votre site ?",
-    "subtitle": "Rejoignez des centaines de sites déjà optimisés avec Velifa",
+    "subtitle": "Obtenez votre rapport gratuit en moins d'une minute",
     "button": "Analyser mon site maintenant"
   },
   "footer": {
@@ -202,12 +202,9 @@
       "desc": "Pour les équipes et agences gérant plusieurs projets web.",
       "features": [
         "Tout le plan Pro",
-        "Jusqu'à 10 sites suivis simultanément",
-        "Alertes performance par email",
-        "Audits programmés automatiques",
-        "Export des rapports en PDF",
-        "Accès API dédié (clé API)",
-        "Support prioritaire avancé"
+        "Analyse approfondie des métriques Lighthouse",
+        "Support prioritaire avancé",
+        "Bientôt : suivi multi-sites, alertes, audits programmés, export PDF, API"
       ]
     },
     "perMonth": "/mois",
@@ -253,7 +250,7 @@
     "hiddenAudits": "audits masqués",
     "goPro": "Passer Pro",
     "businessAccess": "Espace Business — Accès illimité",
-    "businessDesc": "Multi-sites, alertes de performance et accès API inclus.",
+    "businessDesc": "Analyse approfondie et support prioritaire. Multi-sites, alertes et API : bientôt.",
     "businessFeature": "Fonctionnalité Business",
     "businessFeatureDesc": "est réservée au plan Business.",
     "upgradeBusiness": "Passer Business",
@@ -315,7 +312,7 @@
     "a9_proDesc": "ajoute un compte personnel avec historique des audits et suivi de l'évolution des scores.",
     "a9_business": "Le",
     "a9_businessPlan": "Business",
-    "a9_businessDesc": "inclut plusieurs sites, les audits programmés automatiquement, l'export PDF et l'accès API.",
+    "a9_businessDesc": "ajoute l'analyse approfondie et le support prioritaire. Multi-sites, audits programmés, export PDF et API sont en cours de développement.",
     "a9_link": "Voir les tarifs",
     "ctaTitle": "Une autre question ?",
     "ctaDesc": "N'hésitez pas à nous contacter — nous répondons généralement en quelques heures.",
@@ -351,9 +348,9 @@
     "f6Desc": "Analyses automatiques récurrentes pour suivre vos performances en continu.",
     "f7Title": "Multi-sites",
     "f7Desc": "Gérez plusieurs projets et sites web depuis un seul tableau de bord.",
-    "f8Title": "Export PDF",
+    "f8Title": "Export PDF (bientôt)",
     "f8Desc": "Générez des rapports PDF complets pour partager vos résultats avec vos équipes ou clients.",
-    "f9Title": "Accès API",
+    "f9Title": "Accès API (bientôt)",
     "f9Desc": "Intégrez Velifa dans vos workflows avec un accès API complet et documentation.",
     "howEyebrow": "Comment ça marche",
     "howTitle": "En 3 étapes, votre rapport",
@@ -472,7 +469,7 @@
     "notificationsTitle": "Notifications",
     "notif1Label": "Recevoir les rapports par email",
     "notif1Desc": "Un email récapitulatif après chaque audit terminé.",
-    "notif2Label": "Alertes de performance",
+    "notif2Label": "Alertes de performance (bientôt)",
     "notif2Desc": "Notification si un score chute sous votre seuil configuré.",
     "notif3Label": "Newsletter Velifa",
     "notif3Desc": "Actualités, conseils SEO et nouvelles fonctionnalités.",
