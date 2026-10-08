@@ -806,5 +806,47 @@
     "pdf": "Exporter en PDF",
     "pdfDesc": "Rapport complet prêt à partager",
     "soon": "Bientôt"
+  },
+  "comparePage": {
+    "title": "Avant / après",
+    "subtitle": "Comparaison de deux audits de la même page sur mobile.",
+    "before": "Avant",
+    "after": "Après",
+    "auditOf": "Audit du {date}",
+    "openReport": "Voir le rapport",
+    "performance": "Performance mobile",
+    "trend": {
+      "better": "Amélioré",
+      "worse": "Dégradé",
+      "stable": "Stable",
+      "unknown": "Non mesuré"
+    },
+    "noiseNote": "Une mesure Lighthouse varie d’un passage à l’autre : un écart de moins de 5 points (ou de moins de 10 % sur une mesure) est considéré comme stable.",
+    "scoresTitle": "Scores Lighthouse",
+    "labTitle": "Mesures de vitesse (simulation)",
+    "fieldTitle": "Vrais visiteurs (Chrome UX Report)",
+    "fieldNote": "Moyenne glissante sur 28 jours : l’effet complet d’une correction n’apparaît qu’environ 28 jours après.",
+    "colMetric": "Indicateur",
+    "colChange": "Évolution",
+    "metric": {
+      "performance": "Performance",
+      "accessibility": "Accessibilité",
+      "seo": "SEO",
+      "bestPractices": "Bonnes pratiques",
+      "lcp": "Chargement (LCP)",
+      "cls": "Stabilité (CLS)",
+      "tbt": "Temps bloquant (TBT)",
+      "fcp": "Premier affichage (FCP)",
+      "inp": "Réactivité (INP)"
+    },
+    "recsTitle": "Recommandations",
+    "issuesTitle": "Langue arabe et confidentialité",
+    "resolved": "N’apparaissent plus",
+    "added": "Nouveaux points",
+    "remaining": "Toujours présents",
+    "noneList": "Aucun",
+    "notComparable": "Comparaison impossible : un des deux audits ne contient pas ces données.",
+    "error": "Comparaison impossible : {message}",
+    "compare": "Comparer"
   }
 }

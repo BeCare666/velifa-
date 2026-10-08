@@ -107,7 +107,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.6 | Estimation d'impact business (référence Deloitte/Google, présentée comme corrélation) | Texte sourcé dans le rapport | ✅ |
 | 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ✅ |
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ✅ |
-| 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ⬜ |
+| 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ✅ |
 | 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ⬜ |
 | 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ⬜ |
 | 1.12 | 🔒 Clés de production (PageSpeed, Browserless, Brevo, Clerk, TiDB, Redis, Turnstile) et déploiement | Vous fournissez les clés | 🔒 |
@@ -308,4 +308,21 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : `npx jest` → **13 suites, 190 tests réussis** (+16) — dont décodage du lien `wa.me` identique au message
   d'origine et relecture du CSV produit par le parseur ; `tsc` exit 0 ; `next build` exit 0 ;
   API réelle : `/admin/prospects/export` sans jeton → 401 ; avec clé admin → 500 (pas de base locale, attendu).
+
+### 2026-10-08 — 1.9 Comparaison avant/après
+- `analyses/compare.ts` : scores (4), mesures labo (LCP, CLS, TBT, FCP), données terrain CrUX (LCP, INP, CLS),
+  recommandations et points Golfe (« n'apparaissent plus » / nouveaux / toujours présents). Le plus ancien = « avant ».
+  - **Honnêteté de mesure** : une variation Lighthouse n'est pas une amélioration. Seuils retenus : < 5 points de score,
+    ou < max(seuil absolu, 10 %) sur une mesure (LCP/FCP/TTFB 100 ms, TBT 50 ms, INP 25 ms, CLS 0,01) → « stable ».
+  - Pas de « corrigé » trompeur : si un audit a une page bloquée ou pas de contrôles/recommandations (audit ancien),
+    la comparaison de ces listes est `null` (« comparaison impossible ») au lieu de tout marquer comme résolu.
+  - Libellé prudent « n'apparaissent plus » (la liste est limitée aux 8 recommandations principales).
+- `GET /analyses/:id/compare/:otherId` : deux audits terminés de la **même URL** (sinon 400), aucun champ personnel.
+  Accès par identifiants d'audit, comme le rapport public.
+- Page `/[locale]/analyse/[id]/compare/[otherId]` (FR/EN/AR, espace `comparePage`) avec note sur la variabilité
+  et sur la moyenne glissante de 28 jours des données terrain. Bouton « Comparer » dans *Mes audits* quand la même URL
+  a un audit plus ancien.
+- Preuves : `npx jest` → **14 suites, 204 tests réussis** (+14) ; `tsc` exit 0 ; `next build` exit 0 ;
+  rendu réel (`next start` + API simulée appelant `compareAnalyses` sur la fixture PageSpeed réelle) :
+  `/fr|en|ar/analyse/after/compare/demo` → 200, `dir="rtl"` en arabe, aucune clé brute ; URL différente → message d'erreur.
 

@@ -1,4 +1,4 @@
-import type { Analysis, CreateAnalysisResponse, MyAudit } from '@/types/analysis';
+import type { Analysis, AnalysisComparison, CreateAnalysisResponse, MyAudit } from '@/types/analysis';
 import type { SubscriptionInfo } from '@/types/subscription';
 
 const BASE_URL   = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
@@ -55,6 +55,9 @@ export const api = {
     }),
 
   getAnalysis: (id: string) => apiFetch<{ data: Analysis }>(`/analyses/${id}`),
+
+  compareAnalyses: (id: string, otherId: string) =>
+    apiFetch<{ data: AnalysisComparison }>(`/analyses/${encodeURIComponent(id)}/compare/${encodeURIComponent(otherId)}`),
 
   getMine: (authToken: string) =>
     apiFetch<{ data: MyAudit[]; timestamp: string }>('/analyses/mine', { authToken }),

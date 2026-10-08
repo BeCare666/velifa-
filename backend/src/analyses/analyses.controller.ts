@@ -77,6 +77,15 @@ export class AnalysesController {
   }
 
   /**
+   * GET /analyses/:id/compare/:otherId
+   * Comparaison avant/après de deux audits terminés d'une même URL (le plus ancien = avant).
+   */
+  @Get(':id/compare/:otherId')
+  async compare(@Param('id') id: string, @Param('otherId') otherId: string) {
+    return this.analysesService.compare(id, otherId);
+  }
+
+  /**
    * POST /analyses/:id/send-email
    * Envoie le rapport existant par email sans relancer l'audit.
    * Pas de throttle — action utilisateur explicite unique.

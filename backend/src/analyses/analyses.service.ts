@@ -19,6 +19,7 @@ import { verifyTurnstile } from '../common/security/turnstile';
 import { checkEmailSend, toPublicAnalysis } from './analysis-access';
 import { buildReportUrl, toReportLocale } from '../i18n/report-texts';
 import { hasPaidAccess } from '../payments/entitlements';
+import { compareAnalyses, AnalysisComparison } from './compare';
 
 const CACHE_TTL_HOURS  = 24;
 const FREE_USER_LIMIT  = 3;   // audits / 24h pour un utilisateur gratuit connecté
@@ -135,6 +136,21 @@ export class AnalysesService {
     const analysis = await this.db.findAnalysisById(id);
     if (!analysis) throw new NotFoundException(`Analysis ${id} not found`);
     return toPublicAnalysis(analysis);
+  }
+
+  /**
+   * Comparaison avant/après. Chaque identifiant d'audit vaut accès au rapport (comme GET /analyses/:id) :
+   * connaître les deux suffit ; ils doivent porter sur la même URL et être terminés.
+   */
+  async compare(id: string, otherId: string): Promise<AnalysisComparison> {
+    if (id === otherId) throw new BadRequestException('Choisissez deux audits différents.');
+    const [a, b] = await Promise.all([this.db.findAnalysisById(id), this.db.findAnalysisById(otherId)]);
+    if (!a || !b) throw new NotFoundException('Audit introuvable');
+    if (a.urlHash !== b.urlHash) throw new BadRequestException('Les deux audits ne portent pas sur la même URL.');
+    if (a.status !== 'completed' || b.status !== 'completed') {
+      throw new BadRequestException('Les deux audits doivent être terminés.');
+    }
+    return compareAnalyses(a, b);
   }
 
   async findByUser(clerkUserId: string) {

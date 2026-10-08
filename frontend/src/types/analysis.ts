@@ -90,6 +90,22 @@ export interface Analysis {
   completedAt?: string | null;
 }
 
+export type Trend = 'better' | 'worse' | 'stable' | 'unknown';
+export interface MetricDiff { key: string; before: number | null; after: number | null; delta: number | null; trend: Trend }
+export interface ListDiff { resolved: string[]; added: string[]; remaining: string[] }
+
+/** GET /analyses/:id/compare/:otherId */
+export interface AnalysisComparison {
+  urlSite: string;
+  before: { id: string; createdAt: string };
+  after: { id: string; createdAt: string };
+  scores: MetricDiff[];
+  lab: MetricDiff[];
+  field: MetricDiff[] | null;
+  recommendations: ListDiff | null;
+  siteIssues: ListDiff | null;
+}
+
 export interface CreateAnalysisResponse {
   data: { id: string; status: AnalysisStatus; cached: boolean };
   timestamp: string;

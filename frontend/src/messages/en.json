@@ -803,5 +803,47 @@
     "pdf": "Export to PDF",
     "pdfDesc": "Full report ready to share",
     "soon": "Soon"
+  },
+  "comparePage": {
+    "title": "Before / after",
+    "subtitle": "Comparison of two mobile audits of the same page.",
+    "before": "Before",
+    "after": "After",
+    "auditOf": "Audit of {date}",
+    "openReport": "View report",
+    "performance": "Mobile performance",
+    "trend": {
+      "better": "Improved",
+      "worse": "Worse",
+      "stable": "Stable",
+      "unknown": "Not measured"
+    },
+    "noiseNote": "Lighthouse results vary from run to run: a change of less than 5 points (or less than 10% on a metric) is considered stable.",
+    "scoresTitle": "Lighthouse scores",
+    "labTitle": "Speed metrics (simulation)",
+    "fieldTitle": "Real visitors (Chrome UX Report)",
+    "fieldNote": "Rolling 28-day average: the full effect of a fix only shows about 28 days later.",
+    "colMetric": "Metric",
+    "colChange": "Change",
+    "metric": {
+      "performance": "Performance",
+      "accessibility": "Accessibility",
+      "seo": "SEO",
+      "bestPractices": "Best practices",
+      "lcp": "Loading (LCP)",
+      "cls": "Stability (CLS)",
+      "tbt": "Blocking time (TBT)",
+      "fcp": "First paint (FCP)",
+      "inp": "Responsiveness (INP)"
+    },
+    "recsTitle": "Recommendations",
+    "issuesTitle": "Arabic language and privacy",
+    "resolved": "No longer flagged",
+    "added": "New issues",
+    "remaining": "Still present",
+    "noneList": "None",
+    "notComparable": "Cannot compare: one of the two audits does not include this data.",
+    "error": "Cannot compare: {message}",
+    "compare": "Compare"
   }
 }

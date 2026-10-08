@@ -7,7 +7,7 @@ import { useAuth } from '@clerk/nextjs';
 import {
   BarChart3, Globe, FileSearch, RefreshCw, ArrowRight,
   Loader2, Zap, ChevronLeft, ChevronRight, Filter, Calendar,
-  Gauge, Search,
+  Gauge, Search, GitCompare,
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { api } from '@/lib/api';
@@ -144,6 +144,7 @@ export default function AuditsPage() {
   const router = useRouter();
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const t = useTranslations('audits');
+  const tc = useTranslations('comparePage');
   const locale = useLocale();
   const formatDate = useFormatDate();
 
@@ -191,6 +192,17 @@ export default function AuditsPage() {
     const avg = Math.round(scored.reduce((s, a) => s + a.scorePerformance, 0) / scored.length);
     const best = Math.max(...scored.map((a) => a.scorePerformance));
     return { total: audits.length, avg, best };
+  }, [audits]);
+
+  // Audit précédent de la même URL (liste triée du plus récent au plus ancien) → lien « Comparer »
+  const previousOf = useMemo(() => {
+    const map: Record<string, string> = {};
+    const lastSeen: Record<string, string> = {};
+    for (const a of [...(audits ?? [])].reverse()) {
+      if (lastSeen[a.url]) map[a.id] = lastSeen[a.url];
+      lastSeen[a.url] = a.id;
+    }
+    return map;
   }, [audits]);
 
   // Filtering
@@ -425,6 +437,20 @@ export default function AuditsPage() {
                                     {t('report')}
                                     <ArrowRight className="w-3 h-3" />
                                   </Link>
+                                  {previousOf[audit.id] && (
+                                    <Link
+                                      href={`/${locale}/analyse/${audit.id}/compare/${previousOf[audit.id]}`}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all"
+                                      style={{
+                                        background: 'var(--surface-raised)',
+                                        border: '1px solid var(--border)',
+                                        color: 'var(--text-muted)',
+                                      }}
+                                    >
+                                      <GitCompare className="w-3 h-3" />
+                                      {tc('compare')}
+                                    </Link>
+                                  )}
                                   <button
                                     onClick={() => relaunch(audit)}
                                     disabled={relaunching === audit.id}
