@@ -164,6 +164,28 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       `);
       this.logger.log('Migration: prospects table ready');
+
+      // Leads : demandes « Je veux corriger » envoyées depuis un rapport
+      await this.pool.query(`
+        CREATE TABLE IF NOT EXISTS leads (
+          id            VARCHAR(36)   NOT NULL,
+          analysis_id   VARCHAR(36)   NOT NULL,
+          url_site      VARCHAR(2048) NOT NULL,
+          name          VARCHAR(120)  NULL,
+          email         VARCHAR(255)  NULL,
+          phone         VARCHAR(20)   NULL,
+          message       TEXT          NULL,
+          locale        VARCHAR(5)    NOT NULL,
+          clerk_user_id VARCHAR(255)  NULL,
+          ip_address    VARCHAR(64)   NULL,
+          status        VARCHAR(20)   NOT NULL DEFAULT 'new',
+          created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          KEY idx_leads_analysis (analysis_id),
+          KEY idx_leads_created (created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+      `);
+      this.logger.log('Migration: leads table ready');
     } catch (err: any) {
       this.logger.error('Migration failed', err?.message);
     }
@@ -468,6 +490,57 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         errorMessage:     r.error_message ?? null,
       })),
     };
+  }
+
+  // ── Leads (« Je veux corriger ») ───────────────────────────────────────
+
+  /** Même contact déjà enregistré pour ce rapport depuis `since` (évite les doublons). */
+  async hasRecentLead(analysisId: string, email: string | null, phone: string | null, since: Date): Promise<boolean> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT 1 FROM leads
+        WHERE analysis_id = ? AND created_at >= ?
+          AND ((? IS NOT NULL AND email = ?) OR (? IS NOT NULL AND phone = ?))
+        LIMIT 1`,
+      [analysisId, since, email, email, phone, phone],
+    );
+    return rows.length > 0;
+  }
+
+  async insertLead(l: {
+    id: string; analysisId: string; urlSite: string; name: string | null; email: string | null;
+    phone: string | null; message: string | null; locale: string; clerkUserId: string | null; ipAddress: string | null;
+  }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO leads (id, analysis_id, url_site, name, email, phone, message, locale, clerk_user_id, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [l.id, l.analysisId, l.urlSite, l.name, l.email, l.phone, l.message, l.locale, l.clerkUserId, l.ipAddress],
+    );
+  }
+
+  async listLeads(limit: number, offset: number): Promise<{ rows: any[]; total: number }> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT l.id, l.analysis_id, l.url_site, l.name, l.email, l.phone, l.message, l.locale, l.status, l.created_at,
+              a.score_performance, a.platform, a.report_url
+         FROM leads l LEFT JOIN analyses a ON a.id = l.analysis_id
+        ORDER BY l.created_at DESC LIMIT ? OFFSET ?`,
+      [limit, offset],
+    );
+    const [[count]] = await this.pool.query<mysql.RowDataPacket[]>('SELECT COUNT(*) AS cnt FROM leads');
+    return {
+      total: Number(count?.cnt ?? 0),
+      rows: rows.map((r) => ({
+        id: r.id, analysisId: r.analysis_id, urlSite: r.url_site, name: r.name ?? null, email: r.email ?? null,
+        phone: r.phone ?? null, message: r.message ?? null, locale: r.locale, status: r.status, createdAt: r.created_at,
+        scorePerformance: r.score_performance ?? null, platform: r.platform ?? null, reportUrl: r.report_url ?? null,
+      })),
+    };
+  }
+
+  async createAdminNotification(type: string, message: string): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO admin_notifications (id, type, message, read_status, created_at) VALUES (UUID(), ?, ?, FALSE, NOW())`,
+      [type, message],
+    );
   }
 
   // ── Internal helpers ───────────────────────────────────────────────────

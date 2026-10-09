@@ -79,6 +79,7 @@ export default function AdminNotificationsPage() {
                     info:       { color: '#22c55e', bg: 'rgba(34,197,94,0.08)' },
                     warning:    { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
                     critical:   { color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+                    lead:       { color: '#D4AF37', bg: 'rgba(212,175,55,0.10)' },
                   };
                   const { color, bg } = typeColors[n.type] ?? typeColors.info;
                   return (

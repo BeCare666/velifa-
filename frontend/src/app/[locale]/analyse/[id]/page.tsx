@@ -10,6 +10,7 @@ import {
 import { ThemeToggle } from '@/components/ThemeToggle';
 import ReportProFeatures from '@/components/report/ReportProFeatures';
 import EmailReportModal from '@/components/report/EmailReportModal';
+import LeadForm from '@/components/report/LeadForm';
 import type { FieldMetric, Recommendation } from '@/types/analysis';
 
 export const revalidate = 0;
@@ -269,6 +270,9 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
           <a href="https://web.dev/case-studies/milliseconds-make-millions" target="_blank" rel="noopener noreferrer"
             className="text-xs text-accent hover:underline mt-1 inline-block">{t('impact.source')}</a>
         </div>
+
+        {/* ── « Je veux corriger » (capture de contact) ─────────────────── */}
+        <LeadForm analysisId={analysis.id} />
 
         {/* ── Langue arabe et confidentialité ─────────────────────────── */}
         {checks && (

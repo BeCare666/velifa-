@@ -19,6 +19,7 @@ import { AnalysesService } from './analyses.service';
 import { SseService } from '../sse/sse.service';
 import { CreateAnalysisDto } from './dto/create-analysis.dto';
 import { SendReportEmailDto } from './dto/send-report-email.dto';
+import { CreateLeadDto } from './dto/create-lead.dto';
 import { ClientIp } from '../common/decorators/client-ip.decorator';
 import { verifyClerkToken } from '../common/auth/clerk-auth.service';
 
@@ -83,6 +84,23 @@ export class AnalysesController {
   @Get(':id/compare/:otherId')
   async compare(@Param('id') id: string, @Param('otherId') otherId: string) {
     return this.analysesService.compare(id, otherId);
+  }
+
+  /**
+   * POST /analyses/:id/lead
+   * « Je veux corriger » : demande de contact depuis le rapport (CAPTCHA pour les anonymes).
+   */
+  @Post(':id/lead')
+  @Throttle({ short: { limit: 5, ttl: 3_600_000 } })   // 5 demandes / heure / IP
+  @HttpCode(HttpStatus.OK)
+  async createLead(
+    @Param('id') id: string,
+    @Body() dto: CreateLeadDto,
+    @ClientIp() ip: string,
+    @Headers('authorization') authHeader: string | undefined,
+  ) {
+    const clerkUserId = await verifyClerkToken(authHeader);
+    return this.analysesService.createLead(id, dto, ip, clerkUserId);
   }
 
   /**

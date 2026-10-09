@@ -658,6 +658,15 @@ export class AdminService {
     this.logger.warn(`Admin banned user ${clerkUserId}`);
   }
 
+  // ── Leads ─────────────────────────────────────────────────────────────────
+
+  async getLeads(page: number, limit: number) {
+    const lim = Math.min(Math.max(limit, 1), 200);
+    const p = Math.max(page, 1);
+    const { rows, total } = await this.db.listLeads(lim, (p - 1) * lim);
+    return { leads: rows, total, page: p, limit: lim };
+  }
+
   // ── Notifications ─────────────────────────────────────────────────────────
 
   async getNotifications() {

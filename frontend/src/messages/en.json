@@ -766,6 +766,27 @@
       "title": "Files involved",
       "saving": "Potential saving: {value}",
       "blocking": "Blocking: {value}"
+    },
+    "lead": {
+      "title": "Want to fix these issues?",
+      "subtitle": "Leave your details: we will get back to you with an action plan and a quote for this site.",
+      "cta": "I want to fix this",
+      "name": "Your name (optional)",
+      "email": "Email",
+      "phone": "WhatsApp number",
+      "countryCode": "Country code",
+      "otherCode": "Other (+…)",
+      "message": "Your message (optional)",
+      "submit": "Send my request",
+      "privacy": "Your details are only used to contact you about this report.",
+      "success": "Thank you! We have received your request and will get back to you shortly.",
+      "errors": {
+        "contact_required": "Enter an email or a WhatsApp number.",
+        "phone_international": "Choose the country code or enter the number with + (e.g. +971…).",
+        "phone_invalid": "Invalid WhatsApp number.",
+        "tooMany": "Too many requests, please try again later.",
+        "generic": "Could not send. Please check your details."
+      }
     }
   },
   "emailModal": {

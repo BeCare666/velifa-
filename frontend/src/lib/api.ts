@@ -56,6 +56,15 @@ export const api = {
 
   getAnalysis: (id: string) => apiFetch<{ data: Analysis }>(`/analyses/${id}`),
 
+  createLead: (id: string, body: {
+    name?: string; email?: string; phone?: string; message?: string; cfTurnstileToken?: string;
+  }, authToken?: string | null) =>
+    apiFetch<{ data: { received: boolean } }>(`/analyses/${encodeURIComponent(id)}/lead`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      authToken,
+    }),
+
   compareAnalyses: (id: string, otherId: string) =>
     apiFetch<{ data: AnalysisComparison }>(`/analyses/${encodeURIComponent(id)}/compare/${encodeURIComponent(otherId)}`),
 
@@ -117,6 +126,8 @@ export const api = {
       apiFetch<any>('/admin/prospects/import', { method: 'POST', body: JSON.stringify({ csv, locale }), authToken: token }),
     getProspects: (token: string | null | undefined, params: Record<string, string>) =>
       apiFetch<any>(`/admin/prospects?${new URLSearchParams(params)}`, { authToken: token }),
+    getLeads: (token: string | null | undefined, params: Record<string, string>) =>
+      apiFetch<any>(`/admin/leads?${new URLSearchParams(params)}`, { authToken: token }),
     exportProspects: (token: string | null | undefined, batch?: string) =>
       downloadAdminExport('prospects', token, `/admin/prospects/export${batch ? `?batch=${encodeURIComponent(batch)}` : ''}`),
   },

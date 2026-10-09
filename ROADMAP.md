@@ -108,7 +108,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.7 | Audit en lot (admin) : import CSV d'URL → file d'attente à débit limité → table `prospects` | Test unitaire du parseur CSV + du service | ✅ |
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ✅ |
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ✅ |
-| 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ⬜ |
+| 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ✅ |
 | 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ⬜ |
 | 1.12 | 🔒 Clés de production (PageSpeed, Browserless, Brevo, Clerk, TiDB, Redis, Turnstile) et déploiement | Vous fournissez les clés | 🔒 |
 
@@ -325,4 +325,21 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : `npx jest` → **14 suites, 204 tests réussis** (+14) ; `tsc` exit 0 ; `next build` exit 0 ;
   rendu réel (`next start` + API simulée appelant `compareAnalyses` sur la fixture PageSpeed réelle) :
   `/fr|en|ar/analyse/after/compare/demo` → 200, `dir="rtl"` en arabe, aucune clé brute ; URL différente → message d'erreur.
+
+### 2026-10-09 — 1.10 « Je veux corriger » (leads)
+- `POST /analyses/:id/lead` : rapport terminé uniquement ; nom, email et/ou WhatsApp, message ; au moins un contact.
+  WhatsApp **international obligatoire** (+/00) : un numéro local sans pays n'est pas deviné (erreur explicite).
+  CAPTCHA Turnstile pour les anonymes (fermé en production sans clé), **5 demandes/h/IP**, IP masquée comme pour les audits.
+  Même contact sur le même rapport en 24 h → pas de doublon. Échec de la notification → la demande reste enregistrée.
+- Table `leads` (au démarrage → 1.11) ; notification admin de type `lead` ; page admin `/admin/leads`
+  (contact cliquable email / WhatsApp, score, plateforme, lien rapport).
+- Rapport : bloc « Vous voulez corriger ces points ? » (FR/EN/AR) avec indicatif pays (Golfe d'abord, 0 national retiré)
+  et mention « coordonnées utilisées uniquement pour vous recontacter au sujet de ce rapport ».
+- Preuves :
+  - `npx jest` → **15 suites, 214 tests réussis** (+10) ; `tsc` exit 0 ; `next build` exit 0 (78 pages) ;
+  - API réelle (`NODE_ENV=production`, sans clés) : email invalide, champ inconnu, message > 1000 → 400 ;
+    anonyme sans CAPTCHA configuré → 503 (échec fermé) ; 6ᵉ requête dans l'heure → 429 ;
+  - rendu du rapport FR/EN/AR : bloc et bouton traduits ; conversion du numéro testée sur le code du composant (6/6).
+- ⚠️ Limite : envoi du formulaire non testé au clic dans un navigateur (extension Chrome non connectée) ;
+  SQL non exécuté sur une vraie base (comme 1.7).
 

@@ -769,6 +769,27 @@
       "title": "Fichiers concernés",
       "saving": "Économie potentielle : {value}",
       "blocking": "Bloquant : {value}"
+    },
+    "lead": {
+      "title": "Vous voulez corriger ces points ?",
+      "subtitle": "Laissez vos coordonnées : nous vous recontactons avec un plan d’action et un devis pour ce site.",
+      "cta": "Je veux corriger",
+      "name": "Votre nom (facultatif)",
+      "email": "Email",
+      "phone": "Numéro WhatsApp",
+      "countryCode": "Indicatif",
+      "otherCode": "Autre (+…)",
+      "message": "Votre message (facultatif)",
+      "submit": "Envoyer ma demande",
+      "privacy": "Vos coordonnées servent uniquement à vous recontacter au sujet de ce rapport.",
+      "success": "Merci ! Votre demande est bien reçue, nous vous recontactons rapidement.",
+      "errors": {
+        "contact_required": "Indiquez un email ou un numéro WhatsApp.",
+        "phone_international": "Choisissez l’indicatif du pays ou saisissez le numéro avec + (ex. +966…).",
+        "phone_invalid": "Numéro WhatsApp invalide.",
+        "tooMany": "Trop de demandes, réessayez plus tard.",
+        "generic": "Envoi impossible. Vérifiez les informations saisies."
+      }
     }
   },
   "emailModal": {

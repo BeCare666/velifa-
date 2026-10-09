@@ -20,6 +20,9 @@ import { checkEmailSend, toPublicAnalysis } from './analysis-access';
 import { buildReportUrl, toReportLocale } from '../i18n/report-texts';
 import { hasPaidAccess } from '../payments/entitlements';
 import { compareAnalyses, AnalysisComparison } from './compare';
+import { normalizeLeadContact, leadNotificationMessage } from './lead';
+import { CreateLeadDto } from './dto/create-lead.dto';
+import { randomUUID } from 'crypto';
 
 const CACHE_TTL_HOURS  = 24;
 const FREE_USER_LIMIT  = 3;   // audits / 24h pour un utilisateur gratuit connecté
@@ -151,6 +154,37 @@ export class AnalysesService {
       throw new BadRequestException('Les deux audits doivent être terminés.');
     }
     return compareAnalyses(a, b);
+  }
+
+  /**
+   * POST /analyses/:id/lead — « Je veux corriger » depuis un rapport terminé.
+   * Enregistre la demande (table `leads`) et crée une notification admin. Un même contact sur le même
+   * rapport dans les 24 h n'est enregistré qu'une fois (réponse identique, sans doublon).
+   */
+  async createLead(id: string, dto: CreateLeadDto, ipAddress: string, clerkUserId: string | null): Promise<{ received: true }> {
+    if (!clerkUserId) await this.verifyCaptcha(dto.cfTurnstileToken ?? '', ipAddress);
+
+    const analysis = await this.db.findAnalysisById(id);
+    if (!analysis || analysis.status !== 'completed') throw new NotFoundException('Rapport introuvable');
+
+    const contact = normalizeLeadContact(dto);
+    const since = new Date(Date.now() - CACHE_TTL_HOURS * 3600 * 1000);
+    if (await this.db.hasRecentLead(id, contact.email, contact.phone, since)) {
+      return { received: true };
+    }
+
+    await this.db.insertLead({
+      id: randomUUID(), analysisId: id, urlSite: analysis.urlSite, ...contact,
+      locale: toReportLocale(analysis.locale), clerkUserId, ipAddress: this.maskIp(ipAddress),
+    });
+    try {
+      await this.db.createAdminNotification('lead', leadNotificationMessage(analysis.urlSite, analysis.scorePerformance, contact));
+    } catch (err: any) {
+      // La demande est enregistrée : un échec de notification ne doit pas la faire échouer
+      this.logger.error(`Lead notification failed for ${id}: ${err?.message}`);
+    }
+    this.logger.log(`Lead received for ${id}`);
+    return { received: true };
   }
 
   async findByUser(clerkUserId: string) {

@@ -128,6 +128,17 @@ export class AdminController {
     return this.adminService.getAudits(parseInt(page) || 1, parseInt(limit) || 20, search, status, score);
   }
 
+  /** GET /admin/leads — demandes « Je veux corriger » reçues depuis les rapports */
+  @Get('leads')
+  async getLeads(
+    @Headers('authorization') auth: string | undefined,
+    @Query('page')  page:  string = '1',
+    @Query('limit') limit: string = '50',
+  ) {
+    await requireAdmin(auth);
+    return this.adminService.getLeads(parseInt(page) || 1, parseInt(limit) || 50);
+  }
+
   /** GET /admin/performance */
   @Get('performance')
   async getPerformance(@Headers('authorization') auth: string | undefined) {
