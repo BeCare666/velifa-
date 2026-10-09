@@ -996,5 +996,29 @@
     "notComparable": "Comparaison impossible : un des deux audits ne contient pas ces données.",
     "error": "Comparaison impossible : {message}",
     "compare": "Comparer"
+  },
+  "sallaApp": {
+    "title": "VELIFA — vitesse de votre boutique",
+    "scoreLabel": "Score de performance mobile",
+    "lastAudit": "Dernière mesure : {date}",
+    "fullReport": "Rapport complet",
+    "noAuditYet": "Votre boutique n’a pas encore été mesurée. Lancez la première mesure.",
+    "notTracked": "Nous n’avons pas encore pu lire l’adresse de votre boutique. Réinstallez l’app ou contactez-nous.",
+    "runAudit": "Mesurer maintenant",
+    "running": "Mesure en cours (30 à 60 secondes)…",
+    "quota": "Mesures restantes aujourd’hui : {left} sur {limit}",
+    "topFixes": "À corriger en priorité",
+    "plansNote": "Pour le suivi programmé, les alertes email et les rapports PDF : plans VELIFA.",
+    "seePlans": "Voir les plans",
+    "errors": {
+      "invalid_token": "Impossible de vérifier votre session Salla. Rouvrez l’app depuis le tableau de bord.",
+      "invalid_session": "Session expirée. Rouvrez l’app.",
+      "app_not_installed": "L’app n’est pas installée sur cette boutique.",
+      "salla_not_configured": "Service pas encore configuré. Réessayez plus tard.",
+      "store_not_tracked": "L’adresse de votre boutique n’est pas encore enregistrée.",
+      "daily_limit": "Limite quotidienne de mesures atteinte.",
+      "open_from_salla": "Ouvrez cette page depuis votre tableau de bord Salla (Applications → VELIFA).",
+      "generic": "Une erreur est survenue. Réessayez."
+    }
   }
 }

@@ -121,6 +121,15 @@ export const api = {
     URL.revokeObjectURL(url);
   },
 
+  // ── Tableau de bord intégré Salla (session VELIFA issue du jeton de l'iframe) ──
+  salla: {
+    session: (token: string) =>
+      apiFetch<{ data: { session: string; expiresAt: string } }>('/integrations/salla/session', { method: 'POST', body: JSON.stringify({ token }) }),
+    dashboard: (session: string) => apiFetch<{ data: any }>('/integrations/salla/dashboard', { authToken: session }),
+    runAudit: (session: string, locale: string) =>
+      apiFetch<{ data: { id: string } }>('/integrations/salla/audit', { method: 'POST', body: JSON.stringify({ locale }), authToken: session }),
+  },
+
   // ── Sites suivis (jeton Clerk obligatoire) ────────────────────────────────────
   sites: {
     list:   (token: string, workspaceId?: string) =>

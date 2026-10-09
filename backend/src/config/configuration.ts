@@ -39,6 +39,7 @@ class EnvironmentVariables {
   @IsOptional() @IsString() LEMONSQUEEZY_BUSINESS_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_WEBHOOK_SECRET?: string;
   @IsOptional() @IsString() SALLA_CLIENT_ID?: string;
+  @IsOptional() @IsString() SALLA_APP_ID?: string;
   @IsOptional() @IsString() SALLA_CLIENT_SECRET?: string;
   @IsOptional() @IsString() SALLA_WEBHOOK_SECRET?: string;
   @IsOptional() @IsString() MARKETPLACE_TOKEN_KEY?: string;
@@ -86,6 +87,8 @@ export default () => ({
   // App Salla (OAuth Easy Mode) — ROADMAP 3.2
   salla: {
     clientId:      process.env.SALLA_CLIENT_ID ?? '',
+    // En-tête S-Source de l'introspection des jetons de l'Embedded SDK
+    appId:         process.env.SALLA_APP_ID ?? '',
     clientSecret:  process.env.SALLA_CLIENT_SECRET ?? '',
     webhookSecret: process.env.SALLA_WEBHOOK_SECRET ?? '',
   },

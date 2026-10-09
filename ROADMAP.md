@@ -142,7 +142,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 3.1 | 🔒 Compte partenaire Salla + accord ; compte partenaire Zid + accord | Action de votre part | ⚠️ Salla : compte + app créés (OAuth Easy Mode) ; Zid 🔒 |
 | 3.2 | App Salla : OAuth, webhooks d'installation/désinstallation, création automatique du site suivi | Tests avec charges utiles de la doc Salla ; test réel sur boutique de démo | ⚠️ tests doc ✅ ; test réel → secret webhook + URL publique |
 | 3.3 | App Zid : même périmètre | Idem | ⬜ |
-| 3.4 | Tableau de bord intégré marchand (AR d'abord) | Build + revue | ⬜ |
+| 3.4 | Tableau de bord intégré marchand (AR d'abord) | Build + revue | ⚠️ build + revue ✅ ; test dans Salla → App ID + déploiement |
 | 3.5 | Shopify App (marché mondial) | Après validation des apps Salla/Zid | ⬜ |
 
 ---
@@ -172,7 +172,9 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
 4 bis. App Salla : définir le secret du webhook (stratégie « Signature ») dans le portail et le mettre dans `SALLA_WEBHOOK_SECRET` ;
    déclarer l'URL `https://<backend>/api/v1/integrations/salla/webhook` après déploiement ; créer une boutique de démo ;
-   confirmer auprès de partners@salla.sa que la facturation via nos plans (hors Salla) est acceptée.
+   confirmer auprès de partners@salla.sa que la facturation via nos plans (hors Salla) est acceptée ;
+   renseigner `SALLA_APP_ID` (identifiant de l'app) ; déclarer la page intégrée (Embedded Pages → Iframe URL
+   `https://<frontend>/ar/salla/app`) ; vérifier le domaine de l'espace marchand pour `SALLA_FRAME_ANCESTORS`.
 5. Décider l'usage de l'export 1.8 : WhatsApp exige l'accord préalable du destinataire (voir journal 4.1) ;
    le message pré-rempli ne doit servir qu'après accord. Option possible : colonne « accord WhatsApp » dans les prospects.
 
@@ -570,4 +572,27 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   `api.salla.dev/admin/v2/store/info` sans jeton → 401 (endpoint existant).
 - ⚠️ `backend/env` n'est **pas lu** par NestJS (qui lit `.env`) : au déploiement, renseigner ces variables dans
   l'hébergeur (Render) ou un `.env` — sans reprendre `NODE_TLS_REJECT_UNAUTHORIZED=0` (voir journal du 2026-10-08).
+
+### 2026-10-09 — 3.4 Tableau de bord intégré dans l'espace marchand Salla
+- Sources officielles (docs.salla.dev, Embedded SDK) : paquet `@salla.sa/embedded-sdk` (installé à la version exacte
+  **0.2.6**, publiée le 2026-05-17, dépôt officiel SallaApp), `embedded.init()`, `embedded.auth.getToken()` ;
+  Salla ajoute `token`, `theme`, `lang` à l'URL de l'iframe ; vérification côté serveur par
+  `POST https://api.salla.dev/exchange-authority/v1/introspect` (en-tête `S-Source: <App ID>`) → `merchant_id`.
+- Backend : `POST /integrations/salla/session` (jeton vérifié auprès de Salla + app installée → session VELIFA d'1 h
+  signée HMAC), `GET /integrations/salla/dashboard` (boutique, dernier audit : score, 3 priorités, points Golfe ;
+  quota), `POST /integrations/salla/audit` (audit de la boutique, 3 / 24 h comme un compte gratuit).
+  `SALLA_APP_ID` ajouté (vide dans `backend/env`, à renseigner).
+- Frontend : page `/{ar,en,fr}/salla/app` (arabe d'abord), sans en-tête ni pied de page du site.
+  **Iframe** : seules les pages `/salla/*` envoient `Content-Security-Policy: frame-ancestors` (configurable
+  `SALLA_FRAME_ANCESTORS`, défaut `https://salla.sa https://*.salla.sa`) ; toutes les autres gardent
+  `X-Frame-Options: DENY`. Domaine exact de l'espace marchand **non confirmé** par une source officielle → à vérifier.
+- **Trouvé et corrigé pendant la revue** : le middleware Clerk redirigeait toute page (« handshake ») dans un vrai
+  navigateur → l'iframe Salla aurait été cassée. `/salla/*` ne passe plus que par le middleware de langue (aucun appel
+  Clerk côté serveur dans le code) ; vérifié : page Salla → 200 direct, `/ar/dashboard` → toujours protégé par Clerk.
+- Preuves : `npx jest` → **26 suites, 349 tests réussis** (+5 : session signée/expirée/falsifiée, introspection refusée,
+  app désinstallée, données sans champ personnel, quota 429) ; `tsc` exit 0 ; `next build` exit 0 ;
+  en-têtes vérifiés par route ; **rendu réel** (Edge headless, API simulée) : tableau de bord arabe RTL complet ;
+  sans jeton → message « افتح هذه الصفحة من لوحة تحكم سلة ».
+- Lien entre le marchand et un compte VELIFA payant (pour profiter des plans) : non construit — à définir après la
+  réponse de Salla sur la facturation hors Salla.
 

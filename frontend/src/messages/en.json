@@ -993,5 +993,29 @@
     "notComparable": "Cannot compare: one of the two audits does not include this data.",
     "error": "Cannot compare: {message}",
     "compare": "Compare"
+  },
+  "sallaApp": {
+    "title": "VELIFA — your store speed",
+    "scoreLabel": "Mobile performance score",
+    "lastAudit": "Last measurement: {date}",
+    "fullReport": "Full report",
+    "noAuditYet": "Your store has not been measured yet. Run the first measurement now.",
+    "notTracked": "We could not read your store address yet. Reinstall the app or contact us.",
+    "runAudit": "Measure now",
+    "running": "Measuring (30 to 60 seconds)…",
+    "quota": "Measurements left today: {left} of {limit}",
+    "topFixes": "What to fix first",
+    "plansNote": "For scheduled monitoring, email alerts and PDF reports: VELIFA plans.",
+    "seePlans": "See plans",
+    "errors": {
+      "invalid_token": "Your Salla session could not be verified. Reopen the app from the dashboard.",
+      "invalid_session": "Session expired. Reopen the app.",
+      "app_not_installed": "The app is not installed on this store.",
+      "salla_not_configured": "The service is not configured yet. Please try later.",
+      "store_not_tracked": "Your store address has not been recorded yet.",
+      "daily_limit": "Daily measurement limit reached.",
+      "open_from_salla": "Open this page from your Salla dashboard (Apps → VELIFA).",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

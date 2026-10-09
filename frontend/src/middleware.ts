@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -25,7 +25,11 @@ function shouldSkipI18n(pathname: string): boolean {
   );
 }
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
+// Tableau de bord intégré dans l'espace marchand Salla (iframe) : authentifié par le jeton Salla, pas par Clerk.
+// Le middleware Clerk y est évité : ses redirections d'authentification casseraient l'affichage dans l'iframe.
+const isSallaEmbedded = (pathname: string) => /^\/(?:(?:ar|en|fr)\/)?salla(?:\/|$)/.test(pathname);
+
+const withClerk = clerkMiddleware(async (auth, req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
   if (isPrivateRoute(req)) {
@@ -39,6 +43,11 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   // Applique le middleware i18n (détection locale, redirections)
   return intlMiddleware(req);
 });
+
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (isSallaEmbedded(req.nextUrl.pathname)) return intlMiddleware(req);
+  return withClerk(req, event);
+}
 
 export const config = {
   matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
