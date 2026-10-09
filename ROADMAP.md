@@ -595,4 +595,8 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   sans jeton → message « افتح هذه الصفحة من لوحة تحكم سلة ».
 - Lien entre le marchand et un compte VELIFA payant (pour profiter des plans) : non construit — à définir après la
   réponse de Salla sur la facturation hors Salla.
+- Complément (2026-10-09) : `SALLA_APP_ID` et `SALLA_WEBHOOK_SECRET` fournis et placés dans `backend/env` (ignoré par
+  git) ; ils avaient été collés dans `ROADMAP.md` (fichier commité) → retirés avant tout commit (vérifié : absents de
+  l'historique). Introspection Salla appelée avec un jeton invalide → `422 « Decryption failed »`, identique avec un
+  App ID bidon : l'App ID ne peut être validé qu'avec un vrai jeton (boutique de démo). Notre code renvoie alors 401.
 
