@@ -542,4 +542,7 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   - **Lemon Squeezy réel** (clé fournie, mode test, lecture seule) : compte authentifié, boutique « velifa » en **USD**,
     **0 produit** → `GET /admin/plans/lemon-variants` renvoie une liste vide (aucune variante à sélectionner pour l'instant).
   - Documentation Lemon Squeezy vérifiée : produits et variantes en **lecture seule** via l'API.
+- Complément (2026-10-09) : cas des publicités « Click to WhatsApp » ajouté à la règle 0 des scripts, d'après la
+  documentation officielle Meta : conversation ouverte par la personne → réponse autorisée (fenêtre de 24 h, fenêtre
+  gratuite de 72 h depuis une publicité / bouton de Page), modèles approuvés ensuite, accord explicite pour recontacter.
 

@@ -24,6 +24,20 @@ Conséquences pratiques :
 5. Envois **un par un, à la main** ; jamais d'envoi automatisé ni en masse.
 6. Ne jamais affirmer un gain de ventes garanti ; l'étude Deloitte/Google est une **corrélation** (voir le rapport).
 
+**Cas des publicités « Click to WhatsApp » (Facebook / Instagram) et du bouton d'action de la Page** —
+documentation officielle Meta (developers.facebook.com/docs/whatsapp/pricing, lue le 2026-10-09) :
+
+- c'est la personne qui envoie le premier message → on peut **lui répondre** dans la fenêtre de service client de
+  **24 h** ouverte par son message (messages libres) ;
+- si le message vient d'une publicité Click to WhatsApp ou du bouton d'action de la Page (application Android / iOS)
+  et qu'on répond dans les 24 h, une fenêtre **gratuite de 72 h** s'ouvre à partir de notre réponse ;
+- après ces fenêtres : uniquement des **modèles de messages approuvés** (payants) ;
+- pour la **recontacter plus tard** (relances, offres), il faut son accord explicite citant VELIFA → le demander dans
+  la conversation : « هل تسمحون لـ VELIFA بالتواصل معكم لاحقاً عبر واتساب؟ » / « May VELIFA contact you later on WhatsApp? ».
+
+Parcours conforme possible : publicité → audit gratuit → rapport → bouton « Obtenir de l'aide via WhatsApp » (la
+personne écrit elle-même à notre numéro) → script n° 2 puis proposition (n° 4).
+
 ⚠️ Point à valider par un juriste local (ROADMAP 4.4) : règles saoudiennes / émiraties sur la prospection
 commerciale non sollicitée par email et messages directs.
 
