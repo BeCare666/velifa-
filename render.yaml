@@ -7,14 +7,30 @@ services:
     buildCommand: cd backend && npm install && npm run prisma:generate && npm run build
     startCommand: cd backend && node dist/main
     healthCheckPath: /api/v1/health
+    # Valeurs à saisir dans le tableau de bord Render (sync: false = jamais dans git).
+    # Ne PAS ajouter NODE_TLS_REJECT_UNAUTHORIZED (désactive la vérification TLS de toutes les connexions).
     envVars:
       - key: NODE_ENV
         value: production
+      # Base de données et file d'attente
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
         sync: false
+      # Adresse du frontend Vercel (CORS, liens des emails et rapports)
+      - key: FRONTEND_URL
+        sync: false
+      # Authentification et administration
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: ADMIN_API_KEY
+        sync: false
+      # Audits
       - key: PAGESPEED_API_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
         sync: false
       - key: BROWSERLESS_API_KEY
         sync: false
@@ -24,17 +40,33 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      # Emails et contact
       - key: BREVO_API_KEY
-        sync: false
-      - key: BREVO_TEMPLATE_ID
         sync: false
       - key: BREVO_FROM_EMAIL
         sync: false
+      - key: BREVO_FROM_NAME
+        sync: false
       - key: WHATSAPP_NUMBER
         sync: false
-      - key: TURNSTILE_SECRET_KEY
+      # Paiements (variantes choisies dans Admin → Plans et prix)
+      - key: LEMONSQUEEZY_API_KEY
         sync: false
-      - key: JWT_SECRET
+      - key: LEMONSQUEEZY_STORE_ID
         sync: false
-      - key: FRONTEND_URL
+      - key: LEMONSQUEEZY_WEBHOOK_SECRET
+        sync: false
+      # App Salla
+      - key: SALLA_CLIENT_ID
+        sync: false
+      - key: SALLA_CLIENT_SECRET
+        sync: false
+      - key: SALLA_APP_ID
+        sync: false
+      - key: SALLA_WEBHOOK_SECRET
+        sync: false
+      - key: MARKETPLACE_TOKEN_KEY
+        sync: false
+      # Facultatif
+      - key: SENTRY_DSN
         sync: false
