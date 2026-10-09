@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import ReportProFeatures from '@/components/report/ReportProFeatures';
 import EmailReportModal from '@/components/report/EmailReportModal';
 import LeadForm from '@/components/report/LeadForm';
+import PdfDownloadButton from '@/components/report/PdfDownloadButton';
 import type { FieldMetric, Recommendation } from '@/types/analysis';
 
 export const revalidate = 0;
@@ -128,6 +129,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
             <span dir="ltr" className="text-sm font-medium text-text truncate">{analysis.urlSite}</span>
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
+            <PdfDownloadButton analysisId={analysis.id} />
             <a href={analysis.urlSite} target="_blank" rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 text-sm text-text-muted hover:text-accent transition">
               {t('viewSite')} <ExternalLink className="w-3.5 h-3.5" />

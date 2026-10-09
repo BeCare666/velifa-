@@ -124,7 +124,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ✅ |
 | 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ✅ (limites chiffrées : hypothèse à valider) |
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ✅ |
-| 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⬜ |
+| 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⚠️ gabarit ✅, Browserless réel → 1.12 |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ⬜ |
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ⬜ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
@@ -420,4 +420,26 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   API réelle : PATCH sans jeton → 401, fréquence invalide / seuil 500 → 400.
 - ⚠️ Limite : passage horaire réel non observé (pas de Redis local) ; à vérifier en environnement configuré
   (journal « Planificateur des audits programmés enregistré »).
+
+### 2026-10-09 — 2.4 Rapport PDF à la marque de l'agence
+- `reports/pdf-report.template.ts` : HTML A4 autonome, **marque blanche** (nom, logo, couleur de l'agence, aucune
+  mention VELIFA), arabe en RTL avec police Noto Sans Arabic, FR/EN : score, données terrain, mesures labo,
+  6 recommandations principales, points Golfe + avertissement juridique, scores Lighthouse, sources des mesures.
+  Toute donnée variable échappée ; couleur et logo revalidés (pas d'injection CSS / `javascript:`).
+- Textes partagés avec le rapport web : `scripts/sync-report-texts.js` (`npm run i18n:sync`) génère
+  `i18n/report-messages.generated.ts` depuis `frontend/src/messages` ; un test échoue si la copie n'est plus à jour.
+- `GET /reports/:analysisId/pdf?workspaceId=&locale=` : membre de l'espace, **plan Business** du titulaire
+  (annoncé sur la page Tarifs), audit terminé ; rendu par l'API `/pdf` de Browserless (`html`, format A4 — vérifié
+  dans la documentation Browserless) ; 10 PDF/min ; Browserless non configuré → 503 explicite.
+- Rapport web : bouton « PDF à votre marque » visible pour les membres d'un espace agence (FR/EN/AR).
+  Tarifs / tableau de bord : le PDF n'est plus « bientôt » (l'API le reste).
+- Preuves :
+  - `npx jest` → **20 suites, 282 tests réussis** (+8 : RTL, marque blanche, échappement, contenu, accès, plan, 503) ;
+    `tsc` exit 0 ; `next build` exit 0 ; API réelle : `/reports/c1/pdf` sans jeton → 401 ;
+  - **PDF réellement imprimé** à partir de la fixture PageSpeed réelle avec le moteur Chromium local (Edge headless,
+    profil temporaire) en arabe et en anglais : 2 pages A4, arabe correctement rendu (RTL, ligatures), marque de
+    l'agence. Corrigé à la relecture : « Date : » à la française dans toutes les langues ; section Golfe coupée
+    entre deux pages (désormais insécable).
+- ⚠️ Limite : appel Browserless réel non effectué (clé de production non utilisée sans accord) → à vérifier en 1.12,
+  notamment le chargement de la police arabe par le Chrome de Browserless.
 

@@ -205,7 +205,8 @@
         "In-depth analysis of Lighthouse metrics",
         "Advanced priority support",
         "Multi-site tracking, scheduled audits (daily or weekly) and email alerts",
-        "Coming soon: PDF export, API"
+        "PDF report branded with your agency (Arabic, English, French)",
+        "Coming soon: API"
       ]
     },
     "perMonth": "/month",
@@ -251,7 +252,7 @@
     "hiddenAudits": "hidden audits",
     "goPro": "Go Pro",
     "businessAccess": "Business Access — Unlimited",
-    "businessDesc": "In-depth analysis, multi-site tracking, scheduled audits and alerts. PDF export and API: coming soon.",
+    "businessDesc": "In-depth analysis, multi-site tracking, scheduled audits, alerts and branded PDF. API: coming soon.",
     "businessFeature": "Business Feature",
     "businessFeatureDesc": "is reserved for the Business plan.",
     "upgradeBusiness": "Upgrade to Business",
@@ -854,6 +855,16 @@
         "phone_invalid": "Invalid WhatsApp number.",
         "tooMany": "Too many requests, please try again later.",
         "generic": "Could not send. Please check your details."
+      }
+    },
+    "pdf": {
+      "button": "Branded PDF",
+      "workspace": "Agency space",
+      "errors": {
+        "pdf_requires_business": "Branded PDF export requires the Business plan.",
+        "pdf_unavailable": "PDF export is temporarily unavailable.",
+        "pdf_failed": "PDF generation failed. Please try again.",
+        "generic": "Download failed. Please try again."
       }
     }
   },

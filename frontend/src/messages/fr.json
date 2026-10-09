@@ -205,7 +205,8 @@
         "Analyse approfondie des métriques Lighthouse",
         "Support prioritaire avancé",
         "Suivi multi-sites, audits programmés (quotidiens ou hebdomadaires) et alertes email",
-        "Bientôt : export PDF, API"
+        "Rapport PDF à la marque de votre agence (arabe, anglais, français)",
+        "Bientôt : API"
       ]
     },
     "perMonth": "/mois",
@@ -251,7 +252,7 @@
     "hiddenAudits": "audits masqués",
     "goPro": "Passer Pro",
     "businessAccess": "Espace Business — Accès illimité",
-    "businessDesc": "Analyse approfondie, suivi multi-sites, audits programmés et alertes. Export PDF et API : bientôt.",
+    "businessDesc": "Analyse approfondie, suivi multi-sites, audits programmés, alertes et PDF à votre marque. API : bientôt.",
     "businessFeature": "Fonctionnalité Business",
     "businessFeatureDesc": "est réservée au plan Business.",
     "upgradeBusiness": "Passer Business",
@@ -857,6 +858,16 @@
         "phone_invalid": "Numéro WhatsApp invalide.",
         "tooMany": "Trop de demandes, réessayez plus tard.",
         "generic": "Envoi impossible. Vérifiez les informations saisies."
+      }
+    },
+    "pdf": {
+      "button": "PDF à votre marque",
+      "workspace": "Espace agence",
+      "errors": {
+        "pdf_requires_business": "L’export PDF à votre marque nécessite le plan Business.",
+        "pdf_unavailable": "Export PDF momentanément indisponible.",
+        "pdf_failed": "La génération du PDF a échoué. Réessayez.",
+        "generic": "Téléchargement impossible. Réessayez."
       }
     }
   },

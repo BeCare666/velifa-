@@ -88,6 +88,27 @@ export const api = {
       authToken,
     }),
 
+  /** PDF à la marque d'un espace agence (plan Business). Lève une erreur avec le code renvoyé par l'API. */
+  downloadReportPdf: async (token: string, analysisId: string, workspaceId: string, locale: string) => {
+    const res = await fetch(
+      `${BASE_URL}/reports/${encodeURIComponent(analysisId)}/pdf?workspaceId=${encodeURIComponent(workspaceId)}&locale=${encodeURIComponent(locale)}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw Object.assign(new Error((body as any).message ?? `API error ${res.status}`), { statusCode: res.status });
+    }
+    const name = /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') ?? '')?.[1] ?? 'rapport.pdf';
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   // ── Sites suivis (jeton Clerk obligatoire) ────────────────────────────────────
   sites: {
     list:   (token: string, workspaceId?: string) =>
