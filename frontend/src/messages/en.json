@@ -28,7 +28,7 @@
     "relaunch": "Relaunch analysis",
     "rateLimitTitle": "You have used your free audits for today",
     "rateLimitDesc": "The free plan is limited to 3 audits per 24h. Go Pro for unlimited audits, full history and advanced reports.",
-    "upgradePro": "Go Pro — €9/month",
+    "upgradePro": "Go Pro",
     "retryTomorrow": "Try again tomorrow",
     "analyzeNow": "Analyze now",
     "privacyNote": "By submitting, you accept our",
@@ -213,7 +213,11 @@
     "startFree": "Start for free",
     "subscribe": "Subscribe",
     "contactUs": "Contact us",
-    "mostPopular": "Most popular"
+    "mostPopular": "Most popular",
+    "perYear": "/year",
+    "billingLabel": "Billing",
+    "billingMonthly": "Monthly",
+    "billingYearly": "Yearly"
   },
   "dashboard": {
     "welcome": "Welcome back",

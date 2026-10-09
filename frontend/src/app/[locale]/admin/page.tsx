@@ -207,7 +207,7 @@ export default function AdminOverviewPage() {
           <KpiCard label="Aujourd'hui"    value={stats?.todayAudits ?? 0}   icon={Activity}     loading={loading} accent trend={trends.todayVsYesterday} trendLabel="vs hier" />
           <KpiCard label="Abonnes Pro"    value={stats?.proUsers ?? 0}      icon={TrendingUp}   loading={loading} accent />
           <KpiCard label="Business"       value={stats?.businessUsers ?? 0} icon={CheckCircle2} loading={loading} />
-          <KpiCard label="MRR (EUR)"      value={stats?.estimatedRevenue ?? 0} icon={DollarSign} loading={loading} accent sub={`${stats?.proUsers ?? 0} Pro · ${stats?.businessUsers ?? 0} Biz`} />
+          <KpiCard label="MRR estimé (USD)"      value={stats?.estimatedRevenue ?? 0} icon={DollarSign} loading={loading} accent sub={`${stats?.proUsers ?? 0} Pro · ${stats?.businessUsers ?? 0} Biz`} />
           <KpiCard label="Score moyen"    value={Math.round(stats?.avgScore ?? 0)} icon={ArrowUpRight} loading={loading} />
           <KpiCard label="Echecs"         value={stats?.failedAudits ?? 0}  icon={AlertTriangle} loading={loading} red={!loading && (stats?.failedAudits ?? 0) > 0} />
         </div>

@@ -490,7 +490,6 @@ const KEY_FEATURE_ICONS = [BarChart2, Mail, MessageCircle, Shield];
 const KEY_FEATURE_KEYS = ['detailedScore', 'emailReport', 'whatsapp', 'dataProtected'] as const;
 const STEP_KEYS = ['step1', 'step2', 'step3'] as const;
 const PLAN_KEYS = ['free', 'pro', 'business'] as const;
-const PLAN_PRICES = ['0', '9', '29'] as const;
 
 // ── Hero Background Carousel ─────────────────────────────────────────────────────
 const heroImages = [
@@ -568,6 +567,14 @@ export default function HomePage() {
   const tPP    = useTranslations('pricingPreview');
   const tCta   = useTranslations('cta');
 
+  // Prix mensuels saisis dans le backoffice (GET /plans), en USD
+  const [monthly, setMonthly] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    api.getPlans()
+      .then((r) => setMonthly(Object.fromEntries(r.data.map((p) => [p.code, p.priceMonthly]))))
+      .catch(() => setMonthly({}));
+  }, []);
+
   const keyFeatures = KEY_FEATURE_ICONS.map((icon, i) => ({
     icon,
     title: tKF(`${KEY_FEATURE_KEYS[i]}.title`),
@@ -582,7 +589,7 @@ export default function HomePage() {
 
   const plansPreview = PLAN_KEYS.map((key, i) => ({
     name:    tPP(`${key}.name`),
-    price:   PLAN_PRICES[i],
+    price:   monthly == null ? '…' : monthly[key] == null ? '—' : `$${monthly[key]}`,
     badge:   key === 'pro' ? tPP(`${key}.badge`) : undefined,
     features: [] as string[],
   }));
@@ -790,7 +797,7 @@ export default function HomePage() {
                   </h3>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="font-heading text-4xl font-bold text-text">{plan.price}</span>
-                    <span className="text-text-muted text-sm">€{tPP('perMonth')}</span>
+                    <span className="text-text-muted text-sm">{tPP('perMonth')}</span>
                   </div>
                 </div>
                 <ul className="space-y-2 flex-1 mb-6">

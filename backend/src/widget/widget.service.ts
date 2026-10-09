@@ -3,7 +3,6 @@ import {
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { ConfigService } from '@nestjs/config';
 import { randomBytes, randomUUID } from 'crypto';
 import { DatabaseService, Workspace } from '../prisma/database.service';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
@@ -11,7 +10,8 @@ import { validateUrl, hashUrl, assertPublicHost } from '../common/validators/url
 import { effectivePlan } from '../payments/plan-limits';
 import { toReportLocale } from '../i18n/report-texts';
 import { normalizeLeadContact } from '../analyses/lead';
-import { DEFAULT_WIDGET_DAILY_LIMIT, MAX_WIDGET_ORIGINS, isOriginAllowed, normalizeOrigin, parseOrigins } from './widget-rules';
+import { PlansService } from '../plans/plans.service';
+import { MAX_WIDGET_ORIGINS, isOriginAllowed, normalizeOrigin, parseOrigins } from './widget-rules';
 
 const DAY_MS = 24 * 3_600_000;
 
@@ -23,7 +23,7 @@ export class WidgetService {
   constructor(
     private readonly db: DatabaseService,
     @InjectQueue(BULL_ANALYSES_QUEUE) private readonly queue: Queue,
-    private readonly config: ConfigService,
+    private readonly plans: PlansService,
   ) {}
 
   private async ownerIsBusiness(workspace: Workspace): Promise<boolean> {
@@ -96,7 +96,7 @@ export class WidgetService {
   ): Promise<{ id: string }> {
     const workspace = await this.publicAccess(key, origin);
 
-    const limit = this.config.get<number>('widget.dailyLimit', DEFAULT_WIDGET_DAILY_LIMIT);
+    const limit = (await this.plans.get('business')).widgetDailyLimit;
     if (await this.db.countWorkspaceProspectsSince(workspace.id, new Date(Date.now() - DAY_MS)) >= limit) {
       throw new HttpException({ statusCode: 429, message: 'daily_limit', error: 'Too Many Requests' }, HttpStatus.TOO_MANY_REQUESTS);
     }

@@ -102,29 +102,29 @@ export default function AdminRevenuePage() {
                   <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.80)' }}>Revenu mensuel récurrent</span>
                 </div>
                 <p style={{ fontSize: 42, fontWeight: 800, color: '#D4AF37', margin: 0, letterSpacing: '-0.01em' }}>
-                  {fmt(data?.estimatedMonthly ?? 0)} <span style={{ fontSize: 22, fontWeight: 600 }}>€ / mois</span>
+                  ${fmt(data?.estimatedMonthly ?? 0)} <span style={{ fontSize: 22, fontWeight: 600 }}>/ mois (estimation)</span>
                 </p>
               </div>
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
                 <div>
                   <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0 0 6px' }}>Pro</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#D4AF37', margin: 0 }}>{fmt((data?.proCount ?? 0) * (data?.priceProEur ?? 9))} €</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.proCount} × {data?.priceProEur}€</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: '#D4AF37', margin: 0 }}>${fmt((data?.proCount ?? 0) * (data?.priceProUsd ?? 0))}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.proCount} × ${data?.priceProUsd}</p>
                 </div>
                 <div>
                   <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0 0 6px' }}>Business</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#a8a8a8', margin: 0 }}>{fmt((data?.businessCount ?? 0) * (data?.priceBusinessEur ?? 29))} €</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.businessCount} × {data?.priceBusinessEur}€</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: '#a8a8a8', margin: 0 }}>${fmt((data?.businessCount ?? 0) * (data?.priceBusinessUsd ?? 0))}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.businessCount} × ${data?.priceBusinessUsd}</p>
                 </div>
               </div>
             </div>
 
             {/* KPI grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
-              <KpiCard label="Abonnés Pro"      value={fmt(data?.proCount ?? 0)}      icon={TrendingUp} sub={`${data?.priceProEur}€/mois par abonné`} />
-              <KpiCard label="Abonnés Business" value={fmt(data?.businessCount ?? 0)} icon={Users}      sub={`${data?.priceBusinessEur}€/mois par abonné`} />
+              <KpiCard label="Abonnés Pro"      value={fmt(data?.proCount ?? 0)}      icon={TrendingUp} sub={`$${data?.priceProUsd}/mois par abonné`} />
+              <KpiCard label="Abonnés Business" value={fmt(data?.businessCount ?? 0)} icon={Users}      sub={`$${data?.priceBusinessUsd}/mois par abonné`} />
               <KpiCard label="Total abonnés"    value={fmt((data?.proCount ?? 0) + (data?.businessCount ?? 0))} icon={Users} />
-              <KpiCard label="Revenu annuel projeté" value={`${fmt((data?.estimatedMonthly ?? 0) * 12)} €`} icon={DollarSign} />
+              <KpiCard label="Revenu annuel projeté" value={`$${fmt((data?.estimatedMonthly ?? 0) * 12)}`} icon={DollarSign} />
             </div>
           </>
         )}
@@ -142,8 +142,8 @@ export default function AdminRevenuePage() {
                   <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, fontSize: 12 }}
-                    formatter={(v: any) => [`${v}€`, 'Revenu']} />
-                  <Bar dataKey="montant" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Revenu (€)" />
+                    formatter={(v: any) => [`$${v}`, 'Revenu']} />
+                  <Bar dataKey="montant" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Revenu ($)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -171,7 +171,7 @@ export default function AdminRevenuePage() {
                         {s.plan}
                       </span>
                       <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.70)', marginTop: 4 }}>
-                        {s.plan === 'business' ? `${data.priceBusinessEur}€` : `${data.priceProEur}€`}/mois
+                        {s.plan === 'business' ? `$${data.priceBusinessUsd}` : `$${data.priceProUsd}`}/mois
                       </p>
                     </div>
                   </div>

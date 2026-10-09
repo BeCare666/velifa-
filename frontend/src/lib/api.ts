@@ -1,6 +1,15 @@
 import type { Analysis, AnalysisComparison, CreateAnalysisResponse, MyAudit } from '@/types/analysis';
 import type { SubscriptionInfo } from '@/types/subscription';
 
+export interface PublicPlan {
+  code: 'free' | 'pro' | 'business';
+  currency: string;
+  priceMonthly: number;
+  priceYearly: number | null;
+  yearlyAvailable: boolean;
+  siteLimit: number;
+}
+
 const BASE_URL   = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
 /** Télécharge un export CSV admin avec le jeton Clerk (aucune clé dans l'URL). */
@@ -71,7 +80,10 @@ export const api = {
   getMine: (authToken: string) =>
     apiFetch<{ data: MyAudit[]; timestamp: string }>('/analyses/mine', { authToken }),
 
-  createCheckout: (body: { plan: 'pro' | 'business'; email?: string }, authToken: string) =>
+  /** Prix publics (backoffice) pour la page Tarifs. */
+  getPlans: () => apiFetch<{ data: PublicPlan[] }>('/plans'),
+
+  createCheckout: (body: { plan: 'pro' | 'business'; email?: string; billing?: 'monthly' | 'yearly' }, authToken: string) =>
     apiFetch<{ data: { checkoutUrl: string | null; upgraded: boolean } }>('/payments/checkout', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -191,6 +203,10 @@ export const api = {
     exportUsers:       (token: string | null | undefined) => downloadAdminExport('users', token),
     exportAudits:      (token: string | null | undefined) => downloadAdminExport('audits', token),
     exportPerformance: (token: string | null | undefined) => downloadAdminExport('performance', token),
+    getPlanPricing: (token: string | null | undefined) => apiFetch<any>('/admin/plans', { authToken: token }),
+    updatePlanPricing: (token: string | null | undefined, code: string, body: Record<string, unknown>) =>
+      apiFetch<any>(`/admin/plans/${encodeURIComponent(code)}`, { method: 'PUT', body: JSON.stringify(body), authToken: token }),
+    getLemonVariants: (token: string | null | undefined) => apiFetch<any>('/admin/plans/lemon-variants', { authToken: token }),
     importProspects: (token: string | null | undefined, csv: string, locale: 'ar' | 'en' | 'fr') =>
       apiFetch<any>('/admin/prospects/import', { method: 'POST', body: JSON.stringify({ csv, locale }), authToken: token }),
     getProspects: (token: string | null | undefined, params: Record<string, string>) =>

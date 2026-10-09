@@ -79,8 +79,8 @@ function setup(opts: { plan?: string; count?: number; widgetKey?: string | null;
     findAnalysisById: jest.fn(async (id: string) => ({ id, status: 'completed', scorePerformance: 47, lcpMobile: 3900 })),
   };
   const queue = { add: jest.fn(async () => undefined) };
-  const config = { get: jest.fn((_k: string, def: any) => def) };
-  return { db, queue, workspace, prospects, service: new WidgetService(db as any, queue as any, config as any) };
+  const plans = { get: jest.fn(async () => ({ widgetDailyLimit: 50 })) };
+  return { db, queue, workspace, prospects, service: new WidgetService(db as any, queue as any, plans as any) };
 }
 
 describe('WidgetService — configuration', () => {

@@ -798,6 +798,25 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  // ── Plans et prix (backoffice) ─────────────────────────────────────────
+
+  async listPlanRows(): Promise<any[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>('SELECT * FROM plans');
+    return rows;
+  }
+
+  async updatePlanRow(code: string, v: {
+    priceMonthlyCents: number; priceYearlyCents: number | null; lemonVariantMonthly: string | null;
+    lemonVariantYearly: string | null; siteLimit: number; apiDailyLimit: number; widgetDailyLimit: number;
+  }): Promise<void> {
+    await this.pool.query(
+      `UPDATE plans SET price_monthly_cents = ?, price_yearly_cents = ?, lemon_variant_monthly = ?, lemon_variant_yearly = ?,
+              site_limit = ?, api_daily_limit = ?, widget_daily_limit = ? WHERE code = ?`,
+      [v.priceMonthlyCents, v.priceYearlyCents, v.lemonVariantMonthly, v.lemonVariantYearly,
+       v.siteLimit, v.apiDailyLimit, v.widgetDailyLimit, code],
+    );
+  }
+
   // ── Internal helpers ───────────────────────────────────────────────────
 
   private generateId(): string {

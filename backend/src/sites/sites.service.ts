@@ -1,11 +1,11 @@
 import {
   Injectable, BadRequestException, ConflictException, ForbiddenException, NotFoundException, UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { DatabaseService } from '../prisma/database.service';
 import { validateUrl, hashUrl, assertPublicHost } from '../common/validators/url.validator';
-import { effectivePlan, parseSiteLimits, PlanName } from '../payments/plan-limits';
+import { effectivePlan, PlanName } from '../payments/plan-limits';
+import { PlansService } from '../plans/plans.service';
 import { canSchedule, SCHEDULES } from './monitoring';
 import { toReportLocale } from '../i18n/report-texts';
 
@@ -28,7 +28,7 @@ export interface SiteUsage {
 
 @Injectable()
 export class SitesService {
-  constructor(private readonly db: DatabaseService, private readonly config: ConfigService) {}
+  constructor(private readonly db: DatabaseService, private readonly plans: PlansService) {}
 
   private requireUser(clerkUserId: string | null): string {
     if (!clerkUserId) throw new UnauthorizedException('Valid Clerk token required');
@@ -48,8 +48,7 @@ export class SitesService {
   async usage(owner: string): Promise<SiteUsage> {
     const user = await this.db.findUserByClerkId(owner);
     const plan = effectivePlan(user?.subscriptionPlan, user?.subscriptionStatus);
-    const limits = parseSiteLimits(this.config.get<string>('plans.siteLimits'));
-    return { plan, used: await this.db.countTrackedSitesByOwner(owner), limit: limits[plan], canSchedule: canSchedule(plan) };
+    return { plan, used: await this.db.countTrackedSitesByOwner(owner), limit: (await this.plans.get(plan)).siteLimit, canSchedule: canSchedule(plan) };
   }
 
   async list(callerId: string | null, workspaceId?: string) {

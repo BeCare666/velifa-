@@ -275,7 +275,7 @@ export default function NewAuditModal({ onClose }: Props) {
                     }}
                   >
                     <Sparkles className="w-3 h-3" />
-                    Passer Pro — 9€/mois
+                    Passer Pro
                   </button>
                 </div>
               )}

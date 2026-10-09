@@ -2,14 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { DatabaseService } from '../prisma/database.service';
+import { PlansService } from '../plans/plans.service';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import * as mysql from 'mysql2/promise';
 import * as os from 'os';
 import { randomUUID } from 'crypto';
 import axios from 'axios';
 
-const PRO_PRICE_EUR      = 9;
-const BUSINESS_PRICE_EUR = 29;
 
 @Injectable()
 export class AdminService {
@@ -19,7 +18,14 @@ export class AdminService {
   constructor(
     private readonly db: DatabaseService,
     @InjectQueue(BULL_ANALYSES_QUEUE) private readonly queue: Queue,
+    private readonly plans: PlansService,
   ) {}
+
+  /** Prix mensuels (USD) saisis dans le backoffice — estimation : tous les abonnés comptés au tarif mensuel. */
+  private async monthlyPricesUsd(): Promise<{ pro: number; business: number }> {
+    const all = await this.plans.all();
+    return { pro: all.pro.priceMonthlyCents / 100, business: all.business.priceMonthlyCents / 100 };
+  }
 
   // ── Global stats ──────────────────────────────────────────────────────────
 
@@ -40,7 +46,8 @@ export class AdminService {
 
     const proCount  = Number((proUsers as any)?.cnt  ?? 0);
     const bizCount  = Number((bizUsers as any)?.cnt ?? 0);
-    const revenue   = proCount * PRO_PRICE_EUR + bizCount * BUSINESS_PRICE_EUR;
+    const prices    = await this.monthlyPricesUsd();
+    const revenue   = proCount * prices.pro + bizCount * prices.business;
     const todayCnt  = Number((todayAudits as any)?.cnt ?? 0);
     const yesterdayCnt = Number((yesterdayAudits as any)?.cnt ?? 0);
     const weekCnt   = Number((weekAudits as any)?.cnt ?? 0);
@@ -611,12 +618,13 @@ export class AdminService {
     const proList  = subs.filter(s => s.subscription_plan === 'pro');
     const bizList  = subs.filter(s => s.subscription_plan === 'business');
 
+    const prices = await this.monthlyPricesUsd();
     return {
       proCount:      proList.length,
       businessCount: bizList.length,
-      priceProEur:      PRO_PRICE_EUR,
-      priceBusinessEur: BUSINESS_PRICE_EUR,
-      estimatedMonthly: proList.length * PRO_PRICE_EUR + bizList.length * BUSINESS_PRICE_EUR,
+      priceProUsd:      prices.pro,
+      priceBusinessUsd: prices.business,
+      estimatedMonthly: proList.length * prices.pro + bizList.length * prices.business,
       subscriptions: subs.map(s => ({
         clerkUserId: s.clerk_user_id,
         plan:        s.subscription_plan,

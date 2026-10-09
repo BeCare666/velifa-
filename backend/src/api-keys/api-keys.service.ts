@@ -3,14 +3,14 @@ import {
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { DatabaseService, Analysis } from '../prisma/database.service';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { validateUrl, hashUrl, assertPublicHost } from '../common/validators/url.validator';
 import { effectivePlan } from '../payments/plan-limits';
 import { toReportLocale } from '../i18n/report-texts';
-import { DEFAULT_API_DAILY_LIMIT, MAX_ACTIVE_KEYS, extractApiKey, generateApiKey, hashApiKey } from './api-key';
+import { PlansService } from '../plans/plans.service';
+import { MAX_ACTIVE_KEYS, extractApiKey, generateApiKey, hashApiKey } from './api-key';
 
 const DAY_MS = 24 * 3_600_000;
 
@@ -44,7 +44,7 @@ export class ApiKeysService {
   constructor(
     private readonly db: DatabaseService,
     @InjectQueue(BULL_ANALYSES_QUEUE) private readonly queue: Queue,
-    private readonly config: ConfigService,
+    private readonly plans: PlansService,
   ) {}
 
   private async isBusiness(clerkUserId: string): Promise<boolean> {
@@ -92,7 +92,7 @@ export class ApiKeysService {
   }
 
   async createAudit(owner: string, input: { url: string; locale?: string }) {
-    const limit = this.config.get<number>('api.dailyLimit', DEFAULT_API_DAILY_LIMIT);
+    const limit = (await this.plans.get('business')).apiDailyLimit;
     if (await this.db.countAnalysesBySourceSince(owner, 'api', new Date(Date.now() - DAY_MS)) >= limit) {
       throw new HttpException({ statusCode: 429, message: 'daily_limit', error: 'Too Many Requests' }, HttpStatus.TOO_MANY_REQUESTS);
     }

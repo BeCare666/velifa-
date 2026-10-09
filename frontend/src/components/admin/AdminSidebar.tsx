@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useClerk, useUser, useAuth } from '@clerk/nextjs';
 import {
   LayoutDashboard, Users, BarChart2, DollarSign,
-  Server, LogOut, Zap, Shield, Menu, X, TrendingUp, Bell, Target, Inbox,
+  Server, LogOut, Zap, Shield, Menu, X, TrendingUp, Bell, Target, Inbox, Tags,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -18,6 +18,7 @@ const NAV = [
   { href: '/admin/leads',       icon: Inbox,           label: 'Demandes'       },
   { href: '/admin/performance', icon: TrendingUp,      label: 'Performance'    },
   { href: '/admin/revenue',     icon: DollarSign,      label: 'Revenus'        },
+  { href: '/admin/plans',       icon: Tags,            label: 'Plans et prix'  },
   { href: '/admin/system',      icon: Server,          label: 'Systeme'        },
 ];
 

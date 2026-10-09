@@ -104,9 +104,9 @@ describe('migrations du projet', () => {
     expect(migrations.map((m) => m.version)).toEqual(migrations.map((_, i) => String(i + 1).padStart(3, '0')));
   });
 
-  it('chaque instruction est idempotente (IF NOT EXISTS)', () => {
+  it('chaque instruction est idempotente (IF NOT EXISTS / INSERT IGNORE)', () => {
     for (const s of statements) {
-      expect(s).toMatch(/^(CREATE TABLE IF NOT EXISTS|ALTER TABLE \w+ ADD COLUMN IF NOT EXISTS|CREATE (?:UNIQUE )?INDEX IF NOT EXISTS)\b/);
+      expect(s).toMatch(/^(CREATE TABLE IF NOT EXISTS|ALTER TABLE \w+ ADD COLUMN IF NOT EXISTS|CREATE (?:UNIQUE )?INDEX IF NOT EXISTS|INSERT IGNORE INTO)\b/);
     }
   });
 

@@ -58,8 +58,8 @@ function setup(opts: { plan?: string } = {}) {
     findAnalysisById: jest.fn(async (id: string) => analyses[id] ?? null),
   };
   const queue = { add: jest.fn(async () => undefined) };
-  const config = { get: jest.fn((_k: string, def: any) => def) };
-  const service = new ApiKeysService(db as any, queue as any, config as any);
+  const plans = { get: jest.fn(async () => ({ apiDailyLimit: 50 })) };
+  const service = new ApiKeysService(db as any, queue as any, plans as any);
   return { db, queue, keys, service, setApiCount: (c: number) => { apiCount = c; } };
 }
 
@@ -115,9 +115,9 @@ describe('ApiKeysService — API publique', () => {
     await expect(service.createAudit('user_biz', { url: 'https://interne.example' })).rejects.toThrow('url_invalid');
   });
 
-  it('plafond quotidien → 429', async () => {
+  it('plafond quotidien du plan Business (backoffice) → 429', async () => {
     const { service, setApiCount } = setup();
-    setApiCount(200);
+    setApiCount(50);
     const err = await service.createAudit('user_biz', { url: 'https://shop.example' }).catch((e) => e);
     expect(err).toBeInstanceOf(HttpException);
     expect(err.getStatus()).toBe(429);

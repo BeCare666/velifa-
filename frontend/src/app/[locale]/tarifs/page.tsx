@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useTranslations } from 'next-intl';
 import { Check, Zap, Loader2, CheckCircle2, Sparkles, Gem } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, type PublicPlan } from '@/lib/api';
 import { useSubscription } from '@/context/SubscriptionContext';
 
 // ── Checkout button ───────────────────────────────────────────────────────
@@ -17,8 +17,10 @@ function CheckoutButton({
   userEmail,
   platinum,
   isUpgrade,
+  billing,
 }: {
   plan: 'pro' | 'business';
+  billing: 'monthly' | 'yearly';
   label: string;
   variant: 'gold' | 'ghost';
   userEmail: string | null;
@@ -45,7 +47,7 @@ function CheckoutButton({
       if (!token) throw new Error('Token introuvable');
 
       const res = await api.createCheckout(
-        { plan, email: userEmail ?? undefined },
+        { plan, email: userEmail ?? undefined, billing },
         token,
       );
 
@@ -116,12 +118,30 @@ export default function TarifsPage() {
   const { isSignedIn } = useAuth();
   const t = useTranslations('pricing');
 
+  // Prix saisis dans le backoffice (GET /plans) — USD
+  const [prices, setPrices] = useState<PublicPlan[] | null>(null);
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
+  useEffect(() => {
+    api.getPlans().then((r) => setPrices(r.data)).catch(() => setPrices([]));
+  }, []);
+  const priceOf = (code: 'free' | 'pro' | 'business') => prices?.find((p) => p.code === code);
+  const yearlyAvailable = !!prices?.some((p) => p.code !== 'free' && p.yearlyAvailable);
+  const showYearly = billing === 'yearly' && yearlyAvailable;
+  const fmt = (n: number | null | undefined) =>
+    n == null ? '—' : Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`;
+  const display = (code: 'free' | 'pro' | 'business') => {
+    const p = priceOf(code);
+    if (!p) return prices ? '—' : '…';
+    return fmt(showYearly && p.priceYearly != null ? p.priceYearly : p.priceMonthly);
+  };
+  const period = showYearly ? t('perYear') : t('perMonth');
+
   const plans = [
     {
       key: null as null,
       name: t('free.name'),
-      price: '0',
-      period: `€${t('perMonth')}`,
+      price: display('free'),
+      period,
       description: t('free.desc'),
       cta: t('ctaFree'),
       ctaHref: '/' as const,
@@ -133,8 +153,8 @@ export default function TarifsPage() {
     {
       key: 'pro' as const,
       name: t('pro.name'),
-      price: '9',
-      period: `€${t('perMonth')}`,
+      price: display('pro'),
+      period,
       description: t('pro.desc'),
       cta: t('ctaPro'),
       ctaHref: null,
@@ -146,8 +166,8 @@ export default function TarifsPage() {
     {
       key: 'business' as const,
       name: t('business.name'),
-      price: '29',
-      period: `€${t('perMonth')}`,
+      price: display('business'),
+      period,
       description: t('business.desc'),
       cta: t('ctaBusiness'),
       ctaHref: null,
@@ -180,6 +200,18 @@ export default function TarifsPage() {
 
       {/* ── Plans ─────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-6 pb-20">
+        {yearlyAvailable && (
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex rounded-full border border-border p-1 text-sm" role="group" aria-label={t('billingLabel')}>
+              {(['monthly', 'yearly'] as const).map((b) => (
+                <button key={b} type="button" onClick={() => setBilling(b)} aria-pressed={billing === b}
+                  className={`px-4 py-1.5 rounded-full transition ${billing === b ? 'bg-accent text-velifa-black font-semibold' : 'text-text-muted'}`}>
+                  {b === 'monthly' ? t('billingMonthly') : t('billingYearly')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Badge plan actuel visible si abonné */}
         {isActive && currentPlan && (
           <div className="flex justify-center mb-8">
@@ -324,7 +356,7 @@ export default function TarifsPage() {
                     : plan.cta;
 
                   return (
-                    <CheckoutButton
+                    <CheckoutButton billing={showYearly ? 'yearly' : 'monthly'}
                       plan={plan.key!}
                       label={ctaLabel}
                       variant={plan.ctaVariant}

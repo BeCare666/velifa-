@@ -28,7 +28,7 @@
     "relaunch": "Relancer une analyse",
     "rateLimitTitle": "Vous avez utilisé vos audits gratuits du jour",
     "rateLimitDesc": "Le plan gratuit est limité à 3 audits par 24h. Passez Pro pour des audits illimités, l'historique complet et les rapports avancés.",
-    "upgradePro": "Passer Pro — 9€/mois",
+    "upgradePro": "Passer Pro",
     "retryTomorrow": "Réessayer demain",
     "analyzeNow": "Analyser maintenant",
     "privacyNote": "En soumettant, vous acceptez notre",
@@ -213,7 +213,11 @@
     "startFree": "Commencer gratuitement",
     "subscribe": "S'abonner",
     "contactUs": "Nous contacter",
-    "mostPopular": "Le plus populaire"
+    "mostPopular": "Le plus populaire",
+    "perYear": "/an",
+    "billingLabel": "Facturation",
+    "billingMonthly": "Mensuel",
+    "billingYearly": "Annuel"
   },
   "dashboard": {
     "welcome": "Bienvenue",

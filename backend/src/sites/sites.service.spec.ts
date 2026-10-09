@@ -11,14 +11,9 @@ jest.mock('../common/validators/url.validator', () => {
 });
 
 import { SitesService } from './sites.service';
-import { parseSiteLimits, effectivePlan, DEFAULT_SITE_LIMITS } from '../payments/plan-limits';
+import { effectivePlan } from '../payments/plan-limits';
 
 describe('plan-limits', () => {
-  it('valeurs par défaut et surcharge partielle par variable d’environnement', () => {
-    expect(parseSiteLimits(undefined)).toEqual(DEFAULT_SITE_LIMITS);
-    expect(parseSiteLimits('pro:12, business:100')).toEqual({ free: DEFAULT_SITE_LIMITS.free, pro: 12, business: 100 });
-    expect(parseSiteLimits('pro:abc,inconnu:5')).toEqual(DEFAULT_SITE_LIMITS);
-  });
   it('plan effectif : abonnement expiré → free ; résilié mais période en cours → conservé', () => {
     expect(effectivePlan('business', 'active')).toBe('business');
     expect(effectivePlan('pro', 'cancelled')).toBe('pro');
@@ -48,8 +43,10 @@ function setup(opts: { plans?: Record<string, [string, string]> } = {}) {
     deleteTrackedSite: jest.fn(async (id: string) => { sites.splice(sites.findIndex((s) => s.id === id), 1); }),
     listTrackedSites: jest.fn(async (scope: string, _auditors: string[]) => sites.filter((s) => s.scope === scope)),
   };
-  const config = { get: jest.fn(() => 'free:1,pro:2,business:3') };
-  return { db, sites, service: new SitesService(db as any, config as any) };
+  // Limites saisies dans le backoffice (table plans)
+  const siteLimits: Record<string, number> = { free: 1, pro: 2, business: 3 };
+  const plansService = { get: jest.fn(async (code: string) => ({ siteLimit: siteLimits[code] })) };
+  return { db, sites, service: new SitesService(db as any, plansService as any) };
 }
 
 describe('SitesService', () => {

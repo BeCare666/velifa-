@@ -127,7 +127,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⚠️ gabarit ✅, Browserless réel → 1.12 |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ✅ |
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ✅ |
-| 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
+| 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ✅ (prix = grille 4.2, modifiables dans Admin → Plans et prix) |
 | 2.8 | 🔒 Créer les produits/variantes Lemon Squeezy en USD ; vérifier versement vers votre pays | Action de votre part | 🔒 |
 | 2.9 | Préférences de notification enregistrées côté serveur et respectées par le worker (section retirée en 0.11 car sans effet) | Tests | ✅ |
 
@@ -162,7 +162,9 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 ## Actions requises de votre part (récapitulatif)
 
 1. Clés de service de production (Phase 1.12).
-2. Produits Lemon Squeezy en USD + vérification des versements (2.8).
+2. Produits Lemon Squeezy en USD + vérification des versements (2.8) : créer dans le tableau de bord Lemon Squeezy
+   (boutique « velifa », USD, actuellement 0 produit) Pro et Business, mensuel et annuel, puis les sélectionner dans
+   Admin → Plans et prix. L'API Lemon Squeezy ne permet pas de créer des produits.
    Valider le nombre de sites suivis par plan (2.2, actuellement hypothèse `free:1, pro:5, business:30`, réglable par `PLAN_SITE_LIMITS`)
    et le plafond quotidien du widget agence (2.5, hypothèse 50 audits/jour/agence, `WIDGET_DAILY_LIMIT`)
    et de l'API (2.6, hypothèse 200 audits/jour/compte, `API_DAILY_LIMIT`).
@@ -517,4 +519,27 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   (formulaire 1.10, widget 2.5).
 - ⚠️ Incidence sur 1.8 (non modifiée, décision requise) : le lien WhatsApp pré-rempli de l'export est un message de
   premier contact → à n'utiliser qu'après accord. Ajouté aux actions requises.
+
+### 2026-10-09 — 2.7 Plans et prix en USD, modifiables par l'admin
+- Migration `008_plans.sql` : table `plans` (prix mensuel/annuel en centimes USD, variantes Lemon Squeezy mensuelle et
+  annuelle, sites suivis, audits API/jour, audits widget/jour), initialisée avec la grille 4.2 par `INSERT IGNORE`
+  (ne remplace jamais une valeur modifiée par l'admin).
+- `plans/plans.service.ts` : lecture avec cache de 60 s (vidé à chaque modification), valeurs de secours identiques à
+  la migration si la base est indisponible, validation (prix ≥ 0 à 2 décimales, plan payant ≠ 0, variantes numériques
+  et distinctes, limites entières).
+- **Backoffice** : Admin → « Plans et prix » (`GET/PUT /admin/plans`) ; variantes choisies dans la liste lue sur
+  Lemon Squeezy (`GET /admin/plans/lemon-variants`, lecture seule).
+- **Serveur** : limites de sites, d'API et de widget lues dans `plans` (variables `PLAN_SITE_LIMITS`, `API_DAILY_LIMIT`,
+  `WIDGET_DAILY_LIMIT` supprimées) ; paiement mensuel/annuel avec la variante du plan (secours : anciennes variables
+  de variante pour le mensuel) ; webhook : variante annuelle reconnue. Fonctions Business toujours définies dans le code.
+- **Affichage** : page Tarifs et aperçu de l'accueil alimentés par `GET /plans` (USD, bascule mensuel/annuel affichée
+  seulement si une variante annuelle existe) ; revenu estimé de l'admin en USD depuis les prix du backoffice ;
+  plus aucun prix en euros codé en dur (« Passer Pro — 9€/mois » → « Passer Pro »).
+- Preuves :
+  - `npx jest` → **24 suites, 334 tests réussis** (+16) ; `tsc` exit 0 ; `next build` exit 0 ;
+  - API réelle : `GET /plans` (base absente → valeurs par défaut 0 / 29 / 59 $) ; `/admin/plans` sans jeton → 401 ;
+    prix négatif → 400 ;
+  - **Lemon Squeezy réel** (clé fournie, mode test, lecture seule) : compte authentifié, boutique « velifa » en **USD**,
+    **0 produit** → `GET /admin/plans/lemon-variants` renvoie une liste vide (aucune variante à sélectionner pour l'instant).
+  - Documentation Lemon Squeezy vérifiée : produits et variantes en **lecture seule** via l'API.
 

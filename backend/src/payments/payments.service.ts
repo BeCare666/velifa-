@@ -9,6 +9,9 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../prisma/database.service';
 import { hasPaidAccess } from './entitlements';
+import { PlansService } from '../plans/plans.service';
+
+export type Billing = 'monthly' | 'yearly';
 
 /** Lemon Squeezy REST API base URL */
 const LS_API = 'https://api.lemonsqueezy.com/v1';
@@ -20,6 +23,7 @@ export class PaymentsService {
   constructor(
     private readonly config: ConfigService,
     private readonly db: DatabaseService,
+    private readonly plans: PlansService,
   ) {
     this.logConfig();
   }
@@ -43,6 +47,29 @@ export class PaymentsService {
     );
   }
 
+  /**
+   * Variante Lemon Squeezy du plan : saisie dans le backoffice (table plans).
+   * Secours pour le mensuel : LEMONSQUEEZY_PRO_VARIANT_ID / LEMONSQUEEZY_BUSINESS_VARIANT_ID.
+   */
+  async variantFor(plan: 'pro' | 'business', billing: Billing): Promise<string> {
+    const p = await this.plans.get(plan);
+    if (billing === 'yearly') {
+      if (!p.lemonVariantYearly) throw new BadRequestException('Paiement annuel non disponible pour ce plan');
+      return p.lemonVariantYearly;
+    }
+    return p.lemonVariantMonthly
+      ?? this.config.get<string>(plan === 'pro' ? 'lemonSqueezy.proVariantId' : 'lemonSqueezy.businessVariantId', '');
+  }
+
+  /** Plan correspondant à une variante reçue par webhook (mensuelle ou annuelle), avec le même secours. */
+  async planForVariant(variantId: string): Promise<'pro' | 'business' | null> {
+    const fromPlans = await this.plans.planForVariant(variantId);
+    if (fromPlans) return fromPlans;
+    if (variantId && variantId === this.config.get<string>('lemonSqueezy.proVariantId', '')) return 'pro';
+    if (variantId && variantId === this.config.get<string>('lemonSqueezy.businessVariantId', '')) return 'business';
+    return null;
+  }
+
   // ── Checkout ou Upgrade ───────────────────────────────────────────────────
 
   /**
@@ -55,6 +82,7 @@ export class PaymentsService {
     plan: 'pro' | 'business',
     clerkUserId: string,
     userEmail?: string,
+    billing: Billing = 'monthly',
   ): Promise<{ checkoutUrl: string | null; upgraded: boolean }> {
     const user = await this.db.findUserByClerkId(clerkUserId);
 
@@ -70,12 +98,13 @@ export class PaymentsService {
         user!.lemonSubscriptionId!,
         plan,
         clerkUserId,
+        billing,
       );
       return { checkoutUrl: null, upgraded: true };
     }
 
     // Pas d'abonnement actif ou même plan → nouveau checkout
-    const url = await this.createCheckoutUrl(plan, clerkUserId, userEmail);
+    const url = await this.createCheckoutUrl(plan, clerkUserId, userEmail, billing);
     return { checkoutUrl: url, upgraded: false };
   }
 
@@ -87,11 +116,10 @@ export class PaymentsService {
     lemonSubId: string,
     plan: 'pro' | 'business',
     clerkUserId: string,
+    billing: Billing,
   ): Promise<void> {
     const apiKey    = this.config.get<string>('lemonSqueezy.apiKey', '');
-    const variantId = plan === 'pro'
-      ? this.config.get<string>('lemonSqueezy.proVariantId', '')
-      : this.config.get<string>('lemonSqueezy.businessVariantId', '');
+    const variantId = await this.variantFor(plan, billing);
 
     if (!apiKey || !variantId) {
       throw new BadRequestException('Configuration paiement incomplète pour l\'upgrade');
@@ -141,12 +169,11 @@ export class PaymentsService {
     plan: 'pro' | 'business',
     clerkUserId: string,
     userEmail?: string,
+    billing: Billing = 'monthly',
   ): Promise<string> {
     const apiKey      = this.config.get<string>('lemonSqueezy.apiKey', '');
     const storeId     = this.config.get<string>('lemonSqueezy.storeId', '');
-    const variantId   = plan === 'pro'
-      ? this.config.get<string>('lemonSqueezy.proVariantId', '')
-      : this.config.get<string>('lemonSqueezy.businessVariantId', '');
+    const variantId   = await this.variantFor(plan, billing);
     const frontendUrl = this.config.get<string>('frontendUrl', 'http://localhost:3000');
 
     if (!apiKey || !storeId || !variantId) {
@@ -267,12 +294,7 @@ export class PaymentsService {
     const status: string = attrs?.status ?? 'inactive';
     const variantId      = String(attrs?.variant_id ?? '');
 
-    const proVariantId      = this.config.get<string>('lemonSqueezy.proVariantId', '');
-    const businessVariantId = this.config.get<string>('lemonSqueezy.businessVariantId', '');
-
-    let plan: 'pro' | 'business' | null = null;
-    if (variantId && variantId === proVariantId)      plan = 'pro';
-    else if (variantId && variantId === businessVariantId) plan = 'business';
+    const plan = await this.planForVariant(variantId);
 
     switch (eventName) {
       case 'subscription_created':

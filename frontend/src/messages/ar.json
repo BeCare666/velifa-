@@ -28,7 +28,7 @@
     "relaunch": "إعادة التحليل",
     "rateLimitTitle": "لقد استخدمت تدقيقاتك المجانية اليوم",
     "rateLimitDesc": "الخطة المجانية محدودة بـ 3 تدقيقات كل 24 ساعة. ترقّ إلى برو للحصول على تدقيقات غير محدودة وسجل كامل وتقارير متقدمة.",
-    "upgradePro": "ترقّ إلى برو — 9€/شهر",
+    "upgradePro": "ترقّ إلى برو",
     "retryTomorrow": "حاول غداً",
     "analyzeNow": "حلّل الآن",
     "privacyNote": "بالإرسال، أنت توافق على",
@@ -213,7 +213,11 @@
     "startFree": "ابدأ مجاناً",
     "subscribe": "اشترك",
     "contactUs": "تواصل معنا",
-    "mostPopular": "الأكثر شيوعاً"
+    "mostPopular": "الأكثر شيوعاً",
+    "perYear": "/سنة",
+    "billingLabel": "الفوترة",
+    "billingMonthly": "شهري",
+    "billingYearly": "سنوي"
   },
   "dashboard": {
     "welcome": "مرحباً بعودتك",

@@ -61,6 +61,7 @@ export class PaymentsController {
       dto.plan,
       clerkUserId,
       dto.email,
+      dto.billing ?? 'monthly',
     );
 
     return {

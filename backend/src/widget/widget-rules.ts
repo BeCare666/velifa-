@@ -2,12 +2,6 @@
 
 export const MAX_WIDGET_ORIGINS = 5;
 
-/**
- * Audits par jour et par agence via le widget (protège le quota PageSpeed : le widget ne peut pas avoir de CAPTCHA
- * sur des domaines tiers). ⚠️ Valeur par défaut = hypothèse, réglable par WIDGET_DAILY_LIMIT.
- */
-export const DEFAULT_WIDGET_DAILY_LIMIT = 50;
-
 /** Domaine saisi par l'agence → origine normalisée « https://hôte[:port] », ou null si invalide. */
 export function normalizeOrigin(raw: string): string | null {
   const value = (raw ?? '').trim();
