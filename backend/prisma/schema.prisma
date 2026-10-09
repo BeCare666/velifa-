@@ -1,3 +1,5 @@
+// ⚠️ Non utilisé à l'exécution (l'API utilise mysql2) et incomplet.
+// Source de vérité du schéma : backend/migrations/*.sql (appliquées au démarrage ou via `npm run migrate`).
 generator client {
   provider = "prisma-client-js"
 }

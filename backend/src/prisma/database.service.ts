@@ -1,6 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
 import { ConfigService } from '@nestjs/config';
+import { loadMigrations, runMigrations } from './migrator';
 
 export interface Analysis {
   id: string;
@@ -92,102 +93,22 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.runMigrations();
   }
 
-  /** Non-destructive migrations run at startup */
+  /**
+   * Migrations SQL versionnées (`backend/migrations`, voir `migrator.ts`).
+   * Production : un échec arrête le démarrage (mieux qu'une application sur un schéma incomplet).
+   * Développement : erreur journalisée, l'API démarre quand même (ex. base absente en local).
+   */
   private async runMigrations(): Promise<void> {
     try {
-      // Colonne technologies (détection auto)
-      await this.pool.query(`
-        ALTER TABLE analyses ADD COLUMN IF NOT EXISTS
-        technologies JSON NULL
-      `).catch(() => {
-        // Certains drivers MySQL ne supportent pas IF NOT EXISTS sur ALTER COLUMN
-        // → on ignore silencieusement si la colonne existe déjà
-      });
-
-      // Phase 1 : plateforme, données terrain, recommandations, contrôles langue/confidentialité
-      for (const ddl of [
-        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS platform VARCHAR(40) NULL`,
-        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS field_data JSON NULL`,
-        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS recommendations JSON NULL`,
-        `ALTER TABLE analyses ADD COLUMN IF NOT EXISTS site_checks JSON NULL`,
-      ]) {
-        await this.pool.query(ddl).catch((e: any) => this.logger.warn(`Migration skipped: ${e?.message}`));
-      }
-
-      await this.pool.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          id                   VARCHAR(36)  NOT NULL DEFAULT (UUID()),
-          clerk_user_id        VARCHAR(255) NOT NULL,
-          subscription_plan    VARCHAR(20)  NULL,
-          subscription_status  VARCHAR(20)  NULL,
-          lemon_subscription_id VARCHAR(100) NULL,
-          updated_at           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          UNIQUE KEY uq_clerk_user_id (clerk_user_id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-      this.logger.log('Migration: users table ready');
-
-      // Suspension columns
-      await this.pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended BOOLEAN NOT NULL DEFAULT FALSE`).catch(() => {});
-      await this.pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended_at DATETIME NULL`).catch(() => {});
-
-      // Admin notifications table
-      await this.pool.query(`
-        CREATE TABLE IF NOT EXISTS admin_notifications (
-          id         VARCHAR(36)   NOT NULL,
-          type       VARCHAR(50)   NOT NULL DEFAULT 'info',
-          message    TEXT          NOT NULL,
-          read_status BOOLEAN      NOT NULL DEFAULT FALSE,
-          created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-      this.logger.log('Migration: admin_notifications table ready');
-
-      // Prospects (audit en lot, admin) : une ligne par boutique, liée à son audit
-      await this.pool.query(`
-        CREATE TABLE IF NOT EXISTS prospects (
-          id          VARCHAR(36)   NOT NULL,
-          batch_id    VARCHAR(36)   NOT NULL,
-          url_site    VARCHAR(2048) NOT NULL,
-          url_hash    CHAR(64)      NOT NULL,
-          name        VARCHAR(255)  NULL,
-          phone       VARCHAR(20)   NULL,
-          country     CHAR(2)       NULL,
-          locale      VARCHAR(5)    NOT NULL,
-          analysis_id VARCHAR(36)   NULL,
-          created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          UNIQUE KEY uq_prospects_url_hash (url_hash),
-          KEY idx_prospects_batch (batch_id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-      this.logger.log('Migration: prospects table ready');
-
-      // Leads : demandes « Je veux corriger » envoyées depuis un rapport
-      await this.pool.query(`
-        CREATE TABLE IF NOT EXISTS leads (
-          id            VARCHAR(36)   NOT NULL,
-          analysis_id   VARCHAR(36)   NOT NULL,
-          url_site      VARCHAR(2048) NOT NULL,
-          name          VARCHAR(120)  NULL,
-          email         VARCHAR(255)  NULL,
-          phone         VARCHAR(20)   NULL,
-          message       TEXT          NULL,
-          locale        VARCHAR(5)    NOT NULL,
-          clerk_user_id VARCHAR(255)  NULL,
-          ip_address    VARCHAR(64)   NULL,
-          status        VARCHAR(20)   NOT NULL DEFAULT 'new',
-          created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          KEY idx_leads_analysis (analysis_id),
-          KEY idx_leads_created (created_at)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-      this.logger.log('Migration: leads table ready');
+      const report = await runMigrations(
+        async (sql, params) => (await this.pool.query(sql, params))[0] as any[],
+        loadMigrations(),
+        (msg) => this.logger.log(msg),
+      );
+      this.logger.log(`Migrations : ${report.applied.length} appliquée(s), ${report.alreadyApplied.length} déjà en place`);
     } catch (err: any) {
-      this.logger.error('Migration failed', err?.message);
+      this.logger.error(`Migrations échouées : ${err?.message}`);
+      if (this.config.get<string>('nodeEnv') === 'production') throw err;
     }
   }
 

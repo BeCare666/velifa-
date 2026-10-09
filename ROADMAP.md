@@ -109,7 +109,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.8 | Export prospects (CSV) avec lien WhatsApp pré-rempli en arabe par prospect | Test unitaire | ✅ |
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ✅ |
 | 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ✅ |
-| 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ⬜ |
+| 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ✅ |
 | 1.12 | 🔒 Clés de production (PageSpeed, Browserless, Brevo, Clerk, TiDB, Redis, Turnstile) et déploiement | Vous fournissez les clés | 🔒 |
 
 ---
@@ -342,4 +342,29 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   - rendu du rapport FR/EN/AR : bloc et bouton traduits ; conversion du numéro testée sur le code du composant (6/6).
 - ⚠️ Limite : envoi du formulaire non testé au clic dans un navigateur (extension Chrome non connectée) ;
   SQL non exécuté sur une vraie base (comme 1.7).
+
+### 2026-10-09 — 1.11 Migrations SQL versionnées (F3)
+- `backend/migrations/001_baseline.sql` : schéma complet (analyses, users, admin_notifications, prospects, leads),
+  uniquement des instructions idempotentes (`CREATE TABLE/INDEX IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`) :
+  crée tout sur une base vide, n'ajoute que le manquant sur la base existante.
+  Syntaxe vérifiée dans la grammaire officielle TiDB (`ADD COLUMN 'IF NOT EXISTS'?`, `CREATE INDEX IfNotExists`).
+- **Trouvé** : un script manuel `migrations/001_add_clerk_user_id.sql` (juin, jamais suivi par un outil) expliquait
+  `clerk_user_id VARCHAR(64)` + `idx_analyses_clerk_user_id` en production. Repris **à l'identique** dans la baseline
+  (aucun index en double) puis retiré (reste dans l'historique git).
+- `prisma/migrator.ts` : table `schema_migrations` (version, nom, SHA-256, date) ; application dans l'ordre ;
+  migration déjà appliquée puis modifiée → refus ; échec → version non enregistrée (relançable).
+  Les `ALTER` de `DatabaseService.onModuleInit` sont supprimés et remplacés par le migrateur.
+  **Changement de comportement** : en production, un échec de migration arrête le démarrage (avant : erreur ignorée,
+  API lancée sur un schéma incomplet) ; en développement, erreur journalisée et démarrage quand même.
+- `npm run migrate` (`dist/prisma/migrate.js`) pour appliquer manuellement. `render.yaml` inchangé (migrations au démarrage).
+- `schema.prisma` : client Prisma jamais utilisé (tout passe par `mysql2`) → avertissement en tête du fichier.
+- Preuves :
+  - `npx jest` → **16 suites, 225 tests réussis** (+11) : idempotence (2ᵉ passage = 0 instruction), ajout incrémental,
+    refus d'une migration modifiée, échec au milieu, empreinte identique CRLF/LF, versions consécutives,
+    toutes les instructions en `IF NOT EXISTS`, et **toutes les colonnes lues/écrites par le code présentes dans le
+    schéma** (test vérifié par mutation : retirer `site_checks` le fait échouer) ;
+  - `node dist/main` sans base : production → arrêt (exit 1), développement → erreur journalisée + API démarrée ;
+    `npm run migrate` sans base → exit 1 avec message.
+- ⚠️ Limite : jamais exécuté sur la vraie base TiDB (pas d'accès). Au premier démarrage configuré (1.12), vérifier
+  dans les journaux « Migrations : 1 appliquée(s) » puis « 0 appliquée(s), 1 déjà en place » au redémarrage.
 
