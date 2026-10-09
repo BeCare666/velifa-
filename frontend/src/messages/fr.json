@@ -479,7 +479,43 @@
     "deleteTooltip": "Contactez le support à support@velifa.com",
     "enable": "Activer",
     "disable": "Désactiver",
-    "defaultUser": "Utilisateur"
+    "defaultUser": "Utilisateur",
+    "workspace": {
+      "title": "Mon agence",
+      "intro": "Créez l’espace de votre agence : votre nom, votre logo et votre couleur apparaîtront sur les rapports de vos clients.",
+      "name": "Nom de l’agence",
+      "namePlaceholder": "Ex. Agence Riyad Digital",
+      "create": "Créer mon agence",
+      "preview": "Aperçu",
+      "logoUrl": "Logo (URL https)",
+      "brandColor": "Couleur de marque",
+      "defaultLocale": "Langue des rapports par défaut",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "members": "Membres",
+      "you": "vous",
+      "role": {
+        "owner": "Propriétaire",
+        "member": "Membre"
+      },
+      "remove": "Retirer",
+      "leave": "Quitter l’agence",
+      "memberEmail": "Email d’un compte VELIFA",
+      "addMember": "Ajouter",
+      "memberNote": "La personne doit déjà avoir un compte VELIFA avec cet email. 10 membres maximum.",
+      "errors": {
+        "name_invalid": "Le nom doit contenir entre 2 et 80 caractères.",
+        "logo_invalid": "Le logo doit être une adresse https valide.",
+        "color_invalid": "Couleur invalide (format #RRGGBB).",
+        "locale_invalid": "Langue non prise en charge.",
+        "email_invalid": "Email invalide.",
+        "members_limit": "Limite de 10 membres atteinte.",
+        "user_not_found": "Aucun compte VELIFA avec cet email : la personne doit d’abord créer un compte.",
+        "owner_only": "Action réservée au propriétaire de l’agence.",
+        "cannot_remove_owner": "Le propriétaire ne peut pas être retiré.",
+        "generic": "Action impossible pour le moment. Réessayez."
+      }
+    }
   },
   "legal": {
     "title": "Mentions légales",

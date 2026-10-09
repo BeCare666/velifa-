@@ -88,6 +88,20 @@ export const api = {
       authToken,
     }),
 
+  // ── Espaces agence (jeton Clerk obligatoire) ──────────────────────────────────
+  workspaces: {
+    listMine: (token: string) => apiFetch<{ data: any[] }>('/workspaces', { authToken: token }),
+    get:      (token: string, id: string) => apiFetch<{ data: any }>(`/workspaces/${encodeURIComponent(id)}`, { authToken: token }),
+    create:   (token: string, body: Record<string, string>) =>
+      apiFetch<{ data: any }>('/workspaces', { method: 'POST', body: JSON.stringify(body), authToken: token }),
+    update:   (token: string, id: string, body: Record<string, string>) =>
+      apiFetch<{ data: any }>(`/workspaces/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(body), authToken: token }),
+    addMember: (token: string, id: string, email: string) =>
+      apiFetch<{ data: any[] }>(`/workspaces/${encodeURIComponent(id)}/members`, { method: 'POST', body: JSON.stringify({ email }), authToken: token }),
+    removeMember: (token: string, id: string, memberId: string) =>
+      apiFetch<{ data: any[] }>(`/workspaces/${encodeURIComponent(id)}/members/${encodeURIComponent(memberId)}`, { method: 'DELETE', authToken: token }),
+  },
+
   // ── Admin (jeton Clerk obligatoire ; l'accès est vérifié côté serveur) ─────────
   admin: {
     getStats:    (token?: string | null) => apiFetch<any>('/admin/stats',    { authToken: token }),

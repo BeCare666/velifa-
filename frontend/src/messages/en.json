@@ -476,7 +476,43 @@
     "deleteTooltip": "Contact support at support@velifa.com",
     "enable": "Enable",
     "disable": "Disable",
-    "defaultUser": "User"
+    "defaultUser": "User",
+    "workspace": {
+      "title": "My agency",
+      "intro": "Create your agency space: your name, logo and colour will appear on your clients’ reports.",
+      "name": "Agency name",
+      "namePlaceholder": "e.g. Dubai Digital Agency",
+      "create": "Create my agency",
+      "preview": "Preview",
+      "logoUrl": "Logo (https URL)",
+      "brandColor": "Brand colour",
+      "defaultLocale": "Default report language",
+      "save": "Save",
+      "saved": "Saved",
+      "members": "Members",
+      "you": "you",
+      "role": {
+        "owner": "Owner",
+        "member": "Member"
+      },
+      "remove": "Remove",
+      "leave": "Leave agency",
+      "memberEmail": "Email of a VELIFA account",
+      "addMember": "Add",
+      "memberNote": "The person must already have a VELIFA account with this email. 10 members maximum.",
+      "errors": {
+        "name_invalid": "The name must be 2 to 80 characters long.",
+        "logo_invalid": "The logo must be a valid https address.",
+        "color_invalid": "Invalid colour (#RRGGBB format).",
+        "locale_invalid": "Unsupported language.",
+        "email_invalid": "Invalid email.",
+        "members_limit": "Limit of 10 members reached.",
+        "user_not_found": "No VELIFA account with this email: the person must create an account first.",
+        "owner_only": "Only the agency owner can do this.",
+        "cannot_remove_owner": "The owner cannot be removed.",
+        "generic": "This action is not possible right now. Please try again."
+      }
+    }
   },
   "legal": {
     "title": "Legal Notice",

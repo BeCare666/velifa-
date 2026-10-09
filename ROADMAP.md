@@ -121,7 +121,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 | ID | Tâche | Critère d'acceptation | Statut |
 |---|---|---|---|
-| 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ⬜ |
+| 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ✅ |
 | 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ⬜ |
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ⬜ |
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⬜ |
@@ -367,4 +367,20 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
     `npm run migrate` sans base → exit 1 avec message.
 - ⚠️ Limite : jamais exécuté sur la vraie base TiDB (pas d'accès). Au premier démarrage configuré (1.12), vérifier
   dans les journaux « Migrations : 1 appliquée(s) » puis « 0 appliquée(s), 1 déjà en place » au redémarrage.
+
+### 2026-10-09 — 2.1 Espaces agence (workspaces)
+- Migration `002_workspaces.sql` : `workspaces` (nom, logo https, couleur #RRGGBB, langue par défaut ar/en/fr,
+  propriétaire) et `workspace_members` (rôle `owner`/`member`). Idempotente, appliquée par le migrateur 1.11.
+- `workspaces/workspaces.service.ts` + routes `/workspaces` (Clerk obligatoire, limitées en débit) :
+  créer, lister ses espaces, détail avec membres (email affiché, au mieux), modifier la marque (**propriétaire seul**),
+  ajouter un membre **par email d'un compte VELIFA existant** (recherche Clerk ; sinon message explicite, pas
+  d'invitation fictive), retirer un membre / quitter. Propriétaire jamais retirable ; 10 membres max ;
+  un non-membre reçoit 404 (l'existence de l'espace n'est pas révélée).
+  Logo : https uniquement (`javascript:`, `data:`, `http:` refusés).
+- Paramètres → section « Mon agence » (FR/EN/AR) : création, aperçu de la marque, édition, membres.
+- Limites de plan (nombre d'espaces, membres payants) : non appliquées ici → 2.7.
+- Preuves : `npx jest` → **17 suites, 235 tests réussis** (+10 service espaces, migrations 001→002 consécutives,
+  colonnes `workspaces` couvertes) ; `tsc` exit 0 ; `next build` exit 0 ;
+  API réelle : `/workspaces` sans jeton → 401 (GET, POST, DELETE) ; champ `ownerClerkUserId` injecté → 400.
+- ⚠️ Limite : parcours complet non testé avec un vrai compte Clerk (clés de test non utilisées sans accord) ni sur la vraie base.
 

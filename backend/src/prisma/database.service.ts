@@ -72,6 +72,22 @@ export interface ProspectWithAudit {
   errorMessage: string | null;
 }
 
+export interface Workspace {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  brandColor: string;
+  defaultLocale: string;
+  ownerClerkUserId: string;
+  createdAt: Date;
+}
+
+export interface WorkspaceMember {
+  clerkUserId: string;
+  role: 'owner' | 'member';
+  createdAt: Date;
+}
+
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
@@ -461,6 +477,76 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     await this.pool.query(
       `INSERT INTO admin_notifications (id, type, message, read_status, created_at) VALUES (UUID(), ?, ?, FALSE, NOW())`,
       [type, message],
+    );
+  }
+
+  // ── Espaces agence (workspaces) ────────────────────────────────────────
+
+  private rowToWorkspace(r: any): Workspace {
+    return {
+      id: r.id, name: r.name, logoUrl: r.logo_url ?? null, brandColor: r.brand_color,
+      defaultLocale: r.default_locale, ownerClerkUserId: r.owner_clerk_user_id, createdAt: r.created_at,
+    };
+  }
+
+  /** Crée l'espace et inscrit le créateur comme propriétaire. */
+  async createWorkspace(w: Omit<Workspace, 'createdAt'>): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO workspaces (id, name, logo_url, brand_color, default_locale, owner_clerk_user_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [w.id, w.name, w.logoUrl, w.brandColor, w.defaultLocale, w.ownerClerkUserId],
+    );
+    await this.pool.query(
+      `INSERT INTO workspace_members (workspace_id, clerk_user_id, role) VALUES (?, ?, 'owner')`,
+      [w.id, w.ownerClerkUserId],
+    );
+  }
+
+  async findWorkspaceById(id: string): Promise<Workspace | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>('SELECT * FROM workspaces WHERE id = ?', [id]);
+    return rows[0] ? this.rowToWorkspace(rows[0]) : null;
+  }
+
+  /** Espaces dont l'utilisateur est membre, avec son rôle. */
+  async findWorkspacesForUser(clerkUserId: string): Promise<(Workspace & { role: 'owner' | 'member' })[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT w.*, m.role FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id
+        WHERE m.clerk_user_id = ? ORDER BY w.created_at`,
+      [clerkUserId],
+    );
+    return rows.map((r) => ({ ...this.rowToWorkspace(r), role: r.role }));
+  }
+
+  async updateWorkspace(id: string, data: Partial<Pick<Workspace, 'name' | 'logoUrl' | 'brandColor' | 'defaultLocale'>>): Promise<void> {
+    const map: Record<string, string> = { name: 'name', logoUrl: 'logo_url', brandColor: 'brand_color', defaultLocale: 'default_locale' };
+    const sets: string[] = [];
+    const values: unknown[] = [];
+    for (const [k, v] of Object.entries(data)) {
+      if (map[k] && v !== undefined) { sets.push(`${map[k]} = ?`); values.push(v); }
+    }
+    if (!sets.length) return;
+    await this.pool.query(`UPDATE workspaces SET ${sets.join(', ')} WHERE id = ?`, [...values, id]);
+  }
+
+  async findWorkspaceMembers(workspaceId: string): Promise<WorkspaceMember[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT clerk_user_id, role, created_at FROM workspace_members WHERE workspace_id = ? ORDER BY created_at`,
+      [workspaceId],
+    );
+    return rows.map((r) => ({ clerkUserId: r.clerk_user_id, role: r.role, createdAt: r.created_at }));
+  }
+
+  async addWorkspaceMember(workspaceId: string, clerkUserId: string): Promise<void> {
+    await this.pool.query(
+      `INSERT IGNORE INTO workspace_members (workspace_id, clerk_user_id, role) VALUES (?, ?, 'member')`,
+      [workspaceId, clerkUserId],
+    );
+  }
+
+  async removeWorkspaceMember(workspaceId: string, clerkUserId: string): Promise<void> {
+    await this.pool.query(
+      `DELETE FROM workspace_members WHERE workspace_id = ? AND clerk_user_id = ? AND role <> 'owner'`,
+      [workspaceId, clerkUserId],
     );
   }
 

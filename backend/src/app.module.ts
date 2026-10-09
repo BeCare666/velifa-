@@ -9,6 +9,7 @@ import { AnalysesModule } from './analyses/analyses.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { ProspectsModule } from './prospects/prospects.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HealthController } from './health/health.controller';
@@ -32,6 +33,7 @@ import { HealthController } from './health/health.controller';
     PaymentsModule,
     AdminModule,
     ProspectsModule,
+    WorkspacesModule,
   ],
   controllers: [HealthController],
   providers: [

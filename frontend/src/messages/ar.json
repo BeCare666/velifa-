@@ -479,7 +479,43 @@
     "deleteTooltip": "تواصل مع الدعم على support@velifa.com",
     "enable": "تفعيل",
     "disable": "تعطيل",
-    "defaultUser": "مستخدم"
+    "defaultUser": "مستخدم",
+    "workspace": {
+      "title": "وكالتي",
+      "intro": "أنشئ مساحة وكالتك: سيظهر اسمك وشعارك ولونك على تقارير عملائك.",
+      "name": "اسم الوكالة",
+      "namePlaceholder": "مثال: وكالة الرياض الرقمية",
+      "create": "إنشاء وكالتي",
+      "preview": "معاينة",
+      "logoUrl": "الشعار (رابط https)",
+      "brandColor": "لون العلامة",
+      "defaultLocale": "لغة التقارير الافتراضية",
+      "save": "حفظ",
+      "saved": "تم الحفظ",
+      "members": "الأعضاء",
+      "you": "أنت",
+      "role": {
+        "owner": "المالك",
+        "member": "عضو"
+      },
+      "remove": "إزالة",
+      "leave": "مغادرة الوكالة",
+      "memberEmail": "البريد الإلكتروني لحساب VELIFA",
+      "addMember": "إضافة",
+      "memberNote": "يجب أن يكون لدى الشخص حساب VELIFA بهذا البريد. الحد الأقصى 10 أعضاء.",
+      "errors": {
+        "name_invalid": "يجب أن يتكون الاسم من 2 إلى 80 حرفاً.",
+        "logo_invalid": "يجب أن يكون الشعار رابط https صالحاً.",
+        "color_invalid": "لون غير صالح (الصيغة #RRGGBB).",
+        "locale_invalid": "لغة غير مدعومة.",
+        "email_invalid": "بريد إلكتروني غير صالح.",
+        "members_limit": "تم بلوغ الحد الأقصى (10 أعضاء).",
+        "user_not_found": "لا يوجد حساب VELIFA بهذا البريد: يجب على الشخص إنشاء حساب أولاً.",
+        "owner_only": "هذا الإجراء متاح لمالك الوكالة فقط.",
+        "cannot_remove_owner": "لا يمكن إزالة المالك.",
+        "generic": "تعذّر تنفيذ الإجراء حالياً. حاول مرة أخرى."
+      }
+    }
   },
   "legal": {
     "title": "الشروط القانونية",

@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import {
   Loader2, User, Bell, AlertTriangle, Mail, Shield,
-  ToggleLeft, ToggleRight,
+  ToggleLeft, ToggleRight, Building2,
 } from 'lucide-react';
+import WorkspaceSection from '@/components/settings/WorkspaceSection';
 import { useTranslations } from 'next-intl';
 
 // ── localStorage keys ────────────────────────────────────────────────────────
@@ -171,6 +172,13 @@ export default function SettingsPage() {
 
           {/* Préférences de notification : retirées tant qu'elles ne sont pas enregistrées
               et appliquées côté serveur (ROADMAP 2.9). Les anciens interrupteurs n'avaient aucun effet. */}
+
+          {/* Mon agence (offre B) */}
+          <div className="fade-up" style={{ animationDelay: '100ms' }}>
+            <Section title={t('workspace.title')} icon={Building2}>
+              <WorkspaceSection />
+            </Section>
+          </div>
 
           {/* Danger zone */}
           <div className="fade-up" style={{ animationDelay: '140ms' }}>
