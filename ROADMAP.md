@@ -151,7 +151,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 | ID | Tâche | Responsable | Statut |
 |---|---|---|---|
-| 4.1 | Scripts de prospection WhatsApp AR/EN + objections | Claude (rédaction) | ⬜ |
+| 4.1 | Scripts de prospection WhatsApp AR/EN + objections | Claude (rédaction) | ✅ `docs/commercial/scripts-whatsapp.md` |
 | 4.2 | Grille de prix à tester (3 niveaux, SAR/AED/QAR/USD), marquée « hypothèse » | Claude (proposition) / vous (validation) | ✅ proposition (`docs/commercial/grille-prix.md`) ; validation → 2.7 |
 | 4.3 | Liste de 200 boutiques cibles du Golfe | Vous (ou outil d'annuaire) | 🔒 |
 | 4.4 | Validation juridique des indicateurs PDPL et des mentions légales | Juriste local | 🔒 |
@@ -168,6 +168,8 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
    et de l'API (2.6, hypothèse 200 audits/jour/compte, `API_DAILY_LIMIT`).
 3. Comptes partenaires Salla et Zid (3.1).
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
+5. Décider l'usage de l'export 1.8 : WhatsApp exige l'accord préalable du destinataire (voir journal 4.1) ;
+   le message pré-rempli ne doit servir qu'après accord. Option possible : colonne « accord WhatsApp » dans les prospects.
 
 ---
 
@@ -503,4 +505,16 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Proposition dérivée de ces relevés : **Pro 29 $**, **Business 59 $** (annuel −25 % : 261 $ / 531 $),
   offre A **Essentiel 49 $** et **Complet 149 $** ; montants SAR/AED/QAR aux parités fixes (calculs vérifiés par script).
 - Recommandation : baisser `API_DAILY_LIMIT` de 200 à 50 (repère SEOptimer). Montants modifiables par l'admin (2.7).
+
+### 2026-10-09 — 4.1 Scripts de prospection et objections
+- `docs/commercial/scripts-whatsapp.md` (AR/EN) : premier contact, ouverture WhatsApp, rappel unique,
+  proposition (forfaits de la grille 4.2), message après livraison (lien de comparaison 1.9), approche agences,
+  8 réponses aux objections. Aucun gain de ventes promis ; variabilité Lighthouse expliquée ; refus respecté.
+- **Constat vérifié** (politique officielle WhatsApp Business, lue le 2026-10-09) : contact autorisé seulement si
+  la personne **a donné son numéro et a accepté** de recevoir des messages ; toute demande d'arrêt doit être respectée ;
+  spam / envois massifs → limitation ou suppression du compte. Les scripts font donc le **premier contact par email,
+  formulaire ou message direct avec demande d'accord**, et WhatsApp seulement après accord ou demande entrante
+  (formulaire 1.10, widget 2.5).
+- ⚠️ Incidence sur 1.8 (non modifiée, décision requise) : le lien WhatsApp pré-rempli de l'export est un message de
+  premier contact → à n'utiliser qu'après accord. Ajouté aux actions requises.
 
