@@ -726,6 +726,58 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  // ── Clés API ───────────────────────────────────────────────────────────
+
+  async insertApiKey(k: { id: string; ownerClerkUserId: string; name: string; prefix: string; keyHash: string }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO api_keys (id, owner_clerk_user_id, name, prefix, key_hash) VALUES (?, ?, ?, ?, ?)`,
+      [k.id, k.ownerClerkUserId, k.name, k.prefix, k.keyHash],
+    );
+  }
+
+  /** Clés d'un titulaire, sans empreinte (jamais renvoyée au client). */
+  async listApiKeys(ownerClerkUserId: string): Promise<{ id: string; name: string; prefix: string; createdAt: Date; lastUsedAt: Date | null; revokedAt: Date | null }[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT id, name, prefix, created_at, last_used_at, revoked_at FROM api_keys
+        WHERE owner_clerk_user_id = ? ORDER BY created_at DESC`,
+      [ownerClerkUserId],
+    );
+    return rows.map((r) => ({
+      id: r.id, name: r.name, prefix: r.prefix, createdAt: r.created_at,
+      lastUsedAt: r.last_used_at ?? null, revokedAt: r.revoked_at ?? null,
+    }));
+  }
+
+  /** Titulaire d'une clé active (non révoquée) à partir de son empreinte. */
+  async findActiveApiKeyByHash(keyHash: string): Promise<{ id: string; ownerClerkUserId: string } | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT id, owner_clerk_user_id FROM api_keys WHERE key_hash = ? AND revoked_at IS NULL LIMIT 1',
+      [keyHash],
+    );
+    return rows[0] ? { id: rows[0].id, ownerClerkUserId: rows[0].owner_clerk_user_id } : null;
+  }
+
+  async touchApiKey(id: string): Promise<void> {
+    await this.pool.query('UPDATE api_keys SET last_used_at = NOW() WHERE id = ?', [id]);
+  }
+
+  /** false si la clé n'existe pas, appartient à un autre titulaire ou est déjà révoquée. */
+  async revokeApiKey(id: string, ownerClerkUserId: string): Promise<boolean> {
+    const [res] = await this.pool.query<mysql.ResultSetHeader>(
+      'UPDATE api_keys SET revoked_at = NOW() WHERE id = ? AND owner_clerk_user_id = ? AND revoked_at IS NULL',
+      [id, ownerClerkUserId],
+    );
+    return res.affectedRows === 1;
+  }
+
+  async countAnalysesBySourceSince(clerkUserId: string, source: string, since: Date): Promise<number> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT COUNT(*) AS cnt FROM analyses WHERE clerk_user_id = ? AND source = ? AND created_at >= ?',
+      [clerkUserId, source, since],
+    );
+    return Number(rows[0]?.cnt ?? 0);
+  }
+
   // ── Internal helpers ───────────────────────────────────────────────────
 
   private generateId(): string {

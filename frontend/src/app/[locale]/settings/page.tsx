@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import {
   Loader2, User, Bell, AlertTriangle, Mail, Shield,
-  ToggleLeft, ToggleRight, Building2,
+  ToggleLeft, ToggleRight, Building2, KeyRound,
 } from 'lucide-react';
 import WorkspaceSection from '@/components/settings/WorkspaceSection';
+import ApiKeysSection from '@/components/settings/ApiKeysSection';
 import { useTranslations } from 'next-intl';
 
 // ── localStorage keys ────────────────────────────────────────────────────────
@@ -177,6 +178,13 @@ export default function SettingsPage() {
           <div className="fade-up" style={{ animationDelay: '100ms' }}>
             <Section title={t('workspace.title')} icon={Building2}>
               <WorkspaceSection />
+            </Section>
+          </div>
+
+          {/* Clés API (API publique v1) */}
+          <div className="fade-up" style={{ animationDelay: '120ms' }}>
+            <Section title={t('apiKeys.title')} icon={KeyRound}>
+              <ApiKeysSection />
             </Section>
           </div>
 

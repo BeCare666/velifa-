@@ -41,6 +41,7 @@ class EnvironmentVariables {
   @IsOptional() @IsInt() @Min(5000) PROSPECT_AUDIT_INTERVAL_MS?: number;
   @IsOptional() @IsString() PLAN_SITE_LIMITS?: string;
   @IsOptional() @IsInt() @Min(1) WIDGET_DAILY_LIMIT?: number;
+  @IsOptional() @IsInt() @Min(1) API_DAILY_LIMIT?: number;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -85,6 +86,8 @@ export default () => ({
   // Sites suivis par plan (hypothèse à valider, ROADMAP 4.2) : "free:1,pro:5,business:30"
   plans: { siteLimits: process.env.PLAN_SITE_LIMITS ?? '' },
   // Widget agence : audits par jour et par agence (hypothèse à valider ; pas de CAPTCHA possible sur domaines tiers)
+  // API publique v1 : audits par jour et par titulaire (hypothèse à valider)
+  api: { dailyLimit: parseInt(process.env.API_DAILY_LIMIT ?? '200', 10) },
   widget: { dailyLimit: parseInt(process.env.WIDGET_DAILY_LIMIT ?? '50', 10) },
   prospects: { auditIntervalMs: parseInt(process.env.PROSPECT_AUDIT_INTERVAL_MS ?? '30000', 10) },
   security: {

@@ -206,7 +206,7 @@
         "Support prioritaire avancé",
         "Suivi multi-sites, audits programmés (quotidiens ou hebdomadaires) et alertes email",
         "Rapport PDF à la marque de votre agence (arabe, anglais, français)",
-        "Bientôt : API"
+        "API REST : lancer et lire des audits depuis vos outils"
       ]
     },
     "perMonth": "/mois",
@@ -252,7 +252,7 @@
     "hiddenAudits": "audits masqués",
     "goPro": "Passer Pro",
     "businessAccess": "Espace Business — Accès illimité",
-    "businessDesc": "Analyse approfondie, suivi multi-sites, audits programmés, alertes et PDF à votre marque. API : bientôt.",
+    "businessDesc": "Analyse approfondie, suivi multi-sites, audits programmés, alertes, PDF à votre marque et API.",
     "businessFeature": "Fonctionnalité Business",
     "businessFeatureDesc": "est réservée au plan Business.",
     "upgradeBusiness": "Passer Business",
@@ -569,6 +569,29 @@
           "owner_only": "Action réservée au propriétaire de l’agence.",
           "generic": "Action impossible pour le moment. Réessayez."
         }
+      }
+    },
+    "apiKeys": {
+      "title": "Clés API",
+      "intro": "Lancez et récupérez des audits depuis vos propres outils (API REST v1). Chaque clé agit en votre nom.",
+      "businessOnly": "L’API est disponible avec le plan Business.",
+      "name": "Nom de la clé",
+      "namePlaceholder": "Ex. Intégration CRM",
+      "create": "Créer une clé",
+      "showOnce": "Copiez cette clé maintenant : elle ne sera plus jamais affichée.",
+      "copy": "Copier",
+      "copied": "Copié",
+      "lastUsed": "Dernière utilisation : {date}",
+      "revoked": "Révoquée",
+      "revoke": "Révoquer",
+      "example": "Exemple",
+      "exampleNote": "Puis GET /public/audits/{id} pour lire le statut et les résultats. Limite quotidienne d’audits par compte.",
+      "errors": {
+        "api_requires_business": "L’API nécessite le plan Business.",
+        "name_invalid": "Donnez un nom à la clé (80 caractères maximum).",
+        "keys_limit": "5 clés actives maximum : révoquez-en une.",
+        "key_not_found": "Clé introuvable.",
+        "generic": "Action impossible pour le moment. Réessayez."
       }
     }
   },

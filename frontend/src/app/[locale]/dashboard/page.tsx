@@ -447,35 +447,6 @@ const BUSINESS_SILVER = '#C8C8C8';
 const BUSINESS_BORDER = 'rgba(200,200,200,0.40)';
 const BUSINESS_SURFACE = 'rgba(200,200,200,0.07)';
 
-// Fonctions en cours de construction (Phase 2 du ROADMAP) : affichées comme « bientôt »,
-// jamais simulées dans le navigateur.
-function UpcomingFeatures() {
-  const items = [
-    { icon: Key,   label: 'Clé API personnelle' },
-  ];
-  return (
-    <div
-      className="p-5 rounded-[var(--velifa-radius-lg)]"
-      style={{ background: BUSINESS_SURFACE, border: `1px solid ${BUSINESS_BORDER}` }}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <Gem className="w-4 h-4" style={{ color: BUSINESS_SILVER }} />
-        <span className="font-heading font-semibold text-sm" style={{ color: BUSINESS_SILVER }}>
-          Bientôt disponible
-        </span>
-      </div>
-      <ul className="space-y-2">
-        {items.map(({ icon: Icon, label }) => (
-          <li key={label} className="flex items-center gap-2 text-sm text-text-muted">
-            <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: BUSINESS_SILVER }} />
-            {label}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 // ── Page principale ────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const router = useRouter();
@@ -746,13 +717,6 @@ export default function DashboardPage() {
           {!isLoading && (
             <div className="fade-up mb-6" style={{ animationDelay: '270ms' }}>
               <TrackedSites />
-            </div>
-          )}
-
-          {/* ── Fonctions à venir (non simulées) ─────────────── */}
-          {!isLoading && (
-            <div className="fade-up mb-10 sm:mb-14" style={{ animationDelay: '280ms' }}>
-              <UpcomingFeatures />
             </div>
           )}
 

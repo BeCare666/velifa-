@@ -126,7 +126,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ✅ |
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⚠️ gabarit ✅, Browserless réel → 1.12 |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ✅ |
-| 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ⬜ |
+| 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ✅ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
 | 2.8 | 🔒 Créer les produits/variantes Lemon Squeezy en USD ; vérifier versement vers votre pays | Action de votre part | 🔒 |
 | 2.9 | Préférences de notification enregistrées côté serveur et respectées par le worker (section retirée en 0.11 car sans effet) | Tests | ⬜ |
@@ -164,7 +164,8 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 1. Clés de service de production (Phase 1.12).
 2. Produits Lemon Squeezy en USD + vérification des versements (2.8).
    Valider le nombre de sites suivis par plan (2.2, actuellement hypothèse `free:1, pro:5, business:30`, réglable par `PLAN_SITE_LIMITS`)
-   et le plafond quotidien du widget agence (2.5, hypothèse 50 audits/jour/agence, `WIDGET_DAILY_LIMIT`).
+   et le plafond quotidien du widget agence (2.5, hypothèse 50 audits/jour/agence, `WIDGET_DAILY_LIMIT`)
+   et de l'API (2.6, hypothèse 200 audits/jour/compte, `API_DAILY_LIMIT`).
 3. Comptes partenaires Salla et Zid (3.1).
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
 
@@ -465,4 +466,19 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   - **backend réel** : préflight `/widget/…` depuis `https://agence.ae` → autorisé, en-têtes limités à `Content-Type` ;
     préflight `/workspaces` depuis ce domaine → refusé ; depuis le frontend → autorisé avec identifiants ;
     clé mal formée → 404 ; configuration sans jeton → 401.
+
+### 2026-10-09 — 2.6 Clés API et API publique v1
+- Migration `006_api_keys.sql` : clés par titulaire ; **seule l'empreinte SHA-256** est stockée (+ préfixe affichable).
+- Clés `vlf_` + 40 hex (160 bits), affichées **une seule fois** ; 5 actives max ; révocation ; dernière utilisation.
+  Gestion : `GET/POST/DELETE /api-keys` (Clerk). Création et **chaque appel** : plan Business du titulaire
+  (abonnement expiré → 403 immédiat, sans révoquer la clé).
+- API publique v1 : `POST /api/v1/public/audits` `{ url, locale? }` → 202 + audit en file ;
+  `GET /api/v1/public/audits/:id` → statut puis scores, mesures, données terrain, recommandations, contrôles,
+  lien du rapport. Clé via `Authorization: Bearer vlf_…` ou `X-API-Key`. Un titulaire ne lit que **ses** audits
+  (404 sinon). URL validée (anti-SSRF), 30 requêtes/min, plafond quotidien (`API_DAILY_LIMIT`, hypothèse 200).
+- Paramètres → « Clés API » (FR/EN/AR) avec exemple `curl`. Tableau de bord : encart « Bientôt » retiré
+  (plus aucune fonction annoncée sans implémentation) ; Tarifs : l'API n'est plus « bientôt ».
+- Preuves : `npx jest` → **22 suites, 311 tests réussis** (+10 : format/empreinte, en-têtes, révocation, plan,
+  plafond, propriété des audits, aucune donnée personnelle) ; `tsc` exit 0 ; `next build` exit 0 ;
+  API réelle : sans clé, jeton Clerk à la place d'une clé, clé mal formée → 401 ; `/api-keys` sans jeton → 401.
 

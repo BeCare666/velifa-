@@ -121,6 +121,15 @@ export const api = {
       apiFetch<{ data: any }>(`/sites/${encodeURIComponent(id)}/monitoring`, { method: 'PATCH', body: JSON.stringify(body), authToken: token }),
   },
 
+  // ── Clés de l'API publique (jeton Clerk obligatoire) ──────────────────────────
+  apiKeys: {
+    list:   (token: string) => apiFetch<{ data: { keys: any[]; available: boolean } }>('/api-keys', { authToken: token }),
+    create: (token: string, name: string) =>
+      apiFetch<{ data: { key: string; prefix: string; name: string } }>('/api-keys', { method: 'POST', body: JSON.stringify({ name }), authToken: token }),
+    revoke: (token: string, id: string) =>
+      apiFetch<{ data: { keys: any[]; available: boolean } }>(`/api-keys/${encodeURIComponent(id)}`, { method: 'DELETE', authToken: token }),
+  },
+
   // ── Espaces agence (jeton Clerk obligatoire) ──────────────────────────────────
   workspaces: {
     listMine: (token: string) => apiFetch<{ data: any[] }>('/workspaces', { authToken: token }),

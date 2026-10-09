@@ -206,7 +206,7 @@
         "Advanced priority support",
         "Multi-site tracking, scheduled audits (daily or weekly) and email alerts",
         "PDF report branded with your agency (Arabic, English, French)",
-        "Coming soon: API"
+        "REST API: run and read audits from your own tools"
       ]
     },
     "perMonth": "/month",
@@ -252,7 +252,7 @@
     "hiddenAudits": "hidden audits",
     "goPro": "Go Pro",
     "businessAccess": "Business Access — Unlimited",
-    "businessDesc": "In-depth analysis, multi-site tracking, scheduled audits, alerts and branded PDF. API: coming soon.",
+    "businessDesc": "In-depth analysis, multi-site tracking, scheduled audits, alerts, branded PDF and API.",
     "businessFeature": "Business Feature",
     "businessFeatureDesc": "is reserved for the Business plan.",
     "upgradeBusiness": "Upgrade to Business",
@@ -566,6 +566,29 @@
           "owner_only": "Only the agency owner can do this.",
           "generic": "This action is not possible right now. Please try again."
         }
+      }
+    },
+    "apiKeys": {
+      "title": "API keys",
+      "intro": "Run and retrieve audits from your own tools (REST API v1). Each key acts on your behalf.",
+      "businessOnly": "The API is available with the Business plan.",
+      "name": "Key name",
+      "namePlaceholder": "e.g. CRM integration",
+      "create": "Create a key",
+      "showOnce": "Copy this key now: it will never be shown again.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "lastUsed": "Last used: {date}",
+      "revoked": "Revoked",
+      "revoke": "Revoke",
+      "example": "Example",
+      "exampleNote": "Then GET /public/audits/{id} to read the status and results. Daily audit limit per account.",
+      "errors": {
+        "api_requires_business": "The API requires the Business plan.",
+        "name_invalid": "Give the key a name (80 characters maximum).",
+        "keys_limit": "5 active keys maximum: revoke one first.",
+        "key_not_found": "Key not found.",
+        "generic": "This action is not possible right now. Please try again."
       }
     }
   },
