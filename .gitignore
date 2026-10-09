@@ -29,3 +29,6 @@ tmp/
 # OS
 .DS_Store
 Thumbs.db
+
+# Notes personnelles contenant des clés : jamais dans git
+note.txt
