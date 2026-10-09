@@ -129,7 +129,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ✅ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
 | 2.8 | 🔒 Créer les produits/variantes Lemon Squeezy en USD ; vérifier versement vers votre pays | Action de votre part | 🔒 |
-| 2.9 | Préférences de notification enregistrées côté serveur et respectées par le worker (section retirée en 0.11 car sans effet) | Tests | ⬜ |
+| 2.9 | Préférences de notification enregistrées côté serveur et respectées par le worker (section retirée en 0.11 car sans effet) | Tests | ✅ |
 
 ---
 
@@ -481,4 +481,17 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : `npx jest` → **22 suites, 311 tests réussis** (+10 : format/empreinte, en-têtes, révocation, plan,
   plafond, propriété des audits, aucune donnée personnelle) ; `tsc` exit 0 ; `next build` exit 0 ;
   API réelle : sans clé, jeton Clerk à la place d'une clé, clé mal formée → 401 ; `/api-keys` sans jeton → 401.
+
+### 2026-10-09 — 2.9 Préférences de notification
+- Migration `007_notification_prefs.sql` : `users.notify_reports`, `users.notify_alerts` (activées par défaut).
+- `GET/PUT /me/notifications` (Clerk) ; enregistrement possible même sans abonnement (ligne `users` créée).
+- **Respectées côté serveur** : le worker n'envoie l'email de rapport d'un compte que si « rapports » est actif
+  (un visiteur anonyme qui a saisi son email reçoit toujours son rapport) ; les alertes de baisse de score (2.3) ne
+  partent pas si « alertes » est désactivé (score de référence mis à jour normalement, pas de rattrapage ensuite).
+- Paramètres → « Notifications » (FR/EN/AR) branché sur le serveur (retour à l'état enregistré en cas d'échec) ;
+  ancien code `localStorage` supprimé ; « Newsletter » non proposée (aucune newsletter n'existe).
+- Preuves : `npx jest` → **23 suites, 318 tests réussis** (+7 : règle d'envoi, alertes désactivées) ; `tsc` exit 0 ;
+  `next build` exit 0 ; API réelle : `/me/notifications` sans jeton → 401 (GET et PUT).
+- Constat (préexistant, sans effet ici) : `ValidationPipe` global avec conversion implicite → la chaîne `"oui"` est
+  convertie en booléen ; le frontend envoie de vrais booléens JSON.
 

@@ -501,11 +501,9 @@
     "emailNote": "L'email est géré par votre compte Clerk et ne peut pas être modifié ici.",
     "notificationsTitle": "Notifications",
     "notif1Label": "Recevoir les rapports par email",
-    "notif1Desc": "Un email récapitulatif après chaque audit terminé.",
-    "notif2Label": "Alertes de performance (bientôt)",
-    "notif2Desc": "Notification si un score chute sous votre seuil configuré.",
-    "notif3Label": "Newsletter Velifa",
-    "notif3Desc": "Actualités, conseils SEO et nouvelles fonctionnalités.",
+    "notif1Desc": "Un email récapitulatif après chaque audit que vous lancez.",
+    "notif2Label": "Alertes de performance",
+    "notif2Desc": "Email quand le score d’un site suivi passe sous votre seuil (audits programmés).",
     "dangerTitle": "Zone dangereuse",
     "deleteAccount": "Supprimer mon compte",
     "deleteAccountDesc": "Cette action est irréversible. Toutes vos données seront effacées.",
@@ -593,7 +591,8 @@
         "key_not_found": "Clé introuvable.",
         "generic": "Action impossible pour le moment. Réessayez."
       }
-    }
+    },
+    "notifError": "Impossible d’enregistrer vos préférences. Réessayez."
   },
   "legal": {
     "title": "Mentions légales",

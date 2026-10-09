@@ -88,7 +88,10 @@ export class MonitoringService implements OnModuleInit {
     if (!site || !analysis || analysis.status !== 'completed') return { alerted: false };
 
     const score = analysis.scorePerformance;
-    const due = shouldAlert(site.alertThreshold ?? null, site.lastScore ?? null, score);
+    // Alertes désactivées par le titulaire (2.9) : pas d'email, le score de référence est mis à jour normalement.
+    const prefs = await this.db.getNotificationPrefs(site.ownerClerkUserId).catch(() => null);
+    const alertsOn = prefs?.alerts ?? true;
+    const due = alertsOn && shouldAlert(site.alertThreshold ?? null, site.lastScore ?? null, score);
     const alertedAt = due ? await this.sendAlert(site, analysis.id, score!) : null;
     // Alerte due mais non envoyée : on garde l'ancien score de référence pour retenter au prochain audit.
     const reference = due && !alertedAt ? site.lastScore ?? null : score;

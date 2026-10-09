@@ -498,11 +498,9 @@
     "emailNote": "Email is managed by your Clerk account and cannot be changed here.",
     "notificationsTitle": "Notifications",
     "notif1Label": "Receive reports by email",
-    "notif1Desc": "A summary email after each completed audit.",
-    "notif2Label": "Performance alerts (coming soon)",
-    "notif2Desc": "Notification if a score drops below your configured threshold.",
-    "notif3Label": "Velifa Newsletter",
-    "notif3Desc": "News, SEO tips and new features.",
+    "notif1Desc": "A summary email after each audit you run.",
+    "notif2Label": "Performance alerts",
+    "notif2Desc": "Email when a tracked site’s score drops below your threshold (scheduled audits).",
     "dangerTitle": "Danger zone",
     "deleteAccount": "Delete my account",
     "deleteAccountDesc": "This action is irreversible. All your data will be erased.",
@@ -590,7 +588,8 @@
         "key_not_found": "Key not found.",
         "generic": "This action is not possible right now. Please try again."
       }
-    }
+    },
+    "notifError": "Could not save your preferences. Please try again."
   },
   "legal": {
     "title": "Legal Notice",

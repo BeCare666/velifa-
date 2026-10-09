@@ -778,6 +778,26 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return Number(rows[0]?.cnt ?? 0);
   }
 
+  // ── Préférences de notification ────────────────────────────────────────
+
+  /** null si le compte n'a jamais enregistré de préférences (valeurs par défaut à appliquer). */
+  async getNotificationPrefs(clerkUserId: string): Promise<{ reports: boolean; alerts: boolean } | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT notify_reports, notify_alerts FROM users WHERE clerk_user_id = ? LIMIT 1',
+      [clerkUserId],
+    );
+    if (!rows[0]) return null;
+    return { reports: !!rows[0].notify_reports, alerts: !!rows[0].notify_alerts };
+  }
+
+  async setNotificationPrefs(clerkUserId: string, prefs: { reports: boolean; alerts: boolean }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO users (id, clerk_user_id, notify_reports, notify_alerts) VALUES (UUID(), ?, ?, ?)
+       ON DUPLICATE KEY UPDATE notify_reports = VALUES(notify_reports), notify_alerts = VALUES(notify_alerts)`,
+      [clerkUserId, prefs.reports, prefs.alerts],
+    );
+  }
+
   // ── Internal helpers ───────────────────────────────────────────────────
 
   private generateId(): string {

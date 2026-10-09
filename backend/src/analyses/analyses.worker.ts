@@ -14,6 +14,7 @@ import { TechDetectorService, primaryPlatform } from '../tech-detector/tech-dete
 import type { SiteChecks } from '../site-checks/site-checks';
 import { buildWhatsappLink, buildReportUrl, toReportLocale } from '../i18n/report-texts';
 import { MonitoringService } from '../sites/monitoring.service';
+import { shouldSendReportEmail } from '../notifications/notification-prefs';
 
 export interface AnalysisJobPayload {
   analysisId: string;
@@ -135,7 +136,12 @@ export class AnalysisWorker {
         reportUrl,
       });
 
-      if (email) try {
+      // Compte connecté : email de rapport seulement si sa préférence « rapports » est active (2.9)
+      const owner = email ? (await this.db.findAnalysisById(analysisId))?.clerkUserId ?? null : null;
+      const prefs = owner ? await this.db.getNotificationPrefs(owner).catch(() => null) : null;
+      const sendEmail = shouldSendReportEmail(email, owner, prefs);
+      if (email && !sendEmail) this.logger.log(`[${analysisId}] Report email skipped (user preference)`);
+      if (sendEmail) try {
         await this.brevo.sendReportEmail({
           toEmail:           email,
           urlSite:           url,

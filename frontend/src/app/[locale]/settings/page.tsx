@@ -9,20 +9,8 @@ import {
 } from 'lucide-react';
 import WorkspaceSection from '@/components/settings/WorkspaceSection';
 import ApiKeysSection from '@/components/settings/ApiKeysSection';
+import { api } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-
-// ── localStorage keys ────────────────────────────────────────────────────────
-const LS_KEY = 'velifa_notifications';
-interface NotifPrefs {
-  emailReports: boolean;
-  perfAlerts: boolean;
-  newsletter: boolean;
-}
-function loadPrefs(): NotifPrefs {
-  if (typeof window === 'undefined') return { emailReports: true, perfAlerts: false, newsletter: false };
-  try { return { emailReports: true, perfAlerts: false, newsletter: false, ...JSON.parse(localStorage.getItem(LS_KEY) ?? '{}') }; }
-  catch { return { emailReports: true, perfAlerts: false, newsletter: false }; }
-}
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
 function Toggle({ on, onToggle, label, description, enableLabel, disableLabel }: {
@@ -72,24 +60,39 @@ function Section({ title, icon: Icon, children }: {
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function SettingsPage() {
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, getToken } = useAuth();
   const { user } = useUser();
-  const [prefs, setPrefs] = useState<NotifPrefs>({ emailReports: true, perfAlerts: false, newsletter: false });
+  // Préférences enregistrées côté serveur et respectées par le worker et les alertes (ROADMAP 2.9)
+  const [prefs, setPrefs] = useState<{ reports: boolean; alerts: boolean } | null>(null);
+  const [prefsError, setPrefsError] = useState(false);
   const t = useTranslations('settings');
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) router.push('/sign-in');
   }, [isLoaded, isSignedIn, router]);
 
-  // Load from localStorage after mount
-  useEffect(() => { setPrefs(loadPrefs()); }, []);
+  useEffect(() => {
+    if (!isSignedIn) return;
+    (async () => {
+      try {
+        const token = await getToken();
+        if (token) setPrefs((await api.notifications.get(token)).data);
+      } catch { setPrefsError(true); }
+    })();
+  }, [isSignedIn, getToken]);
 
-  function toggle(key: keyof NotifPrefs) {
-    setPrefs((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem(LS_KEY, JSON.stringify(next));
-      return next;
-    });
+  async function toggle(key: 'reports' | 'alerts') {
+    if (!prefs) return;
+    const next = { ...prefs, [key]: !prefs[key] };
+    setPrefs(next);
+    setPrefsError(false);
+    try {
+      const token = await getToken();
+      if (token) setPrefs((await api.notifications.set(token, next)).data);
+    } catch {
+      setPrefs(prefs);          // retour à l'état enregistré
+      setPrefsError(true);
+    }
   }
 
   if (!isLoaded || !isSignedIn) {
@@ -171,8 +174,22 @@ export default function SettingsPage() {
             </Section>
           </div>
 
-          {/* Préférences de notification : retirées tant qu'elles ne sont pas enregistrées
-              et appliquées côté serveur (ROADMAP 2.9). Les anciens interrupteurs n'avaient aucun effet. */}
+          {/* Notifications (enregistrées côté serveur) */}
+          <div className="fade-up" style={{ animationDelay: '80ms' }}>
+            <Section title={t('notificationsTitle')} icon={Bell}>
+              {!prefs ? (
+                prefsError ? <p className="text-sm score-poor">{t('notifError')}</p> : <Loader2 className="w-5 h-5 text-accent animate-spin" />
+              ) : (
+                <>
+                  <Toggle on={prefs.reports} onToggle={() => toggle('reports')} label={t('notif1Label')} description={t('notif1Desc')}
+                    enableLabel={t('enable')} disableLabel={t('disable')} />
+                  <Toggle on={prefs.alerts} onToggle={() => toggle('alerts')} label={t('notif2Label')} description={t('notif2Desc')}
+                    enableLabel={t('enable')} disableLabel={t('disable')} />
+                  {prefsError && <p className="text-sm score-poor mt-3">{t('notifError')}</p>}
+                </>
+              )}
+            </Section>
+          </div>
 
           {/* Mon agence (offre B) */}
           <div className="fade-up" style={{ animationDelay: '100ms' }}>

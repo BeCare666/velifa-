@@ -121,6 +121,13 @@ export const api = {
       apiFetch<{ data: any }>(`/sites/${encodeURIComponent(id)}/monitoring`, { method: 'PATCH', body: JSON.stringify(body), authToken: token }),
   },
 
+  // ── Préférences de notification (jeton Clerk obligatoire) ─────────────────────
+  notifications: {
+    get: (token: string) => apiFetch<{ data: { reports: boolean; alerts: boolean } }>('/me/notifications', { authToken: token }),
+    set: (token: string, prefs: { reports: boolean; alerts: boolean }) =>
+      apiFetch<{ data: { reports: boolean; alerts: boolean } }>('/me/notifications', { method: 'PUT', body: JSON.stringify(prefs), authToken: token }),
+  },
+
   // ── Clés de l'API publique (jeton Clerk obligatoire) ──────────────────────────
   apiKeys: {
     list:   (token: string) => apiFetch<{ data: { keys: any[]; available: boolean } }>('/api-keys', { authToken: token }),

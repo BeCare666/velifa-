@@ -50,7 +50,7 @@ describe('canSchedule', () => {
   });
 });
 
-function setup(opts: { sites?: any[]; plans?: Record<string, [string, string]>; analysis?: any; email?: string | null; emailFails?: boolean } = {}) {
+function setup(opts: { sites?: any[]; plans?: Record<string, [string, string]>; analysis?: any; email?: string | null; emailFails?: boolean; alertsOff?: boolean } = {}) {
   let n = 0;
   const db = {
     findDueTrackedSites: jest.fn(async () => opts.sites ?? []),
@@ -63,6 +63,7 @@ function setup(opts: { sites?: any[]; plans?: Record<string, [string, string]>; 
     findTrackedSiteById: jest.fn(async (id: string) => (opts.sites ?? []).find((s) => s.id === id) ?? null),
     findAnalysisById: jest.fn(async () => opts.analysis ?? null),
     recordTrackedSiteAudit: jest.fn(async () => undefined),
+    getNotificationPrefs: jest.fn(async () => (opts.alertsOff ? { reports: true, alerts: false } : null)),
   };
   const queue = { add: jest.fn(async () => undefined) };
   const config = { get: jest.fn((k: string, def: any) => (k === 'frontendUrl' ? 'https://velifa.io/' : def)) };
@@ -135,6 +136,13 @@ describe('MonitoringService.onScheduledAuditCompleted', () => {
     await noEmail.service.onScheduledAuditCompleted('s1', 'c9');
     expect(noEmail.brevo.sendAlertEmail).not.toHaveBeenCalled();
     expect(noEmail.db.recordTrackedSiteAudit).toHaveBeenCalledWith('s1', 72, 'c9', null);
+  });
+
+  it('alertes désactivées par le titulaire (2.9) : pas d’email, score de référence mis à jour normalement', async () => {
+    const { db, brevo, service } = setup({ sites: [site()], analysis: done(41), alertsOff: true });
+    expect(await service.onScheduledAuditCompleted('s1', 'c9')).toEqual({ alerted: false });
+    expect(brevo.sendAlertEmail).not.toHaveBeenCalled();
+    expect(db.recordTrackedSiteAudit).toHaveBeenCalledWith('s1', 41, 'c9', null);
   });
 
   it('site supprimé entre-temps ou audit non terminé : rien', async () => {
