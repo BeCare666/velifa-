@@ -152,7 +152,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | ID | Tâche | Responsable | Statut |
 |---|---|---|---|
 | 4.1 | Scripts de prospection WhatsApp AR/EN + objections | Claude (rédaction) | ⬜ |
-| 4.2 | Grille de prix à tester (3 niveaux, SAR/AED/QAR/USD), marquée « hypothèse » | Claude (proposition) / vous (validation) | ⬜ |
+| 4.2 | Grille de prix à tester (3 niveaux, SAR/AED/QAR/USD), marquée « hypothèse » | Claude (proposition) / vous (validation) | ✅ proposition (`docs/commercial/grille-prix.md`) ; validation → 2.7 |
 | 4.3 | Liste de 200 boutiques cibles du Golfe | Vous (ou outil d'annuaire) | 🔒 |
 | 4.4 | Validation juridique des indicateurs PDPL et des mentions légales | Juriste local | 🔒 |
 | 4.5 | Points de décision : 5 clients A payants ; 2 agences prêtes à payer B | Vous | ⬜ |
@@ -494,4 +494,13 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   `next build` exit 0 ; API réelle : `/me/notifications` sans jeton → 401 (GET et PUT).
 - Constat (préexistant, sans effet ici) : `ValidationPipe` global avec conversion implicite → la chaîne `"oui"` est
   convertie en booléen ; le frontend envoie de vrais booléens JSON.
+
+### 2026-10-09 — 4.2 Grille de prix (proposition sourcée)
+- `docs/commercial/grille-prix.md`. Prix concurrents **relevés sur les pages officielles le 2026-10-09** :
+  SEOptimer (Starter 29 $, Pro 39 $ avec PDF marque blanche, Max 59 $ avec PDF + widget ; annuel −25 %),
+  Calibre (Starter 75 $, Team 150 $) ; services Khamsat pour Salla (25 $ page d'accueil seule, options 25–50 $).
+  GTmetrix (annonce officielle 2023) et DebugBear (sources contradictoires) signalés comme **non revérifiés / non retenus**.
+- Proposition dérivée de ces relevés : **Pro 29 $**, **Business 59 $** (annuel −25 % : 261 $ / 531 $),
+  offre A **Essentiel 49 $** et **Complet 149 $** ; montants SAR/AED/QAR aux parités fixes (calculs vérifiés par script).
+- Recommandation : baisser `API_DAILY_LIMIT` de 200 à 50 (repère SEOptimer). Montants modifiables par l'admin (2.7).
 
