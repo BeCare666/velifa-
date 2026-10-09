@@ -817,6 +817,65 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  // ── Installations marketplaces (Salla, Zid) ────────────────────────────
+
+  async findInstallation(platform: string, merchantId: string): Promise<any | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT * FROM marketplace_installations WHERE platform = ? AND merchant_id = ? LIMIT 1',
+      [platform, merchantId],
+    );
+    return rows[0] ?? null;
+  }
+
+  /** Crée ou met à jour l'installation (événements rejoués par la plateforme : opération idempotente). */
+  async upsertInstallation(i: {
+    id: string; platform: string; merchantId: string; status: string;
+    accessTokenEnc?: string | null; refreshTokenEnc?: string | null; tokenExpiresAt?: Date | null; scope?: string | null;
+    installedAt?: Date | null;
+  }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO marketplace_installations
+         (id, platform, merchant_id, status, access_token_enc, refresh_token_enc, token_expires_at, scope, installed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         status            = VALUES(status),
+         access_token_enc  = COALESCE(VALUES(access_token_enc), access_token_enc),
+         refresh_token_enc = COALESCE(VALUES(refresh_token_enc), refresh_token_enc),
+         token_expires_at  = COALESCE(VALUES(token_expires_at), token_expires_at),
+         scope             = COALESCE(VALUES(scope), scope),
+         installed_at      = COALESCE(installed_at, VALUES(installed_at)),
+         uninstalled_at    = NULL`,
+      [i.id, i.platform, i.merchantId, i.status, i.accessTokenEnc ?? null, i.refreshTokenEnc ?? null,
+       i.tokenExpiresAt ?? null, i.scope ?? null, i.installedAt ?? null],
+    );
+  }
+
+  async setInstallationStore(platform: string, merchantId: string, s: { storeName: string | null; storeDomain: string; trackedSiteId: string | null }): Promise<void> {
+    await this.pool.query(
+      'UPDATE marketplace_installations SET store_name = ?, store_domain = ?, tracked_site_id = COALESCE(?, tracked_site_id) WHERE platform = ? AND merchant_id = ?',
+      [s.storeName, s.storeDomain, s.trackedSiteId, platform, merchantId],
+    );
+  }
+
+  /** Désinstallation : jetons effacés, date enregistrée. */
+  async markUninstalled(platform: string, merchantId: string, at: Date): Promise<void> {
+    await this.pool.query(
+      `UPDATE marketplace_installations
+          SET status = 'uninstalled', access_token_enc = NULL, refresh_token_enc = NULL, token_expires_at = NULL,
+              tracked_site_id = NULL, uninstalled_at = ?
+        WHERE platform = ? AND merchant_id = ?`,
+      [at, platform, merchantId],
+    );
+  }
+
+  async findTrackedSiteByScopeAndHash(scope: string, urlHash: string): Promise<TrackedSite | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT * FROM tracked_sites WHERE scope = ? AND url_hash = ? LIMIT 1',
+      [scope, urlHash],
+    );
+    return rows[0] ? this.rowToTrackedSite(rows[0]) : null;
+  }
+
   // ── Internal helpers ───────────────────────────────────────────────────
 
   private generateId(): string {

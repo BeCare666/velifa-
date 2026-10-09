@@ -139,8 +139,8 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 | ID | Tâche | Critère d'acceptation | Statut |
 |---|---|---|---|
-| 3.1 | 🔒 Compte partenaire Salla + accord ; compte partenaire Zid + accord | Action de votre part | 🔒 |
-| 3.2 | App Salla : OAuth, webhooks d'installation/désinstallation, création automatique du site suivi | Tests avec charges utiles de la doc Salla ; test réel sur boutique de démo | ⬜ |
+| 3.1 | 🔒 Compte partenaire Salla + accord ; compte partenaire Zid + accord | Action de votre part | ⚠️ Salla : compte + app créés (OAuth Easy Mode) ; Zid 🔒 |
+| 3.2 | App Salla : OAuth, webhooks d'installation/désinstallation, création automatique du site suivi | Tests avec charges utiles de la doc Salla ; test réel sur boutique de démo | ⚠️ tests doc ✅ ; test réel → secret webhook + URL publique |
 | 3.3 | App Zid : même périmètre | Idem | ⬜ |
 | 3.4 | Tableau de bord intégré marchand (AR d'abord) | Build + revue | ⬜ |
 | 3.5 | Shopify App (marché mondial) | Après validation des apps Salla/Zid | ⬜ |
@@ -170,6 +170,9 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
    et de l'API (2.6, hypothèse 200 audits/jour/compte, `API_DAILY_LIMIT`).
 3. Comptes partenaires Salla et Zid (3.1).
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
+4 bis. App Salla : définir le secret du webhook (stratégie « Signature ») dans le portail et le mettre dans `SALLA_WEBHOOK_SECRET` ;
+   déclarer l'URL `https://<backend>/api/v1/integrations/salla/webhook` après déploiement ; créer une boutique de démo ;
+   confirmer auprès de partners@salla.sa que la facturation via nos plans (hors Salla) est acceptée.
 5. Décider l'usage de l'export 1.8 : WhatsApp exige l'accord préalable du destinataire (voir journal 4.1) ;
    le message pré-rempli ne doit servir qu'après accord. Option possible : colonne « accord WhatsApp » dans les prospects.
 
@@ -545,4 +548,26 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Complément (2026-10-09) : cas des publicités « Click to WhatsApp » ajouté à la règle 0 des scripts, d'après la
   documentation officielle Meta : conversation ouverte par la personne → réponse autorisée (fenêtre de 24 h, fenêtre
   gratuite de 72 h depuis une publicité / bouton de Page), modèles approuvés ensuite, accord explicite pour recontacter.
+
+### 2026-10-09 — 3.2 App Salla (OAuth Easy Mode, webhooks, site suivi automatique)
+- Décisions du propriétaire : app créée dans le portail partenaire ; **OAuth Easy Mode** (recommandé par Salla : les
+  jetons arrivent par l'événement `app.store.authorize`) ; usage des marchands **dans les plans VELIFA**.
+  Clés de l'app (`SALLA_CLIENT_ID`, `SALLA_CLIENT_SECRET`) ajoutées dans `backend/env` (ignoré par git) avec une clé de
+  chiffrement générée (`MARKETPLACE_TOKEN_KEY`) ; `SALLA_WEBHOOK_SECRET` vide en attendant le portail.
+- Sources officielles lues : autorisation OAuth (Easy/Custom Mode, jetons 2 semaines, renouvellement à usage unique),
+  App Events (13 événements, exemples), sécurité des webhooks (stratégie Signature : HMAC-SHA256 hex du corps,
+  en-têtes `X-Salla-Security-Strategy` / `X-Salla-Signature`), « Store Information » (`GET /admin/v2/store/info` →
+  `data.domain`, scope `offline_access`).
+- Migration `009_marketplace_installations.sql`. `POST /api/v1/integrations/salla/webhook` : signature vérifiée sur le
+  **corps brut** à temps constant (stratégie Token refusée, documentation incohérente) ;
+  `app.installed` → installation ; `app.store.authorize` → jetons **chiffrés AES-256-GCM**, domaine lu par
+  `store/info`, **site suivi créé** (titulaire technique `salla:<marchand>`, plan gratuit tant que le marchand n'est pas
+  relié à un compte VELIFA — 3.4) ; `app.uninstalled` → jetons effacés, site retiré ; événements rejoués sans doublon.
+- Non fait volontairement : renouvellement des jetons (paramètres non lisibles dans la documentation publique ;
+  inutile pour la 3.2, à traiter quand les jetons seront réutilisés).
+- Preuves : `npx jest` → **25 suites, 344 tests réussis** (+10, valeurs des exemples officiels) ; `tsc` exit 0 ;
+  backend réel : sans signature / signature fausse / stratégie Token → 401 ; signature correcte → 200 ;
+  `api.salla.dev/admin/v2/store/info` sans jeton → 401 (endpoint existant).
+- ⚠️ `backend/env` n'est **pas lu** par NestJS (qui lit `.env`) : au déploiement, renseigner ces variables dans
+  l'hébergeur (Render) ou un `.env` — sans reprendre `NODE_TLS_REJECT_UNAUTHORIZED=0` (voir journal du 2026-10-08).
 

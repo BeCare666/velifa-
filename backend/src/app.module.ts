@@ -16,6 +16,7 @@ import { WidgetModule } from './widget/widget.module';
 import { ApiKeysModule } from './api-keys/api-keys.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PlansModule } from './plans/plans.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HealthController } from './health/health.controller';
@@ -46,6 +47,7 @@ import { HealthController } from './health/health.controller';
     ApiKeysModule,
     NotificationsModule,
     PlansModule,
+    IntegrationsModule,
   ],
   controllers: [HealthController],
   providers: [

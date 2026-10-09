@@ -38,6 +38,10 @@ class EnvironmentVariables {
   @IsOptional() @IsString() LEMONSQUEEZY_PRO_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_BUSINESS_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_WEBHOOK_SECRET?: string;
+  @IsOptional() @IsString() SALLA_CLIENT_ID?: string;
+  @IsOptional() @IsString() SALLA_CLIENT_SECRET?: string;
+  @IsOptional() @IsString() SALLA_WEBHOOK_SECRET?: string;
+  @IsOptional() @IsString() MARKETPLACE_TOKEN_KEY?: string;
   @IsOptional() @IsInt() @Min(5000) PROSPECT_AUDIT_INTERVAL_MS?: number;
 }
 
@@ -79,6 +83,13 @@ export default () => ({
     fromName:   process.env.BREVO_FROM_NAME ?? 'VELIFA',
   },
   whatsapp: { number: process.env.WHATSAPP_NUMBER ?? '' },
+  // App Salla (OAuth Easy Mode) — ROADMAP 3.2
+  salla: {
+    clientId:      process.env.SALLA_CLIENT_ID ?? '',
+    clientSecret:  process.env.SALLA_CLIENT_SECRET ?? '',
+    webhookSecret: process.env.SALLA_WEBHOOK_SECRET ?? '',
+  },
+  marketplace: { tokenKey: process.env.MARKETPLACE_TOKEN_KEY ?? '' },
   // Audit en lot : écart entre deux audits de prospects (2 appels PageSpeed + 1 capture par audit)
   prospects: { auditIntervalMs: parseInt(process.env.PROSPECT_AUDIT_INTERVAL_MS ?? '30000', 10) },
   security: {
