@@ -110,7 +110,7 @@ compréhensible en arabe, avec un argument chiffré et un contact WhatsApp.
 | 1.9 | Comparaison avant/après de deux audits d'une même URL | Test unitaire + page rapport | ✅ |
 | 1.10 | Capture de contact sur le rapport (« Je veux corriger ») → table `leads` + notification admin | Test unitaire | ✅ |
 | 1.11 | Migrations SQL versionnées remplaçant les `ALTER` au démarrage (**F3**) | Script de migration idempotent | ✅ |
-| 1.12 | 🔒 Clés de production (PageSpeed, Browserless, Brevo, Clerk, TiDB, Redis, Turnstile) et déploiement | Vous fournissez les clés | 🔒 |
+| 1.12 | 🔒 Clés de production (PageSpeed, Browserless, Brevo, Clerk, TiDB, Redis, Turnstile) et déploiement | Vous fournissez les clés | 🔄 TiDB, PageSpeed, Browserless, Cloudinary, Turnstile ✅ ; Redis, Brevo, Clerk prod 🔒 |
 
 ---
 
@@ -124,7 +124,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ✅ |
 | 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ✅ (limites chiffrées : hypothèse à valider) |
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ✅ |
-| 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⚠️ gabarit ✅, Browserless réel → 1.12 |
+| 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ✅ |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ✅ |
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ✅ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ✅ (prix = grille 4.2, modifiables dans Admin → Plans et prix) |
@@ -599,4 +599,24 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   git) ; ils avaient été collés dans `ROADMAP.md` (fichier commité) → retirés avant tout commit (vérifié : absents de
   l'historique). Introspection Salla appelée avec un jeton invalide → `422 « Decryption failed »`, identique avec un
   App ID bidon : l'App ID ne peut être validé qu'avec un vrai jeton (boutique de démo). Notre code renvoie alors 401.
+
+### 2026-10-09 — 1.12 Vérifications avec les vraies clés (`backend/.env`, `frontend/.env.local`)
+- Fichiers créés à partir de `backend/env` et `frontend/env.local` (ignorés par git) : `NODE_TLS_REJECT_UNAUTHORIZED`
+  retirée ; variables inutilisées retirées (`JWT_SECRET`, anciennes variantes Lemon Squeezy, `NEXT_PUBLIC_ADMIN_API_KEY`) ;
+  `LEMONSQUEEZY_STORE_ID` corrigé (493648, lu via l'API).
+- **TiDB réelle** (8.5.3 serverless) : inspection en lecture seule (62 audits, 3 utilisateurs, schéma = point de départ de
+  la baseline) puis `npm run migrate` → **9 migrations appliquées** ; second passage → **0 appliquée, 9 en place**.
+  Données existantes intactes (62 / 3 / 4 lignes), nouvelles tables et colonnes présentes, plans = grille 4.2. (Ferme la
+  limite de 1.7, 1.10, 1.11.)
+- Backend réel sur la vraie base : démarrage « Migrations : 0 appliquée(s), 9 déjà en place » ; `GET /plans` lu en base ;
+  `GET /analyses/:id` d'un audit réel sans aucun champ personnel ; `/health` → 503 (Redis absent).
+- Clés vérifiées (appels en lecture seule, 1 audit PageSpeed, 1 capture et 1 PDF Browserless) :
+  - ✅ PageSpeed (audit réel, Lighthouse 13.5.0) ; ✅ Cloudinary (ping) ; ✅ secret Turnstile reconnu ;
+  - ✅ **Browserless** : capture JPEG réelle et **PDF arabe réel** rendu correctement (police arabe, RTL) → 2.4 ✅ ;
+  - ✅ Clerk fonctionnel mais clé de **test** (`sk_test_`) : la production exige une instance Clerk de production ;
+  - ❌ **Redis Upstash** `intent-pug-139072.upstash.io` : domaine inexistant (DNS Google : « Non-existent domain ») →
+    base supprimée : en créer une nouvelle et mettre à jour `REDIS_URL` ;
+  - ❌ **Brevo** : « API Key is not enabled » → réactiver ou créer une clé ; vérifier l'expéditeur `BREVO_FROM_EMAIL`.
+- Sécurité : le dépôt GitHub est **public** et le commit « my first commit » y a publié `note.txt` (clé Lemon Squeezy,
+  jeton Salla SP_, Client ID / Client Secret Salla) → `note.txt` retiré du suivi et ignoré ; **clés à regénérer**.
 
