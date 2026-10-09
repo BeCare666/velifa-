@@ -96,6 +96,8 @@ export const api = {
       apiFetch<{ data: any }>('/sites', { method: 'POST', body: JSON.stringify(body), authToken: token }),
     remove: (token: string, id: string) =>
       apiFetch<{ data: any }>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE', authToken: token }),
+    updateMonitoring: (token: string, id: string, body: { schedule?: string; alertThreshold?: number | null; locale?: string }) =>
+      apiFetch<{ data: any }>(`/sites/${encodeURIComponent(id)}/monitoring`, { method: 'PATCH', body: JSON.stringify(body), authToken: token }),
   },
 
   // ── Espaces agence (jeton Clerk obligatoire) ──────────────────────────────────

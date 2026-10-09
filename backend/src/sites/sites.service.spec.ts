@@ -44,6 +44,7 @@ function setup(opts: { plans?: Record<string, [string, string]> } = {}) {
       return true;
     }),
     findTrackedSiteById: jest.fn(async (id: string) => sites.find((s) => s.id === id) ?? null),
+    updateTrackedSiteMonitoring: jest.fn(async (id: string, m: any) => Object.assign(sites.find((s) => s.id === id), m)),
     deleteTrackedSite: jest.fn(async (id: string) => { sites.splice(sites.findIndex((s) => s.id === id), 1); }),
     listTrackedSites: jest.fn(async (scope: string, _auditors: string[]) => sites.filter((s) => s.scope === scope)),
   };
@@ -64,7 +65,7 @@ describe('SitesService', () => {
       scope: 'user:user_a', workspaceId: null, ownerClerkUserId: 'user_a', urlSite: 'https://shop.example',
       label: 'Ma boutique', createdBy: 'user_a',
     });
-    expect(res.usage).toEqual({ plan: 'free', used: 1, limit: 1 });
+    expect(res.usage).toEqual({ plan: 'free', used: 1, limit: 1, canSchedule: false });
   });
 
   it('URL invalide, interne ou résolue vers le réseau interne → 400', async () => {
@@ -125,5 +126,23 @@ describe('SitesService', () => {
     await service.add('user_agence', { url: 'https://client.example', workspaceId: 'ws1' });
     await service.remove('user_sara', sites[0].id);
     expect(sites).toHaveLength(0);
+  });
+
+  it('audits programmés : Business requis côté serveur ; seuil 1–100 ; désactivation toujours possible', async () => {
+    const free = setup();
+    await free.service.add('user_a', { url: 'https://a.example' });
+    const id = free.sites[0].id;
+    await expect(free.service.updateMonitoring('user_a', id, { schedule: 'weekly' })).rejects.toThrow('schedule_requires_business');
+    await expect(free.service.updateMonitoring('user_a', id, { alertThreshold: 0 })).rejects.toThrow('threshold_invalid');
+    await expect(free.service.updateMonitoring('user_a', id, { schedule: 'hourly' })).rejects.toThrow('schedule_invalid');
+    await free.service.updateMonitoring('user_a', id, { schedule: 'off', alertThreshold: null });
+    await expect(free.service.updateMonitoring('user_b', id, { schedule: 'off' })).rejects.toBeInstanceOf(NotFoundException);
+
+    const biz = setup({ plans: { user_agence: ['business', 'active'] } });
+    await biz.service.add('user_agence', { url: 'https://client.example', workspaceId: 'ws1' });
+    // Un membre règle la surveillance d'un site de l'agence : le plan du titulaire s'applique
+    const res = await biz.service.updateMonitoring('user_sara', biz.sites[0].id, { schedule: 'daily', alertThreshold: 60, locale: 'ar' });
+    expect(biz.db.updateTrackedSiteMonitoring).toHaveBeenCalledWith(biz.sites[0].id, { schedule: 'daily', alertThreshold: 60, locale: 'ar' });
+    expect(res.usage.canSchedule).toBe(true);
   });
 });

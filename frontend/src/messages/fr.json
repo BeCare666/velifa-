@@ -204,7 +204,8 @@
         "Tout le plan Pro",
         "Analyse approfondie des métriques Lighthouse",
         "Support prioritaire avancé",
-        "Bientôt : suivi multi-sites, alertes, audits programmés, export PDF, API"
+        "Suivi multi-sites, audits programmés (quotidiens ou hebdomadaires) et alertes email",
+        "Bientôt : export PDF, API"
       ]
     },
     "perMonth": "/mois",
@@ -250,7 +251,7 @@
     "hiddenAudits": "audits masqués",
     "goPro": "Passer Pro",
     "businessAccess": "Espace Business — Accès illimité",
-    "businessDesc": "Analyse approfondie et support prioritaire. Multi-sites, alertes et API : bientôt.",
+    "businessDesc": "Analyse approfondie, suivi multi-sites, audits programmés et alertes. Export PDF et API : bientôt.",
     "businessFeature": "Fonctionnalité Business",
     "businessFeatureDesc": "est réservée au plan Business.",
     "upgradeBusiness": "Passer Business",
@@ -275,8 +276,17 @@
         "url_invalid": "Adresse invalide ou non autorisée.",
         "site_limit": "Limite de sites atteinte pour votre plan.",
         "already_tracked": "Ce site est déjà suivi.",
-        "generic": "Action impossible pour le moment. Réessayez."
-      }
+        "generic": "Action impossible pour le moment. Réessayez.",
+        "schedule_requires_business": "Les audits programmés nécessitent le plan Business.",
+        "threshold_invalid": "Le seuil doit être un nombre entre 1 et 100."
+      },
+      "schedule": "Audit programmé",
+      "scheduleOff": "Pas d’audit programmé",
+      "scheduleDaily": "Chaque jour",
+      "scheduleWeekly": "Chaque semaine",
+      "threshold": "Seuil",
+      "thresholdHelp": "Alerte email si le score passe sous ce seuil (1–100). Vide = pas d’alerte.",
+      "scheduleBusinessOnly": "Audits programmés et alertes email : disponibles avec le plan Business."
     }
   },
   "errors": {

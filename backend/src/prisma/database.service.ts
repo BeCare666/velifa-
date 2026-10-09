@@ -98,6 +98,12 @@ export interface TrackedSite {
   label: string | null;
   createdBy: string;
   createdAt: Date;
+  schedule?: string;
+  alertThreshold?: number | null;
+  locale?: string;
+  lastScheduledAt?: Date | null;
+  lastScore?: number | null;
+  lastAnalysisId?: string | null;
 }
 
 @Injectable()
@@ -568,7 +574,41 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return {
       id: r.id, scope: r.scope, workspaceId: r.workspace_id ?? null, ownerClerkUserId: r.owner_clerk_user_id,
       urlSite: r.url_site, urlHash: r.url_hash, label: r.label ?? null, createdBy: r.created_by, createdAt: r.created_at,
+      schedule: r.schedule ?? 'off', alertThreshold: r.alert_threshold ?? null, locale: r.locale ?? 'en',
+      lastScheduledAt: r.last_scheduled_at ?? null, lastScore: r.last_score ?? null, lastAnalysisId: r.last_analysis_id ?? null,
     };
+  }
+
+  /** Sites dont l'audit programmé est dû (voir monitoring.dueBefore), les plus anciens d'abord. */
+  async findDueTrackedSites(dueDaily: Date, dueWeekly: Date, limit: number): Promise<TrackedSite[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT * FROM tracked_sites
+        WHERE (schedule = 'daily'  AND (last_scheduled_at IS NULL OR last_scheduled_at <= ?))
+           OR (schedule = 'weekly' AND (last_scheduled_at IS NULL OR last_scheduled_at <= ?))
+        ORDER BY last_scheduled_at IS NOT NULL, last_scheduled_at
+        LIMIT ?`,
+      [dueDaily, dueWeekly, limit],
+    );
+    return rows.map((r) => this.rowToTrackedSite(r));
+  }
+
+  async markTrackedSiteScheduled(id: string, at: Date): Promise<void> {
+    await this.pool.query('UPDATE tracked_sites SET last_scheduled_at = ? WHERE id = ?', [at, id]);
+  }
+
+  async updateTrackedSiteMonitoring(id: string, m: { schedule: string; alertThreshold: number | null; locale: string }): Promise<void> {
+    await this.pool.query(
+      'UPDATE tracked_sites SET schedule = ?, alert_threshold = ?, locale = ? WHERE id = ?',
+      [m.schedule, m.alertThreshold, m.locale, id],
+    );
+  }
+
+  /** Résultat d'un audit programmé : dernier score (référence de la prochaine alerte) et date d'alerte éventuelle. */
+  async recordTrackedSiteAudit(id: string, score: number | null, analysisId: string, alertedAt: Date | null): Promise<void> {
+    await this.pool.query(
+      `UPDATE tracked_sites SET last_score = ?, last_analysis_id = ?, last_alert_at = COALESCE(?, last_alert_at) WHERE id = ?`,
+      [score, analysisId, alertedAt, id],
+    );
   }
 
   async countTrackedSitesByOwner(ownerClerkUserId: string): Promise<number> {

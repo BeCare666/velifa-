@@ -204,7 +204,8 @@
         "Everything in Pro",
         "In-depth analysis of Lighthouse metrics",
         "Advanced priority support",
-        "Coming soon: multi-site tracking, alerts, scheduled audits, PDF export, API"
+        "Multi-site tracking, scheduled audits (daily or weekly) and email alerts",
+        "Coming soon: PDF export, API"
       ]
     },
     "perMonth": "/month",
@@ -250,7 +251,7 @@
     "hiddenAudits": "hidden audits",
     "goPro": "Go Pro",
     "businessAccess": "Business Access — Unlimited",
-    "businessDesc": "In-depth analysis and priority support. Multi-site, alerts and API: coming soon.",
+    "businessDesc": "In-depth analysis, multi-site tracking, scheduled audits and alerts. PDF export and API: coming soon.",
     "businessFeature": "Business Feature",
     "businessFeatureDesc": "is reserved for the Business plan.",
     "upgradeBusiness": "Upgrade to Business",
@@ -275,8 +276,17 @@
         "url_invalid": "Invalid or disallowed address.",
         "site_limit": "Site limit reached for your plan.",
         "already_tracked": "This site is already tracked.",
-        "generic": "This action is not possible right now. Please try again."
-      }
+        "generic": "This action is not possible right now. Please try again.",
+        "schedule_requires_business": "Scheduled audits require the Business plan.",
+        "threshold_invalid": "The threshold must be a number between 1 and 100."
+      },
+      "schedule": "Scheduled audit",
+      "scheduleOff": "No scheduled audit",
+      "scheduleDaily": "Every day",
+      "scheduleWeekly": "Every week",
+      "threshold": "Threshold",
+      "thresholdHelp": "Email alert when the score drops below this threshold (1–100). Empty = no alert.",
+      "scheduleBusinessOnly": "Scheduled audits and email alerts: available with the Business plan."
     }
   },
   "errors": {

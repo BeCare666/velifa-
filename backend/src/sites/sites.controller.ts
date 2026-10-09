@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, Headers, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Headers, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { verifyClerkToken } from '../common/auth/clerk-auth.service';
 import { SitesService } from './sites.service';
-import { AddSiteDto } from './dto/add-site.dto';
+import { AddSiteDto, SiteMonitoringDto } from './dto/add-site.dto';
 
 /** Sites suivis (personnels ou d'un espace agence). Utilisateur Clerk connecté obligatoire. */
 @Controller('sites')
@@ -20,6 +20,16 @@ export class SitesController {
   @HttpCode(HttpStatus.CREATED)
   async add(@Headers('authorization') auth: string | undefined, @Body() dto: AddSiteDto) {
     return this.sites.add(await verifyClerkToken(auth), dto);
+  }
+
+  /** PATCH /sites/:id/monitoring — audits programmés (Business) et seuil d'alerte */
+  @Patch(':id/monitoring')
+  async updateMonitoring(
+    @Headers('authorization') auth: string | undefined,
+    @Param('id') id: string,
+    @Body() dto: SiteMonitoringDto,
+  ) {
+    return this.sites.updateMonitoring(await verifyClerkToken(auth), id, dto);
   }
 
   @Delete(':id')

@@ -13,6 +13,7 @@ import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
 import { TechDetectorService, primaryPlatform } from '../tech-detector/tech-detector.service';
 import type { SiteChecks } from '../site-checks/site-checks';
 import { buildWhatsappLink, buildReportUrl, toReportLocale } from '../i18n/report-texts';
+import { MonitoringService } from '../sites/monitoring.service';
 
 export interface AnalysisJobPayload {
   analysisId: string;
@@ -21,6 +22,8 @@ export interface AnalysisJobPayload {
   locale: string;
   /** Audit en lot (prospection) : sert à espacer les audits programmés. */
   prospect?: boolean;
+  /** Audit programmé d'un site suivi : déclenche l'évaluation de l'alerte à la fin. */
+  trackedSiteId?: string;
 }
 
 @Processor(BULL_ANALYSES_QUEUE)
@@ -36,6 +39,7 @@ export class AnalysisWorker {
     private readonly sse: SseService,
     private readonly config: ConfigService,
     private readonly techDetector: TechDetectorService,
+    private readonly monitoring: MonitoringService,
   ) {}
 
   @Process('run')
@@ -147,6 +151,14 @@ export class AnalysisWorker {
       } catch (err: any) {
         this.logger.warn(`[${analysisId}] Email failed (non-blocking): ${err.message}`);
         Sentry.captureException(err, { tags: { analysisId, step: 'email' } });
+      }
+
+      if (job.data.trackedSiteId) {
+        try {
+          await this.monitoring.onScheduledAuditCompleted(job.data.trackedSiteId, analysisId);
+        } catch (err: any) {
+          this.logger.warn(`[${analysisId}] Alert evaluation failed (non-blocking): ${err.message}`);
+        }
       }
 
       this.sse.emit(analysisId, { status: 'completed', redirectUrl: reportUrl });

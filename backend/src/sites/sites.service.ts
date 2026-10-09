@@ -6,6 +6,8 @@ import { randomUUID } from 'crypto';
 import { DatabaseService } from '../prisma/database.service';
 import { validateUrl, hashUrl, assertPublicHost } from '../common/validators/url.validator';
 import { effectivePlan, parseSiteLimits, PlanName } from '../payments/plan-limits';
+import { canSchedule, SCHEDULES } from './monitoring';
+import { toReportLocale } from '../i18n/report-texts';
 
 export interface SiteScope {
   scope: string;
@@ -20,6 +22,8 @@ export interface SiteUsage {
   plan: PlanName;
   used: number;
   limit: number;
+  /** Audits programmés et alertes disponibles (plan Business). */
+  canSchedule: boolean;
 }
 
 @Injectable()
@@ -45,7 +49,7 @@ export class SitesService {
     const user = await this.db.findUserByClerkId(owner);
     const plan = effectivePlan(user?.subscriptionPlan, user?.subscriptionStatus);
     const limits = parseSiteLimits(this.config.get<string>('plans.siteLimits'));
-    return { plan, used: await this.db.countTrackedSitesByOwner(owner), limit: limits[plan] };
+    return { plan, used: await this.db.countTrackedSitesByOwner(owner), limit: limits[plan], canSchedule: canSchedule(plan) };
   }
 
   async list(callerId: string | null, workspaceId?: string) {
@@ -78,14 +82,42 @@ export class SitesService {
     return this.list(caller, input.workspaceId);
   }
 
-  async remove(callerId: string | null, siteId: string) {
+  /** Fréquence d'audit programmé, seuil d'alerte et langue de l'alerte. Programmation : plan Business du titulaire. */
+  async updateMonitoring(
+    callerId: string | null,
+    siteId: string,
+    input: { schedule?: string; alertThreshold?: number | null; locale?: string },
+  ) {
     const caller = this.requireUser(callerId);
+    const site = await this.accessibleSite(caller, siteId);
+
+    const schedule = input.schedule ?? site.schedule ?? 'off';
+    if (!(SCHEDULES as readonly string[]).includes(schedule)) throw new BadRequestException('schedule_invalid');
+    const threshold = input.alertThreshold === undefined ? site.alertThreshold ?? null : input.alertThreshold;
+    if (threshold !== null && (!Number.isInteger(threshold) || threshold < 1 || threshold > 100)) {
+      throw new BadRequestException('threshold_invalid');
+    }
+    if (schedule !== 'off' && !(await this.usage(site.ownerClerkUserId)).canSchedule) {
+      throw new ForbiddenException('schedule_requires_business');
+    }
+    await this.db.updateTrackedSiteMonitoring(siteId, {
+      schedule, alertThreshold: threshold, locale: toReportLocale(input.locale ?? site.locale),
+    });
+    return this.list(caller, site.workspaceId ?? undefined);
+  }
+
+  /** Site visible par l'appelant (personnel ou espace dont il est membre), sinon 404. */
+  private async accessibleSite(caller: string, siteId: string) {
     const site = await this.db.findTrackedSiteById(siteId);
     if (!site) throw new NotFoundException('Site not found');
-    // Même contrôle d'accès que la lecture du scope (404 pour un tiers)
-    await this.resolveScope(caller, site.workspaceId).then((s) => {
-      if (s.scope !== site.scope) throw new NotFoundException('Site not found');
-    });
+    const scope = await this.resolveScope(caller, site.workspaceId);
+    if (scope.scope !== site.scope) throw new NotFoundException('Site not found');
+    return site;
+  }
+
+  async remove(callerId: string | null, siteId: string) {
+    const caller = this.requireUser(callerId);
+    const site = await this.accessibleSite(caller, siteId);
     await this.db.deleteTrackedSite(siteId);
     return this.list(caller, site.workspaceId ?? undefined);
   }

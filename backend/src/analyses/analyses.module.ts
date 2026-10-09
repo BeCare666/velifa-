@@ -10,6 +10,7 @@ import { BrevoModule } from '../brevo/brevo.module';
 import { SseModule } from '../sse/sse.module';
 import { TechDetectorModule } from '../tech-detector/tech-detector.module';
 import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
+import { SitesModule } from '../sites/sites.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BULL_ANALYSES_QUEUE } from '../redis/redis.module';
     BrevoModule,
     SseModule,
     TechDetectorModule,
+    SitesModule,
   ],
   controllers: [AnalysesController],
   providers: [AnalysesService, AnalysisWorker],

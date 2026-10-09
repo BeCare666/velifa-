@@ -123,7 +123,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 |---|---|---|---|
 | 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ✅ |
 | 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ✅ (limites chiffrées : hypothèse à valider) |
-| 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ⬜ |
+| 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ✅ |
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⬜ |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ⬜ |
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ⬜ |
@@ -398,4 +398,26 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   rapport, relancer un audit, retirer ; « Suivi multi-sites » retiré de l'encart « Bientôt ».
 - Preuves : `npx jest` → **18 suites, 246 tests réussis** (+11) ; `tsc` exit 0 ; `next build` exit 0 ;
   API réelle : `/sites` sans jeton → 401 (GET, POST, DELETE) ; URL absente → 400 ; `ownerClerkUserId` injecté → 400.
+
+### 2026-10-09 — 2.3 Audits programmés et alertes
+- Migration `004_site_monitoring.sql` : par site suivi, fréquence (`off`/`daily`/`weekly`), seuil d'alerte (1–100),
+  langue de l'alerte, dernier passage, dernier score de référence, dernier audit, date de la dernière alerte.
+- **Planificateur** (`sites/monitoring.service.ts` + `monitoring.processor.ts`) : une tâche Bull **répétée toutes les
+  heures** (cron `0 * * * *`, dédoublonnée par Bull) sélectionne au plus 50 sites dus (1 h de tolérance pour ne pas
+  dériver), crée un audit `source='scheduled'` sans email au nom du titulaire, espacé (30 s) dans la file.
+  Plan **Business** requis (annoncé sur la page Tarifs) : contrôlé au réglage **et** à chaque passage
+  (abonnement expiré → plus d'audit, site marqué pour ne pas réessayer chaque heure).
+- **Règle d'alerte** : email quand le score **passe sous** le seuil (pas à chaque audit sous le seuil) ; email FR/EN/AR
+  (RTL), avant → après, liens rapport et **comparaison avant/après** (1.9), rappel sur la variabilité Lighthouse.
+  Envoi en échec ou titulaire sans email vérifié → l'ancien score de référence est conservé pour retenter.
+- `PATCH /sites/:id/monitoring` (membres de l'espace ; plan du titulaire) ; réglages dans « Sites suivis » ;
+  textes Tarifs et tableau de bord mis à jour : multi-sites, audits programmés et alertes ne sont plus « bientôt »
+  (PDF et API le restent).
+- **Corrigé avant livraison** : l'enregistrement de la tâche horaire attendait Redis au démarrage → sans Redis l'API ne
+  démarrait jamais. Rendu non bloquant ; vérifié : API démarrée sans Redis.
+- Preuves : `npx jest` → **19 suites, 274 tests réussis** (+28 : échéances, règle d'alerte (8 cas), planificateur,
+  envoi/échec d'alerte, gabarit email échappé, réglages) ; `tsc` exit 0 ; `next build` exit 0 ;
+  API réelle : PATCH sans jeton → 401, fréquence invalide / seuil 500 → 400.
+- ⚠️ Limite : passage horaire réel non observé (pas de Redis local) ; à vérifier en environnement configuré
+  (journal « Planificateur des audits programmés enregistré »).
 

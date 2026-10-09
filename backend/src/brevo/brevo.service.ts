@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { ReportLocale } from '../i18n/report-texts';
 import { ReportEmailData, renderReportEmail } from './report-email.template';
+import { AlertEmailData, renderAlertEmail } from './alert-email.template';
 
 export interface SendReportEmailDto extends ReportEmailData {
   toEmail: string;
@@ -29,13 +30,28 @@ export class BrevoService {
     }
 
     const { subject, html } = renderReportEmail(dto, dto.locale);
+    await this.send(dto.toEmail, subject, html);
+    this.logger.log(`Report email sent (${dto.locale})`);
+  }
 
+  /** Alerte de baisse de score (audit programmé). */
+  async sendAlertEmail(toEmail: string, locale: ReportLocale, data: AlertEmailData): Promise<void> {
+    if (!this.apiKey) {
+      this.logger.warn('BREVO_API_KEY not set — skipping alert email');
+      return;
+    }
+    const { subject, html } = renderAlertEmail(data, locale);
+    await this.send(toEmail, subject, html);
+    this.logger.log(`Alert email sent (${locale})`);
+  }
+
+  private async send(toEmail: string, subject: string, html: string): Promise<void> {
     try {
       await axios.post(
         'https://api.brevo.com/v3/smtp/email',
         {
           sender:      { email: this.fromEmail, name: this.fromName },
-          to:          [{ email: dto.toEmail }],
+          to:          [{ email: toEmail }],
           subject,
           htmlContent: html,
         },
@@ -44,7 +60,6 @@ export class BrevoService {
           timeout: 10_000,
         },
       );
-      this.logger.log(`Report email sent (${dto.locale})`);
     } catch (error: any) {
       const msg = error.response?.data?.message ?? error.message;
       this.logger.warn(`Email failed: ${msg}`);

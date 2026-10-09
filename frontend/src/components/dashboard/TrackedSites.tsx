@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Globe, Plus, Trash2, RefreshCw, FileSearch, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 
-const ERROR_KEYS = ['url_invalid', 'site_limit', 'already_tracked'] as const;
+const ERROR_KEYS = ['url_invalid', 'site_limit', 'already_tracked', 'schedule_requires_business', 'threshold_invalid'] as const;
 
 const scoreColor = (s: number) =>
   s >= 90 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
@@ -24,7 +24,7 @@ export default function TrackedSites() {
 
   const [workspaces, setWorkspaces] = useState<{ id: string; name: string }[]>([]);
   const [scope, setScope]   = useState('');            // '' = mes sites ; sinon id d'espace agence
-  const [data, setData]     = useState<{ sites: any[]; usage: { plan: string; used: number; limit: number } } | null>(null);
+  const [data, setData]     = useState<{ sites: any[]; usage: { plan: string; used: number; limit: number; canSchedule: boolean } } | null>(null);
   const [url, setUrl]       = useState('');
   const [label, setLabel]   = useState('');
   const [busy, setBusy]     = useState<string | null>(null);
@@ -116,6 +116,28 @@ export default function TrackedSites() {
                     })}>
                     {busy === `audit:${s.id}` ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                   </button>
+                  {usage?.canSchedule && (
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <select value={s.schedule ?? 'off'} disabled={!!busy} aria-label={t('schedule')}
+                        className="rounded-[8px] border border-border bg-transparent px-2 py-1 text-xs text-text"
+                        onChange={(e) => run(`mon:${s.id}`, async (token) =>
+                          setData((await api.sites.updateMonitoring(token, s.id, { schedule: e.target.value, locale })).data))}>
+                        <option value="off">{t('scheduleOff')}</option>
+                        <option value="daily">{t('scheduleDaily')}</option>
+                        <option value="weekly">{t('scheduleWeekly')}</option>
+                      </select>
+                      <input type="number" min={1} max={100} defaultValue={s.alertThreshold ?? ''} disabled={!!busy}
+                        placeholder={t('threshold')} aria-label={t('thresholdHelp')} title={t('thresholdHelp')}
+                        className="w-20 rounded-[8px] border border-border bg-transparent px-2 py-1 text-xs text-text"
+                        onBlur={(e) => {
+                          const v = e.target.value.trim();
+                          const next = v === '' ? null : Number(v);
+                          if (next === (s.alertThreshold ?? null)) return;
+                          run(`mon:${s.id}`, async (token) =>
+                            setData((await api.sites.updateMonitoring(token, s.id, { alertThreshold: next, locale })).data));
+                        }} />
+                    </div>
+                  )}
                   <button type="button" className="text-text-subtle hover:text-[var(--velifa-score-poor)] disabled:opacity-50" disabled={!!busy}
                     aria-label={t('remove')} title={t('remove')}
                     onClick={() => run(`del:${s.id}`, async (token) => setData((await api.sites.remove(token, s.id)).data))}>
@@ -141,6 +163,9 @@ export default function TrackedSites() {
               {busy === 'add' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} {t('add')}
             </button>
           </form>
+          {usage && !usage.canSchedule && data.sites.length > 0 && (
+            <p className="text-xs text-text-subtle mt-3">{t('scheduleBusinessOnly')}</p>
+          )}
           {full && (
             <p className="text-xs text-text-muted mt-2">
               {t('limitReached')} <Link href={`/${locale}/tarifs`} className="text-accent hover:underline">{t('seePlans')}</Link>

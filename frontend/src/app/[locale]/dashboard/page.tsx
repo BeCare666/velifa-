@@ -451,7 +451,6 @@ const BUSINESS_SURFACE = 'rgba(200,200,200,0.07)';
 // jamais simulées dans le navigateur.
 function UpcomingFeatures() {
   const items = [
-    { icon: Bell,  label: 'Audits programmés et alertes email' },
     { icon: Key,   label: 'Clé API personnelle' },
   ];
   return (
