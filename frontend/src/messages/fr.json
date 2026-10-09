@@ -1020,5 +1020,13 @@
       "open_from_salla": "Ouvrez cette page depuis votre tableau de bord Salla (Applications → VELIFA).",
       "generic": "Une erreur est survenue. Réessayez."
     }
+  },
+  "zidApp": {
+    "okTitle": "VELIFA est installé sur votre boutique",
+    "okBody": "{store} est maintenant suivie. Nous mesurons la vitesse mobile de votre boutique et classons ce qu’il faut corriger en priorité.",
+    "yourStore": "Votre boutique",
+    "errorTitle": "L’installation n’a pas pu aboutir",
+    "errorBody": "Impossible de relier votre boutique. Réessayez depuis l’App Market Zid ou contactez-nous.",
+    "seePlans": "Voir les plans VELIFA"
   }
 }

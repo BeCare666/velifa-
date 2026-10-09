@@ -1017,5 +1017,13 @@
       "open_from_salla": "Open this page from your Salla dashboard (Apps → VELIFA).",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "zidApp": {
+    "okTitle": "VELIFA is installed on your store",
+    "okBody": "{store} is now tracked. We will measure your store’s mobile speed and rank what to fix first.",
+    "yourStore": "Your store",
+    "errorTitle": "Installation could not be completed",
+    "errorBody": "We could not connect your store. Please try again from the Zid App Market or contact us.",
+    "seePlans": "See VELIFA plans"
   }
 }

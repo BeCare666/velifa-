@@ -141,7 +141,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 |---|---|---|---|
 | 3.1 | 🔒 Compte partenaire Salla + accord ; compte partenaire Zid + accord | Action de votre part | ⚠️ Salla : compte + app créés (OAuth Easy Mode) ; Zid 🔒 |
 | 3.2 | App Salla : OAuth, webhooks d'installation/désinstallation, création automatique du site suivi | Tests avec charges utiles de la doc Salla ; test réel sur boutique de démo | ⚠️ tests doc ✅ ; test réel → secret webhook + URL publique |
-| 3.3 | App Zid : même périmètre | Idem | ⬜ |
+| 3.3 | App Zid : même périmètre | Idem | ⚠️ code + tests doc ✅ ; test réel → compte partenaire Zid |
 | 3.4 | Tableau de bord intégré marchand (AR d'abord) | Build + revue | ⚠️ build + revue ✅ ; test dans Salla → App ID + déploiement |
 | 3.5 | Shopify App (marché mondial) | Après validation des apps Salla/Zid | ⬜ |
 
@@ -619,4 +619,23 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   - ❌ **Brevo** : « API Key is not enabled » → réactiver ou créer une clé ; vérifier l'expéditeur `BREVO_FROM_EMAIL`.
 - Sécurité : le dépôt GitHub est **public** et le commit « my first commit » y a publié `note.txt` (clé Lemon Squeezy,
   jeton Salla SP_, Client ID / Client Secret Salla) → `note.txt` retiré du suivi et ignoré ; **clés à regénérer**.
+
+### 2026-10-09 — 3.3 App Zid (OAuth par code, webhooks App Market, site suivi automatique)
+- Sources officielles : docs.zid.sa « Authorization » (authorize / token, jetons `access_token` → `X-Manager-Token`
+  et `authorization` → `Authorization: Bearer`, refresh 1 an), « Get Manager Profile » (`user.store.id/title/url`),
+  « Events » (12 événements App Market dont `app.market.application.uninstall`, champs `store_id`, `event_name`…),
+  « Create a Webhook » (Basic Auth facultative via `username` / `password`).
+- Migration `010_zid_tokens.sql` (2ᵉ jeton chiffré). Routes : `GET /integrations/zid/install` (« App URL » → autorisation
+  Zid), `GET /integrations/zid/callback` (« Redirect URL » : échange du code, profil, jetons chiffrés AES-256-GCM, site
+  suivi créé, redirection vers `/ar/zid/installed`), `POST /integrations/zid/webhook`.
+- **Sécurité des webhooks** : Basic Auth vérifiée si configurée ; une désinstallation n'est appliquée que si Zid
+  **confirme** que nos jetons sont refusés (401/403) → un faux webhook ne peut rien supprimer ; erreur réseau / 5xx → rien.
+- Preuves : `npx jest` → **27 suites, 357 tests réussis** (+8) ; `tsc` exit 0 ; `next build` exit 0 ;
+  migration 010 appliquée sur la **vraie TiDB** (10 en place au redémarrage) ; backend réel : install sans configuration
+  → 503, callback sans code → redirection `status=error`, webhooks inconnus ignorés ;
+  **endpoints Zid réels** : échange de jeton au format formulaire compris (« Client authentication failed » avec un faux
+  client), profil avec jetons invalides → **401 JSON** (désinstallation correctement confirmée) ; sans `Accept` JSON,
+  Zid redirige (302) → appel configuré sans suivi de redirection.
+- À fournir : compte partenaire Zid, app créée (`ZID_CLIENT_ID`, `ZID_CLIENT_SECRET`, `ZID_REDIRECT_URI`), URLs déclarées
+  après déploiement, abonnement aux événements App Market dans le tableau de bord partenaire.
 

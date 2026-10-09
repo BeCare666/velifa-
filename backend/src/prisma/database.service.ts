@@ -857,11 +857,18 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
+  async setInstallationAuthToken(platform: string, merchantId: string, authTokenEnc: string): Promise<void> {
+    await this.pool.query(
+      'UPDATE marketplace_installations SET auth_token_enc = ? WHERE platform = ? AND merchant_id = ?',
+      [authTokenEnc, platform, merchantId],
+    );
+  }
+
   /** Désinstallation : jetons effacés, date enregistrée. */
   async markUninstalled(platform: string, merchantId: string, at: Date): Promise<void> {
     await this.pool.query(
       `UPDATE marketplace_installations
-          SET status = 'uninstalled', access_token_enc = NULL, refresh_token_enc = NULL, token_expires_at = NULL,
+          SET status = 'uninstalled', access_token_enc = NULL, refresh_token_enc = NULL, auth_token_enc = NULL, token_expires_at = NULL,
               tracked_site_id = NULL, uninstalled_at = ?
         WHERE platform = ? AND merchant_id = ?`,
       [at, platform, merchantId],

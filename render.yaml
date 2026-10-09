@@ -67,6 +67,17 @@ services:
         sync: false
       - key: MARKETPLACE_TOKEN_KEY
         sync: false
+      # App Zid
+      - key: ZID_CLIENT_ID
+        sync: false
+      - key: ZID_CLIENT_SECRET
+        sync: false
+      - key: ZID_REDIRECT_URI
+        sync: false
+      - key: ZID_WEBHOOK_USERNAME
+        sync: false
+      - key: ZID_WEBHOOK_PASSWORD
+        sync: false
       # Facultatif
       - key: SENTRY_DSN
         sync: false

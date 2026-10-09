@@ -43,6 +43,11 @@ class EnvironmentVariables {
   @IsOptional() @IsString() SALLA_CLIENT_SECRET?: string;
   @IsOptional() @IsString() SALLA_WEBHOOK_SECRET?: string;
   @IsOptional() @IsString() MARKETPLACE_TOKEN_KEY?: string;
+  @IsOptional() @IsString() ZID_CLIENT_ID?: string;
+  @IsOptional() @IsString() ZID_CLIENT_SECRET?: string;
+  @IsOptional() @IsString() ZID_REDIRECT_URI?: string;
+  @IsOptional() @IsString() ZID_WEBHOOK_USERNAME?: string;
+  @IsOptional() @IsString() ZID_WEBHOOK_PASSWORD?: string;
   @IsOptional() @IsInt() @Min(5000) PROSPECT_AUDIT_INTERVAL_MS?: number;
 }
 
@@ -93,6 +98,14 @@ export default () => ({
     webhookSecret: process.env.SALLA_WEBHOOK_SECRET ?? '',
   },
   marketplace: { tokenKey: process.env.MARKETPLACE_TOKEN_KEY ?? '' },
+  // App Zid (OAuth par code) — ROADMAP 3.3
+  zid: {
+    clientId:        process.env.ZID_CLIENT_ID ?? '',
+    clientSecret:    process.env.ZID_CLIENT_SECRET ?? '',
+    redirectUri:     process.env.ZID_REDIRECT_URI ?? '',
+    webhookUsername: process.env.ZID_WEBHOOK_USERNAME ?? '',
+    webhookPassword: process.env.ZID_WEBHOOK_PASSWORD ?? '',
+  },
   // Audit en lot : écart entre deux audits de prospects (2 appels PageSpeed + 1 capture par audit)
   prospects: { auditIntervalMs: parseInt(process.env.PROSPECT_AUDIT_INTERVAL_MS ?? '30000', 10) },
   security: {
