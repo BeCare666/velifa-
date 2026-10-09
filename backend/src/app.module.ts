@@ -12,6 +12,7 @@ import { ProspectsModule } from './prospects/prospects.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { SitesModule } from './sites/sites.module';
 import { ReportsModule } from './reports/reports.module';
+import { WidgetModule } from './widget/widget.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HealthController } from './health/health.controller';
@@ -38,6 +39,7 @@ import { HealthController } from './health/health.controller';
     WorkspacesModule,
     SitesModule,
     ReportsModule,
+    WidgetModule,
   ],
   controllers: [HealthController],
   providers: [

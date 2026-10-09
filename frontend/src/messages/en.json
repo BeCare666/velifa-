@@ -544,6 +544,28 @@
         "owner_only": "Only the agency owner can do this.",
         "cannot_remove_owner": "The owner cannot be removed.",
         "generic": "This action is not possible right now. Please try again."
+      },
+      "widget": {
+        "title": "Audit widget for your website",
+        "intro": "Embed a free audit form on your agency website: visitors see their score, and you receive their contact details here.",
+        "businessOnly": "The widget is available with the Business plan.",
+        "origins": "Allowed domains (one per line)",
+        "originsHelp": "https addresses where the widget will appear, e.g. https://www.your-agency.com (5 maximum). The widget is refused on any other site.",
+        "save": "Save",
+        "regenerate": "New key (disables the old code)",
+        "snippet": "Code to paste on your website",
+        "copy": "Copy",
+        "copied": "Copied",
+        "limitNote": "Abuse protection: 3 audits per hour per visitor, and a daily cap per agency.",
+        "prospects": "Leads received through the widget",
+        "report": "Report",
+        "errors": {
+          "origin_invalid": "Invalid domain: use an https address (e.g. https://www.your-agency.com).",
+          "origins_count": "Enter between 1 and 5 domains.",
+          "widget_requires_business": "The widget requires the Business plan.",
+          "owner_only": "Only the agency owner can do this.",
+          "generic": "This action is not possible right now. Please try again."
+        }
       }
     }
   },

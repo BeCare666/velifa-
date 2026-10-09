@@ -3,6 +3,7 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as helmet from 'helmet';
 import { AppModule } from './app.module';
+import { corsOptionsFor } from './common/security/cors';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -28,12 +29,9 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3001',
   ]));
-  app.enableCors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true,
-  });
+  // Widget agence : CORS ouvert sur /widget/* uniquement (voir common/security/cors.ts)
+  app.enableCors((req: any, callback: (err: Error | null, options: any) => void) =>
+    callback(null, corsOptionsFor(req.originalUrl ?? req.url ?? '', allowedOrigins)));
 
   // ── Global pipes ───────────────────────────────────────────────────────────
   app.useGlobalPipes(

@@ -5,6 +5,7 @@ import { useAuth } from '@clerk/nextjs';
 import { useTranslations } from 'next-intl';
 import { Loader2, UserPlus, X, Save } from 'lucide-react';
 import { api } from '@/lib/api';
+import WidgetSettings from './WidgetSettings';
 
 /** Codes d'erreur renvoyés par l'API /workspaces (traduits dans settings.workspace.errors). */
 const ERROR_KEYS = [
@@ -175,6 +176,12 @@ export default function WorkspaceSection() {
           </form>
         )}
         {isOwner && <p className="text-xs text-text-subtle mt-2">{t('memberNote')}</p>}
+      </div>
+
+      {/* Widget d'audit pour le site de l'agence */}
+      <div className="pt-4 border-t border-border">
+        <h3 className="text-sm font-semibold text-text mb-3">{t('widget.title')}</h3>
+        <WidgetSettings workspaceId={workspace.id} isOwner={isOwner} />
       </div>
 
       {error && <p className="text-sm score-poor">{error}</p>}

@@ -125,7 +125,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ✅ (limites chiffrées : hypothèse à valider) |
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ✅ |
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⚠️ gabarit ✅, Browserless réel → 1.12 |
-| 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ⬜ |
+| 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ✅ |
 | 2.6 | Vraies clés API (hachées en base) + API publique v1 (créer/consulter un audit) | Tests auth par clé | ⬜ |
 | 2.7 | Plans et prix en USD (Lemon Squeezy), limites appliquées côté serveur | Tests des limites | ⬜ |
 | 2.8 | 🔒 Créer les produits/variantes Lemon Squeezy en USD ; vérifier versement vers votre pays | Action de votre part | 🔒 |
@@ -163,7 +163,8 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 1. Clés de service de production (Phase 1.12).
 2. Produits Lemon Squeezy en USD + vérification des versements (2.8).
-   Valider le nombre de sites suivis par plan (2.2, actuellement hypothèse `free:1, pro:5, business:30`, réglable par `PLAN_SITE_LIMITS`).
+   Valider le nombre de sites suivis par plan (2.2, actuellement hypothèse `free:1, pro:5, business:30`, réglable par `PLAN_SITE_LIMITS`)
+   et le plafond quotidien du widget agence (2.5, hypothèse 50 audits/jour/agence, `WIDGET_DAILY_LIMIT`).
 3. Comptes partenaires Salla et Zid (3.1).
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
 
@@ -442,4 +443,26 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
     entre deux pages (désormais insécable).
 - ⚠️ Limite : appel Browserless réel non effectué (clé de production non utilisée sans accord) → à vérifier en 1.12,
   notamment le chargement de la police arabe par le Chrome de Browserless.
+
+### 2026-10-09 — 2.5 Widget d'audit pour les sites d'agences
+- Migration `005_widget.sql` : clé publique du widget et domaines autorisés par espace ; table `workspace_prospects`.
+- Configuration (`PUT /workspaces/:id/widget`, propriétaire, **plan Business**) : 1 à 5 domaines https normalisés,
+  clé de 32 caractères hexadécimaux créée une fois, renouvelable (désactive l'ancien code).
+- Routes publiques `/widget/:key/{config,audit,analyses/:id}` : **origine du navigateur comparée exactement** aux
+  domaines déclarés (sous-domaine, http ou domaine piégé refusés), titulaire Business, email ou WhatsApp international
+  obligatoire, URL validée comme un audit (anti-SSRF), 3 audits/h/IP et **plafond quotidien par agence**
+  (`WIDGET_DAILY_LIMIT`, 50 par défaut, hypothèse) — pas de CAPTCHA possible sur les domaines des agences.
+  Audit au nom du titulaire, **sans email VELIFA** ; le statut n'est lisible que pour les audits de ce widget.
+- **CORS par route** (`common/security/cors.ts`) : `/widget/*` ouvert à toute origine **sans cookies ni
+  Authorization** ; le reste de l'API reste limité au frontend VELIFA.
+- `frontend/public/widget.js` : sans dépendance, Shadow DOM (CSS de l'agence sans effet), FR/EN/AR (RTL), nom et
+  couleur de l'agence, score affiché dans le widget (marque blanche : aucun lien vers VELIFA).
+  « Mon agence » : domaines, code à copier, prospects reçus.
+- Preuves :
+  - `npx jest` → **21 suites, 301 tests réussis** (+19) ; `tsc` exit 0 ; `next build` exit 0 ;
+  - **navigateur réel** (Edge headless) : page « agence » sur une autre origine → formulaire arabe affiché, soumission,
+    requêtes cross-origin correctes, score 47/100 affiché (captures vérifiées) ;
+  - **backend réel** : préflight `/widget/…` depuis `https://agence.ae` → autorisé, en-têtes limités à `Content-Type` ;
+    préflight `/workspaces` depuis ce domaine → refusé ; depuis le frontend → autorisé avec identifiants ;
+    clé mal formée → 404 ; configuration sans jeton → 401.
 

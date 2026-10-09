@@ -80,6 +80,10 @@ export interface Workspace {
   defaultLocale: string;
   ownerClerkUserId: string;
   createdAt: Date;
+  /** Clé publique du widget (null tant que le widget n'est pas configuré). */
+  widgetKey?: string | null;
+  /** Domaines autorisés pour le widget (JSON). */
+  widgetOrigins?: string | null;
 }
 
 export interface WorkspaceMember {
@@ -504,7 +508,60 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return {
       id: r.id, name: r.name, logoUrl: r.logo_url ?? null, brandColor: r.brand_color,
       defaultLocale: r.default_locale, ownerClerkUserId: r.owner_clerk_user_id, createdAt: r.created_at,
+      widgetKey: r.widget_key ?? null, widgetOrigins: r.widget_origins ?? null,
     };
+  }
+
+  async setWorkspaceWidget(id: string, widgetKey: string, originsJson: string): Promise<void> {
+    await this.pool.query('UPDATE workspaces SET widget_key = ?, widget_origins = ? WHERE id = ?', [widgetKey, originsJson, id]);
+  }
+
+  async findWorkspaceByWidgetKey(widgetKey: string): Promise<Workspace | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>('SELECT * FROM workspaces WHERE widget_key = ?', [widgetKey]);
+    return rows[0] ? this.rowToWorkspace(rows[0]) : null;
+  }
+
+  async countWorkspaceProspectsSince(workspaceId: string, since: Date): Promise<number> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT COUNT(*) AS cnt FROM workspace_prospects WHERE workspace_id = ? AND created_at >= ?',
+      [workspaceId, since],
+    );
+    return Number(rows[0]?.cnt ?? 0);
+  }
+
+  async insertWorkspaceProspect(p: {
+    id: string; workspaceId: string; urlSite: string; name: string | null; email: string | null;
+    phone: string | null; analysisId: string; origin: string; ipAddress: string | null;
+  }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO workspace_prospects (id, workspace_id, url_site, name, email, phone, analysis_id, origin, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [p.id, p.workspaceId, p.urlSite, p.name, p.email, p.phone, p.analysisId, p.origin, p.ipAddress],
+    );
+  }
+
+  /** Vrai si cet audit a été lancé par le widget de cet espace (accès au statut depuis le widget). */
+  async isWorkspaceProspectAnalysis(workspaceId: string, analysisId: string): Promise<boolean> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT 1 FROM workspace_prospects WHERE workspace_id = ? AND analysis_id = ? LIMIT 1',
+      [workspaceId, analysisId],
+    );
+    return rows.length > 0;
+  }
+
+  async listWorkspaceProspects(workspaceId: string, limit: number): Promise<any[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT p.id, p.url_site, p.name, p.email, p.phone, p.analysis_id, p.origin, p.created_at,
+              a.status, a.score_performance
+         FROM workspace_prospects p LEFT JOIN analyses a ON a.id = p.analysis_id
+        WHERE p.workspace_id = ? ORDER BY p.created_at DESC LIMIT ?`,
+      [workspaceId, limit],
+    );
+    return rows.map((r) => ({
+      id: r.id, urlSite: r.url_site, name: r.name ?? null, email: r.email ?? null, phone: r.phone ?? null,
+      analysisId: r.analysis_id, origin: r.origin, createdAt: r.created_at,
+      status: r.status ?? null, scorePerformance: r.score_performance ?? null,
+    }));
   }
 
   /** Crée l'espace et inscrit le créateur comme propriétaire. */

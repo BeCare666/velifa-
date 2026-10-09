@@ -131,6 +131,12 @@ export const api = {
       apiFetch<{ data: any }>(`/workspaces/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(body), authToken: token }),
     addMember: (token: string, id: string, email: string) =>
       apiFetch<{ data: any[] }>(`/workspaces/${encodeURIComponent(id)}/members`, { method: 'POST', body: JSON.stringify({ email }), authToken: token }),
+    getWidget: (token: string, id: string) =>
+      apiFetch<{ data: any }>(`/workspaces/${encodeURIComponent(id)}/widget`, { authToken: token }),
+    configureWidget: (token: string, id: string, origins: string[], regenerateKey = false) =>
+      apiFetch<{ data: any }>(`/workspaces/${encodeURIComponent(id)}/widget`, {
+        method: 'PUT', body: JSON.stringify({ origins, regenerateKey }), authToken: token,
+      }),
     removeMember: (token: string, id: string, memberId: string) =>
       apiFetch<{ data: any[] }>(`/workspaces/${encodeURIComponent(id)}/members/${encodeURIComponent(memberId)}`, { method: 'DELETE', authToken: token }),
   },

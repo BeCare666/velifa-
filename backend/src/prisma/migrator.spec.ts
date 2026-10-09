@@ -106,7 +106,7 @@ describe('migrations du projet', () => {
 
   it('chaque instruction est idempotente (IF NOT EXISTS)', () => {
     for (const s of statements) {
-      expect(s).toMatch(/^(CREATE TABLE IF NOT EXISTS|ALTER TABLE \w+ ADD COLUMN IF NOT EXISTS|CREATE INDEX IF NOT EXISTS)\b/);
+      expect(s).toMatch(/^(CREATE TABLE IF NOT EXISTS|ALTER TABLE \w+ ADD COLUMN IF NOT EXISTS|CREATE (?:UNIQUE )?INDEX IF NOT EXISTS)\b/);
     }
   });
 

@@ -547,6 +547,28 @@
         "owner_only": "Action réservée au propriétaire de l’agence.",
         "cannot_remove_owner": "Le propriétaire ne peut pas être retiré.",
         "generic": "Action impossible pour le moment. Réessayez."
+      },
+      "widget": {
+        "title": "Widget d’audit pour votre site",
+        "intro": "Intégrez un formulaire d’audit gratuit sur le site de votre agence : le visiteur voit son score, et vous recevez ses coordonnées ici.",
+        "businessOnly": "Le widget est disponible avec le plan Business.",
+        "origins": "Domaines autorisés (un par ligne)",
+        "originsHelp": "Adresses https où le widget sera affiché, ex. https://www.votre-agence.com (5 maximum). Le widget est refusé sur tout autre site.",
+        "save": "Enregistrer",
+        "regenerate": "Nouvelle clé (désactive l’ancien code)",
+        "snippet": "Code à coller sur votre site",
+        "copy": "Copier",
+        "copied": "Copié",
+        "limitNote": "Protection anti-abus : 3 audits par heure et par visiteur, et un plafond quotidien par agence.",
+        "prospects": "Prospects reçus par le widget",
+        "report": "Rapport",
+        "errors": {
+          "origin_invalid": "Domaine invalide : utilisez une adresse https (ex. https://www.votre-agence.com).",
+          "origins_count": "Indiquez entre 1 et 5 domaines.",
+          "widget_requires_business": "Le widget nécessite le plan Business.",
+          "owner_only": "Action réservée au propriétaire de l’agence.",
+          "generic": "Action impossible pour le moment. Réessayez."
+        }
       }
     }
   },
