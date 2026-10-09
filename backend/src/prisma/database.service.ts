@@ -88,6 +88,18 @@ export interface WorkspaceMember {
   createdAt: Date;
 }
 
+export interface TrackedSite {
+  id: string;
+  scope: string;
+  workspaceId: string | null;
+  ownerClerkUserId: string;
+  urlSite: string;
+  urlHash: string;
+  label: string | null;
+  createdBy: string;
+  createdAt: Date;
+}
+
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
@@ -548,6 +560,73 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       `DELETE FROM workspace_members WHERE workspace_id = ? AND clerk_user_id = ? AND role <> 'owner'`,
       [workspaceId, clerkUserId],
     );
+  }
+
+  // ── Sites suivis ───────────────────────────────────────────────────────
+
+  private rowToTrackedSite(r: any): TrackedSite {
+    return {
+      id: r.id, scope: r.scope, workspaceId: r.workspace_id ?? null, ownerClerkUserId: r.owner_clerk_user_id,
+      urlSite: r.url_site, urlHash: r.url_hash, label: r.label ?? null, createdBy: r.created_by, createdAt: r.created_at,
+    };
+  }
+
+  async countTrackedSitesByOwner(ownerClerkUserId: string): Promise<number> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      'SELECT COUNT(*) AS cnt FROM tracked_sites WHERE owner_clerk_user_id = ?',
+      [ownerClerkUserId],
+    );
+    return Number(rows[0]?.cnt ?? 0);
+  }
+
+  /** false si le site est déjà suivi dans ce scope (clé unique scope + url_hash). */
+  async insertTrackedSite(s: Omit<TrackedSite, 'createdAt'>): Promise<boolean> {
+    const [res] = await this.pool.query<mysql.ResultSetHeader>(
+      `INSERT IGNORE INTO tracked_sites (id, scope, workspace_id, owner_clerk_user_id, url_site, url_hash, label, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [s.id, s.scope, s.workspaceId, s.ownerClerkUserId, s.urlSite, s.urlHash, s.label, s.createdBy],
+    );
+    return res.affectedRows === 1;
+  }
+
+  async findTrackedSiteById(id: string): Promise<TrackedSite | null> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>('SELECT * FROM tracked_sites WHERE id = ?', [id]);
+    return rows[0] ? this.rowToTrackedSite(rows[0]) : null;
+  }
+
+  async deleteTrackedSite(id: string): Promise<void> {
+    await this.pool.query('DELETE FROM tracked_sites WHERE id = ?', [id]);
+  }
+
+  /**
+   * Sites d'un scope avec leur dernier audit terminé, parmi les audits lancés par `auditors`
+   * (le titulaire en personnel, les membres pour un espace agence).
+   */
+  async listTrackedSites(scope: string, auditors: string[]): Promise<(TrackedSite & {
+    lastAnalysisId: string | null; lastScore: number | null; lastAuditAt: Date | null;
+  })[]> {
+    const [rows] = await this.pool.query<mysql.RowDataPacket[]>(
+      `SELECT * FROM tracked_sites WHERE scope = ? ORDER BY created_at`,
+      [scope],
+    );
+    if (!rows.length) return [];
+    const [audits] = auditors.length
+      ? await this.pool.query<mysql.RowDataPacket[]>(
+          `SELECT a.id, a.url_hash, a.score_performance, a.created_at FROM analyses a
+            WHERE a.url_hash IN (?) AND a.clerk_user_id IN (?) AND a.status = 'completed' AND a.deleted_at IS NULL
+            ORDER BY a.created_at DESC`,
+          [rows.map((r) => r.url_hash), auditors],
+        )
+      : [[] as mysql.RowDataPacket[]];
+    const latest = new Map<string, mysql.RowDataPacket>();
+    for (const a of audits) if (!latest.has(a.url_hash)) latest.set(a.url_hash, a);
+    return rows.map((r) => {
+      const a = latest.get(r.url_hash);
+      return {
+        ...this.rowToTrackedSite(r),
+        lastAnalysisId: a?.id ?? null, lastScore: a?.score_performance ?? null, lastAuditAt: a?.created_at ?? null,
+      };
+    });
   }
 
   // ── Internal helpers ───────────────────────────────────────────────────

@@ -255,7 +255,29 @@
     "businessFeatureDesc": "is reserved for the Business plan.",
     "upgradeBusiness": "Upgrade to Business",
     "welcomePro": "Welcome to Velifa {plan}! 🎉",
-    "welcomeProDesc": "Your subscription is active. Enjoy all your features."
+    "welcomeProDesc": "Your subscription is active. Enjoy all your features.",
+    "sites": {
+      "title": "Tracked sites",
+      "usage": "{used} / {limit} sites",
+      "scope": "Space",
+      "personal": "My sites",
+      "empty": "No tracked sites yet. Add the sites you want to audit regularly.",
+      "neverAudited": "Never audited",
+      "report": "Latest report",
+      "audit": "Run an audit",
+      "remove": "Remove",
+      "url": "Site address",
+      "label": "Name (optional)",
+      "add": "Add",
+      "limitReached": "Site limit reached for your plan.",
+      "seePlans": "See plans",
+      "errors": {
+        "url_invalid": "Invalid or disallowed address.",
+        "site_limit": "Site limit reached for your plan.",
+        "already_tracked": "This site is already tracked.",
+        "generic": "This action is not possible right now. Please try again."
+      }
+    }
   },
   "errors": {
     "generic": "An error occurred. Please try again.",

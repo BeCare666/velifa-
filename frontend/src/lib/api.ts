@@ -88,6 +88,16 @@ export const api = {
       authToken,
     }),
 
+  // ── Sites suivis (jeton Clerk obligatoire) ────────────────────────────────────
+  sites: {
+    list:   (token: string, workspaceId?: string) =>
+      apiFetch<{ data: any }>(`/sites${workspaceId ? `?workspaceId=${encodeURIComponent(workspaceId)}` : ''}`, { authToken: token }),
+    add:    (token: string, body: { url: string; label?: string; workspaceId?: string }) =>
+      apiFetch<{ data: any }>('/sites', { method: 'POST', body: JSON.stringify(body), authToken: token }),
+    remove: (token: string, id: string) =>
+      apiFetch<{ data: any }>(`/sites/${encodeURIComponent(id)}`, { method: 'DELETE', authToken: token }),
+  },
+
   // ── Espaces agence (jeton Clerk obligatoire) ──────────────────────────────────
   workspaces: {
     listMine: (token: string) => apiFetch<{ data: any[] }>('/workspaces', { authToken: token }),

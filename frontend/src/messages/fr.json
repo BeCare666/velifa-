@@ -255,7 +255,29 @@
     "businessFeatureDesc": "est réservée au plan Business.",
     "upgradeBusiness": "Passer Business",
     "welcomePro": "Bienvenue dans Velifa {plan} ! 🎉",
-    "welcomeProDesc": "Votre abonnement est actif. Profitez de toutes vos fonctionnalités."
+    "welcomeProDesc": "Votre abonnement est actif. Profitez de toutes vos fonctionnalités.",
+    "sites": {
+      "title": "Sites suivis",
+      "usage": "{used} / {limit} sites",
+      "scope": "Espace",
+      "personal": "Mes sites",
+      "empty": "Aucun site suivi. Ajoutez les sites que vous voulez auditer régulièrement.",
+      "neverAudited": "Jamais audité",
+      "report": "Dernier rapport",
+      "audit": "Lancer un audit",
+      "remove": "Retirer",
+      "url": "Adresse du site",
+      "label": "Nom (facultatif)",
+      "add": "Ajouter",
+      "limitReached": "Limite de sites atteinte pour votre plan.",
+      "seePlans": "Voir les plans",
+      "errors": {
+        "url_invalid": "Adresse invalide ou non autorisée.",
+        "site_limit": "Limite de sites atteinte pour votre plan.",
+        "already_tracked": "Ce site est déjà suivi.",
+        "generic": "Action impossible pour le moment. Réessayez."
+      }
+    }
   },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",

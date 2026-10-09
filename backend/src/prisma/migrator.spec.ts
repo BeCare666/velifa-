@@ -137,7 +137,7 @@ describe('migrations du projet', () => {
 
     // INSERT INTO t (colonnes) dans tout le code
     for (const f of ['prisma/database.service.ts', 'admin/admin.service.ts']) {
-      for (const m of src(f).matchAll(/INSERT INTO (\w+) \(([^)]+)\)/g)) {
+      for (const m of src(f).matchAll(/INSERT (?:IGNORE )?INTO (\w+) \(([^)]+)\)/g)) {
         for (const c of m[2].split(',')) used.push([m[1], c.trim()]);
       }
     }

@@ -122,7 +122,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 | ID | Tâche | Critère d'acceptation | Statut |
 |---|---|---|---|
 | 2.1 | Modèle `workspaces` (agence) : nom, logo, couleur, langue par défaut, membres | Migration + tests service | ✅ |
-| 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ⬜ |
+| 2.2 | Sites suivis en base (remplace `localStorage`), limites par plan appliquées côté serveur | Tests | ✅ (limites chiffrées : hypothèse à valider) |
 | 2.3 | Audits programmés (BullMQ répétable) + alertes email en cas de baisse sous un seuil | Tests du planificateur et de la règle d'alerte | ⬜ |
 | 2.4 | Rapport PDF à la marque de l'agence, AR/EN (rendu HTML → PDF via Browserless) | Test du gabarit HTML ; PDF généré en environnement configuré | ⬜ |
 | 2.5 | Widget d'audit intégrable (script) sur le site de l'agence → prospect enregistré pour l'agence | Test du endpoint public + domaine autorisé | ⬜ |
@@ -163,6 +163,7 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 1. Clés de service de production (Phase 1.12).
 2. Produits Lemon Squeezy en USD + vérification des versements (2.8).
+   Valider le nombre de sites suivis par plan (2.2, actuellement hypothèse `free:1, pro:5, business:30`, réglable par `PLAN_SITE_LIMITS`).
 3. Comptes partenaires Salla et Zid (3.1).
 4. Liste de cibles et prospection (4.3), validation juridique (4.4).
 
@@ -383,4 +384,18 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   colonnes `workspaces` couvertes) ; `tsc` exit 0 ; `next build` exit 0 ;
   API réelle : `/workspaces` sans jeton → 401 (GET, POST, DELETE) ; champ `ownerClerkUserId` injecté → 400.
 - ⚠️ Limite : parcours complet non testé avec un vrai compte Clerk (clés de test non utilisées sans accord) ni sur la vraie base.
+
+### 2026-10-09 — 2.2 Sites suivis en base
+- Migration `003_tracked_sites.sql` : site personnel (`scope = user:<id>`) ou d'un espace agence ; unique par scope.
+- `sites/sites.service.ts` + routes `/sites` (GET, POST, DELETE ; Clerk obligatoire, limitées en débit) :
+  URL validée comme un audit (syntaxe + DNS anti-SSRF) ; membres d'un espace : ajout/retrait ; non-membre → 404.
+  Chaque site renvoie son **dernier audit terminé** (lancé par le titulaire ou un membre de l'espace).
+- **Limite par plan côté serveur** (`payments/plan-limits.ts`) : comptée sur le **titulaire** de l'abonnement, tous
+  espaces confondus (créer plusieurs espaces ne la contourne pas) ; abonnement expiré → limite « free ».
+  ⚠️ Les nombres (`free:1, pro:5, business:30`) sont une **hypothèse** : la page Tarifs n'annonce encore aucune limite.
+  Réglables sans code (`PLAN_SITE_LIMITS`) ; à valider avec la grille de prix (4.2, 2.7).
+- Tableau de bord : bloc « Sites suivis » (FR/EN/AR) — usage `n / limite`, choix personnel / agence, dernier score,
+  rapport, relancer un audit, retirer ; « Suivi multi-sites » retiré de l'encart « Bientôt ».
+- Preuves : `npx jest` → **18 suites, 246 tests réussis** (+11) ; `tsc` exit 0 ; `next build` exit 0 ;
+  API réelle : `/sites` sans jeton → 401 (GET, POST, DELETE) ; URL absente → 400 ; `ownerClerkUserId` injecté → 400.
 

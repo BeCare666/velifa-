@@ -19,6 +19,7 @@ import { api } from '@/lib/api';
 import type { MyAudit } from '@/types/analysis';
 import { useSubscription } from '@/context/SubscriptionContext';
 import NewAuditModal from '@/components/audit/NewAuditModal';
+import TrackedSites from '@/components/dashboard/TrackedSites';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function formatDate(iso: string | null): string {
@@ -450,7 +451,6 @@ const BUSINESS_SURFACE = 'rgba(200,200,200,0.07)';
 // jamais simulées dans le navigateur.
 function UpcomingFeatures() {
   const items = [
-    { icon: Globe, label: 'Suivi multi-sites en base de données' },
     { icon: Bell,  label: 'Audits programmés et alertes email' },
     { icon: Key,   label: 'Clé API personnelle' },
   ];
@@ -740,6 +740,13 @@ export default function DashboardPage() {
                 {t('startFirstAction')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
+            </div>
+          )}
+
+          {/* ── Sites suivis (en base, limite par plan) ────────── */}
+          {!isLoading && (
+            <div className="fade-up mb-6" style={{ animationDelay: '270ms' }}>
+              <TrackedSites />
             </div>
           )}
 

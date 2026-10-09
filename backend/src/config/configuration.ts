@@ -39,6 +39,7 @@ class EnvironmentVariables {
   @IsOptional() @IsString() LEMONSQUEEZY_BUSINESS_VARIANT_ID?: string;
   @IsOptional() @IsString() LEMONSQUEEZY_WEBHOOK_SECRET?: string;
   @IsOptional() @IsInt() @Min(5000) PROSPECT_AUDIT_INTERVAL_MS?: number;
+  @IsOptional() @IsString() PLAN_SITE_LIMITS?: string;
 }
 
 export function validate(config: Record<string, unknown>) {
@@ -80,6 +81,8 @@ export default () => ({
   },
   whatsapp: { number: process.env.WHATSAPP_NUMBER ?? '' },
   // Audit en lot : écart entre deux audits de prospects (2 appels PageSpeed + 1 capture par audit)
+  // Sites suivis par plan (hypothèse à valider, ROADMAP 4.2) : "free:1,pro:5,business:30"
+  plans: { siteLimits: process.env.PLAN_SITE_LIMITS ?? '' },
   prospects: { auditIntervalMs: parseInt(process.env.PROSPECT_AUDIT_INTERVAL_MS ?? '30000', 10) },
   security: {
     turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY ?? '',
