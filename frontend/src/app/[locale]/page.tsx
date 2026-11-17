@@ -12,6 +12,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useCaptcha } from '@/hooks/useCaptcha';
+import { normalizeSiteUrl } from '@/lib/site-url';
 
 // ── Formulaire d'audit ───────────────────────────────────────────────────────
 function AuditForm() {
@@ -39,7 +40,7 @@ function AuditForm() {
     try {
       const authToken = isSignedIn ? await getToken() : undefined;
       const res = await api.createAnalysis({
-        url,
+        url: normalizeSiteUrl(url),
         email: clerkEmail,   // undefined si non connecté → modal email après
         cfTurnstileToken: captcha.token ?? undefined,
         locale,
@@ -69,42 +70,115 @@ function AuditForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="velifa-card text-start space-y-4"
-      style={{ background: 'var(--surface)', maxWidth: '600px', margin: '0 auto' }}
-    >
-      {cachedInfo && (
+    <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto text-start" noValidate>
+      {/* ── Barre d'audit : un seul champ, large, visible dès l'arrivée ─────── */}
+      <label htmlFor="audit-url" className="sr-only">{t('urlLabel')}</label>
+      <div
+        className="rounded-[22px] p-px shadow-[0_24px_80px_rgba(0,0,0,0.55)] transition-shadow duration-300 focus-within:shadow-[0_0_0_4px_rgba(212,175,55,0.18),0_24px_80px_rgba(0,0,0,0.55)]"
+        style={{ background: 'linear-gradient(135deg, rgba(244,216,138,0.75), rgba(212,175,55,0.35) 45%, rgba(168,123,30,0.65))' }}
+      >
+        <div className="flex flex-col sm:flex-row items-stretch gap-2 rounded-[21px] bg-[#0b0b0b]/95 backdrop-blur-md p-2">
+          <div className="flex flex-1 min-w-0 items-center gap-3 px-4">
+            <Globe className="w-5 h-5 flex-shrink-0 text-accent" aria-hidden />
+            <input
+              id="audit-url"
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              dir="ltr"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder={t('inputPlaceholder')}
+              disabled={loading}
+              className="h-14 sm:h-16 w-full min-w-0 bg-transparent text-base sm:text-lg text-text placeholder:text-text-subtle outline-none focus-visible:outline-none disabled:opacity-50"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading || !url.trim() || !captcha.ready}
+            className="velifa-btn h-14 sm:h-16 px-8 text-base flex items-center justify-center gap-2 whitespace-nowrap rounded-[16px] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <><Loader2 className="w-5 h-5 animate-spin" /> {t('analyzing')}</>
+            ) : (
+              <>{t('analyzeNow')} <ArrowRight className="w-5 h-5 rtl:rotate-180" /></>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Vérification anti-robot (visiteurs non connectés) ─────────────── */}
+      {captcha.widget && <div className="mt-4 flex justify-center">{captcha.widget}</div>}
+      {captcha.pending && (
+        <p className="mt-3 flex items-center justify-center gap-2 text-xs text-text-subtle">
+          <Shield className="w-3.5 h-3.5 text-accent" /> {t('captchaPending')}
+        </p>
+      )}
+
+      {captcha.failed && (
+        <div className="mt-4 text-sm text-score-poor bg-score-poor-bg border border-score-poor rounded-velifa-md px-4 py-3 flex items-center justify-between gap-3">
+          <span>{t('captchaFailed')}</span>
+          <button type="button" onClick={captcha.reset} className="underline whitespace-nowrap">
+            {t('captchaRetry')}
+          </button>
+        </div>
+      )}
+
+      {/* ── Erreur générique ──────────────────────────────── */}
+      {error && (
+        <div className="mt-4 text-sm text-score-poor bg-score-poor-bg border border-score-poor rounded-velifa-md px-4 py-3">
+          {error}
+        </div>
+      )}
+
+      {/* ── Erreur 429 : message incitatif doux ───────────── */}
+      {rateLimited && (
         <div
-          className="rounded-velifa-lg border p-5 space-y-4"
-          style={{ background: 'var(--velifa-ink-900)', borderColor: 'var(--accent)' }}
+          className="mt-4 rounded-velifa-lg border p-5 space-y-3"
+          style={{
+            background: 'linear-gradient(135deg, rgba(212,175,55,0.10) 0%, rgba(168,123,30,0.06) 100%)',
+            borderColor: 'rgba(212,175,55,0.40)',
+          }}
         >
+          <div className="flex items-start gap-3">
+            <Sparkles className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>{t('rateLimitTitle')}</p>
+              <p className="text-xs text-text-muted mt-1 leading-relaxed">{t('rateLimitDesc')}</p>
+            </div>
+          </div>
+          <div className="flex gap-3 pt-1">
+            <Link href="/tarifs" className="velifa-btn flex items-center gap-2 text-xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              {t('upgradePro')}
+            </Link>
+            <button type="button" onClick={() => setRateLimited(false)} className="text-xs text-text-muted hover:text-text transition">
+              {t('retryTomorrow')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Audit récent déjà disponible ──────────────────── */}
+      {cachedInfo && (
+        <div className="mt-4 rounded-velifa-lg border p-5 space-y-4" style={{ background: 'var(--velifa-ink-900)', borderColor: 'var(--accent)' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-text">
-                  {t('cachedTitle')}
-                </p>
-                <p className="text-xs text-text-muted mt-0.5">
-                  {t('cachedDesc')}
-                </p>
+                <p className="text-sm font-medium text-text">{t('cachedTitle')}</p>
+                <p className="text-xs text-text-muted mt-0.5">{t('cachedDesc')}</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="text-text-subtle hover:text-text transition p-1"
-            >
+            <button type="button" onClick={handleDismiss} className="text-text-subtle hover:text-text transition p-1">
               <X className="w-4 h-4" />
             </button>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={() => router.push(`/analyse/${cachedInfo.id}`)}
-              className="velifa-btn flex-1 flex items-center justify-center gap-2"
-            >
+            <button type="button" onClick={() => router.push(`/analyse/${cachedInfo.id}`)} className="velifa-btn flex-1 flex items-center justify-center gap-2">
               <Eye className="w-4 h-4" />
               {t('viewReport')}
             </button>
@@ -121,93 +195,7 @@ function AuditForm() {
         </div>
       )}
 
-      <div>
-        <label className="block text-sm font-medium text-text mb-1.5">
-          {t('urlLabel')}
-        </label>
-        <input
-          type="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder={t('inputPlaceholder')}
-          required
-          disabled={loading}
-          className="w-full px-4 py-3 border border-border rounded-velifa-md text-text bg-surface placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent-ring focus:border-transparent transition disabled:opacity-50"
-        />
-      </div>
-      {/* ── Erreur 429 : message incitatif doux ───────────── */}
-      {rateLimited && (
-        <div
-          className="rounded-velifa-lg border p-5 space-y-3"
-          style={{
-            background: 'linear-gradient(135deg, rgba(212,175,55,0.10) 0%, rgba(168,123,30,0.06) 100%)',
-            borderColor: 'rgba(212,175,55,0.40)',
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>
-                {t('rateLimitTitle')}
-              </p>
-              <p className="text-xs text-text-muted mt-1 leading-relaxed">
-                {t('rateLimitDesc')}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-3 pt-1">
-            <Link
-              href="/tarifs"
-              className="velifa-btn flex items-center gap-2 text-xs"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              {t('upgradePro')}
-            </Link>
-            <button
-              type="button"
-              onClick={() => setRateLimited(false)}
-              className="text-xs text-text-muted hover:text-text transition"
-            >
-              {t('retryTomorrow')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Erreur générique ──────────────────────────────── */}
-      {error && (
-        <div className="text-sm text-score-poor bg-score-poor-bg border border-score-poor rounded-velifa-md px-4 py-3">
-          {error}
-        </div>
-      )}
-
-      {captcha.widget && <div className="flex justify-center">{captcha.widget}</div>}
-
-      {/* ── Vérification anti-robot : jamais de bouton grisé sans explication ── */}
-      {captcha.failed && (
-        <div className="text-sm text-score-poor bg-score-poor-bg border border-score-poor rounded-velifa-md px-4 py-3 flex items-center justify-between gap-3">
-          <span>{t('captchaFailed')}</span>
-          <button type="button" onClick={captcha.reset} className="underline whitespace-nowrap">
-            {t('captchaRetry')}
-          </button>
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading || !captcha.ready}
-        className="velifa-btn w-full flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {loading ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> {t('analyzing')}</>
-        ) : captcha.pending ? (
-          <><Shield className="w-4 h-4" /> {t('captchaPending')}</>
-        ) : (
-          <>{t('analyzeNow')} <ArrowRight className="w-4 h-4" /></>
-        )}
-      </button>
-
-      <p className="text-xs text-center text-text-subtle">
+      <p className="mt-4 text-xs text-center text-text-subtle">
         {t('privacyNote')}{' '}
         <Link href="/confidentialite" className="text-accent hover:text-accent-hover underline">
           {t('privacyLink')}
@@ -616,35 +604,27 @@ export default function HomePage() {
         {/* Animated background carousel */}
         <HeroBackground />
 
-        {/* Content — stays fixed, does NOT scroll with images */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        {/* Contenu : promesse + barre d'audit centrées, visibles sans défiler */}
+        <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-6 pt-10 sm:pt-14 pb-16 text-center">
+          <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-accent bg-accent-soft border border-border rounded-full px-4 py-1.5 mb-6">
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            {tHero('badge')}
+          </div>
 
-            {/* Left: text + form */}
-            <div className="text-center lg:text-start">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 text-sm text-accent bg-accent-soft border border-border rounded-full px-4 py-1.5 mb-8">
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                {tHero('badge')}
-              </div>
+          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-text leading-[1.08] mb-5 tracking-tight">
+            {tHero('title')}{' '}
+            <span className="velifa-gold-text">{tHero('titleHighlight')}</span>
+          </h1>
 
-              <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-text leading-tight mb-6 tracking-tight">
-                {tHero('title')}<br className="hidden md:block" />
-                <span className="velifa-gold-text">{tHero('titleHighlight')}</span>
-              </h1>
+          <p className="text-base sm:text-lg text-text-muted mb-8 leading-relaxed max-w-2xl mx-auto">
+            {tHero('subtitle')}
+          </p>
 
-              <p className="text-xl text-text-muted mb-12 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                {tHero('subtitle')}
-              </p>
+          <AuditForm />
 
-              {/* Formulaire inchangé */}
-              <AuditForm />
-            </div>
-
-            {/* Right: report mockup */}
-            <div className="hidden lg:flex items-center justify-center">
-              <ReportMockup />
-            </div>
+          {/* Aperçu d'un rapport, sous le formulaire (grand écran) */}
+          <div className="hidden lg:block mt-14 opacity-90">
+            <ReportMockup />
           </div>
         </div>
       </section>

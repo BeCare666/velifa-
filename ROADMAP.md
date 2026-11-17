@@ -684,3 +684,19 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   « An error occurred »).
 - Preuves : `npx jest src/redis` → **6 tests réussis** ; `npx jest src/health` → **3 réussis** ; `tsc` exit 0.
 - Reste : vérifier `/health` → 200 après redéploiement ; audit réel de bout en bout depuis le site.
+
+### 2026-11-17 — 5.1 (suite) : barre d'audit de l'accueil
+- Cause du blocage en ligne vérifiée dans Chrome sur https://velifa-ae.vercel.app : console
+  `[Cloudflare Turnstile] Error: 110200` (domaine non autorisé pour la clé `0x4AAAAAADYGVg7…`, identique à
+  `frontend/.env.local`) → 🔒 ajouter `velifa-ae.vercel.app` dans les Hostnames du widget. Aucun compte n'est exigé
+  (frontend ni backend) : seul le CAPTCHA des visiteurs anonymes bloquait.
+- Constat (capture 1366×641) : le formulaire était sous la ligne de flottaison, dans la colonne gauche.
+  Second blocage : champ `type="url"` → le navigateur refusait `monsite.com` ; le backend exige aussi le schéma.
+- Accueil : promesse + barre d'audit centrées (champ unique 64 px, bouton sur la même ligne, contour or,
+  `dir="ltr"`), maquette du rapport déplacée sous le formulaire ; textes existants inchangés.
+  `normalizeSiteUrl` (`src/lib/site-url.ts`) : `monsite.com` → `https://monsite.com` ; schémas laissés tels quels
+  (le backend refuse tout sauf http/https). Le bouton garde « Analyser maintenant », l'attente du CAPTCHA est
+  indiquée sous la barre.
+- Preuves : 9 cas `normalizeSiteUrl` vérifiés ; `tsc` exit 0 ; `next build` exit 0 (87 pages) ; rendu local
+  (`next start`) dans Chrome : barre visible sans défiler, Turnstile validé, `example.com` saisi → bouton actif.
+- Non vérifié visuellement : arabe (RTL) et mobile.
