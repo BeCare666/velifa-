@@ -1,69 +1,77 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import type { AnalysisStatus, SseEvent } from '@/types/analysis';
+import type { AnalysisStatus, AnalysisStep, SseEvent } from '@/types/analysis';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
+const POLL_MS = 4000;
 
+/**
+ * Suivi d'une analyse en cours.
+ * - SSE : le backend envoie des événements NOMMÉS `analysis-update` (étapes réelles du worker) ;
+ *   `onmessage` ne reçoit que les événements sans nom, d'où `addEventListener`.
+ * - Interrogation périodique en parallèle : filet de sécurité si l'analyse se termine avant
+ *   l'ouverture du flux (aucun événement ne serait alors envoyé) ou si le flux est coupé.
+ */
 export function useAnalysisStatus(analysisId: string | null) {
   const [status, setStatus] = useState<AnalysisStatus>('pending');
-  const [error, setError]   = useState<string | null>(null);
+  const [step, setStep]     = useState<AnalysisStep | null>(null);
+  const [url, setUrl]       = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const router = useRouter();
-
-  const startPolling = useCallback((id: string) => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`${API_URL}/analyses/${id}`);
-        if (!res.ok) return;
-        const { data } = await res.json();
-        setStatus(data.status);
-        if (data.status === 'completed') {
-          clearInterval(interval);
-          router.push(`/analyse/${id}`);
-        }
-        if (data.status === 'failed') {
-          clearInterval(interval);
-          setError('Analyse échouée. Veuillez réessayer.');
-        }
-      } catch { /* silent */ }
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [router]);
 
   useEffect(() => {
     if (!analysisId) return;
+    let done = false;
+
+    const finish = (next: AnalysisStatus) => {
+      if (done) return;
+      if (next === 'completed') {
+        done = true;
+        setStatus('completed');
+        router.push(`/analyse/${analysisId}`);
+      } else if (next === 'failed') {
+        done = true;
+        setStatus('failed');
+        setFailed(true);
+      }
+    };
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`${API_URL}/analyses/${analysisId}`);
+        if (!res.ok) return;
+        const { data } = await res.json();
+        if (data?.url) setUrl(data.url);
+        if (data?.status === 'completed' || data?.status === 'failed') finish(data.status);
+        else if (data?.status && !done) setStatus((s) => (s === 'pending' ? data.status : s));
+      } catch { /* réseau : on réessaie au prochain tour */ }
+    };
+
+    poll();
+    const interval = setInterval(() => { if (!done) poll(); }, POLL_MS);
 
     let es: EventSource | null = null;
-
     try {
       es = new EventSource(`${API_URL}/analyses/${analysisId}/stream`);
-
-      es.onmessage = (e) => {
+      es.addEventListener('analysis-update', (e) => {
         try {
-          const event: SseEvent = JSON.parse(e.data);
-          setStatus(event.status);
-          if (event.status === 'completed') {
-            es?.close();
-            router.push(`/analyse/${analysisId}`);
-          }
-          if (event.status === 'failed') {
-            es?.close();
-            setError('Analyse échouée. Veuillez réessayer.');
-          }
-        } catch { /* silent */ }
-      };
+          const event: SseEvent = JSON.parse((e as MessageEvent).data);
+          if (event.step) setStep(event.step);
+          if (event.status === 'completed' || event.status === 'failed') finish(event.status);
+          else setStatus(event.status);
+        } catch { /* événement illisible ignoré */ }
+      });
+      // Flux coupé : l'interrogation périodique prend le relais.
+      es.onerror = () => es?.close();
+    } catch { /* EventSource indisponible : interrogation seule */ }
 
-      es.onerror = () => {
-        es?.close();
-        // Fallback to polling on SSE failure
-        startPolling(analysisId);
-      };
-    } catch {
-      startPolling(analysisId);
-    }
+    return () => {
+      done = true;
+      clearInterval(interval);
+      es?.close();
+    };
+  }, [analysisId, router]);
 
-    return () => es?.close();
-  }, [analysisId, router, startPolling]);
-
-  return { status, error };
+  return { status, step, url, failed };
 }

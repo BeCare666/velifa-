@@ -123,8 +123,12 @@ export interface MyAudit {
   completedAt: string | null;
 }
 
+/** Étape réelle du worker pendant `processing` (événements SSE du backend). */
+export type AnalysisStep = 'performance' | 'inspection' | 'report';
+
 export interface SseEvent {
   status: AnalysisStatus;
   analysisId: string;
+  step?: AnalysisStep;
   redirectUrl?: string;
 }

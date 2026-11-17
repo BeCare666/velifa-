@@ -50,7 +50,7 @@ export class AnalysisWorker {
     this.logger.log(`Worker started for ${analysisId} [attempt ${job.attemptsMade + 1}]`);
 
     await this.db.updateAnalysis(analysisId, { status: 'processing' });
-    this.sse.emit(analysisId, { status: 'processing' });
+    this.sse.emit(analysisId, { status: 'processing', step: 'performance' });
 
     try {
       this.logger.log(`[${analysisId}] Running PageSpeed...`);
@@ -66,6 +66,7 @@ export class AnalysisWorker {
       const desktop = desktopResult.status === 'fulfilled' ? desktopResult.value : null;
 
       this.logger.log(`[${analysisId}] Capturing screenshot + detecting technologies...`);
+      this.sse.emit(analysisId, { status: 'processing', step: 'inspection' });
       let screenshotUrl: string | null = null;
       let cloudinaryPublicId: string | null = null;
       let technologies: any[] = [];
@@ -104,6 +105,7 @@ export class AnalysisWorker {
       );
 
       this.logger.log(`[${analysisId}] Saving results...`);
+      this.sse.emit(analysisId, { status: 'processing', step: 'report' });
       await this.db.updateAnalysis(analysisId, {
         status:             'completed',
         completedAt:        new Date(),

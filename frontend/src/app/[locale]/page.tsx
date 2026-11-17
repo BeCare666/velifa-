@@ -183,6 +183,16 @@ function AuditForm() {
 
       {captcha.widget && <div className="flex justify-center">{captcha.widget}</div>}
 
+      {/* ── Vérification anti-robot : jamais de bouton grisé sans explication ── */}
+      {captcha.failed && (
+        <div className="text-sm text-score-poor bg-score-poor-bg border border-score-poor rounded-velifa-md px-4 py-3 flex items-center justify-between gap-3">
+          <span>{t('captchaFailed')}</span>
+          <button type="button" onClick={captcha.reset} className="underline whitespace-nowrap">
+            {t('captchaRetry')}
+          </button>
+        </div>
+      )}
+
       <button
         type="submit"
         disabled={loading || !captcha.ready}
@@ -190,6 +200,8 @@ function AuditForm() {
       >
         {loading ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> {t('analyzing')}</>
+        ) : captcha.pending ? (
+          <><Shield className="w-4 h-4" /> {t('captchaPending')}</>
         ) : (
           <>{t('analyzeNow')} <ArrowRight className="w-4 h-4" /></>
         )}

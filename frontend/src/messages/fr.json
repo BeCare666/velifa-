@@ -33,7 +33,10 @@
     "analyzeNow": "Analyser maintenant",
     "privacyNote": "En soumettant, vous acceptez notre",
     "privacyLink": "politique de confidentialité",
-    "noSpam": "Aucun spam."
+    "noSpam": "Aucun spam.",
+    "captchaPending": "Vérification anti-robot…",
+    "captchaFailed": "La vérification anti-robot n'a pas pu se charger.",
+    "captchaRetry": "Réessayer"
   },
   "trust": {
     "noData": "Aucune donnée revendue",
@@ -471,15 +474,30 @@
     "next": "Suiv."
   },
   "loading": {
-    "step1": "Accès au site en cours...",
-    "step2": "Analyse de la performance (mobile + desktop)...",
-    "step3": "Calcul des Core Web Vitals...",
-    "step4": "Génération du rapport...",
+    "eyebrow": "Audit en cours",
+    "title": "Analyse de",
+    "elapsed": "Temps écoulé",
+    "duration": "Moins d'une minute en général",
+    "stageQueued": "Mise en file d'attente",
+    "stageQueuedDesc": "Votre audit est réservé, il démarre dans un instant.",
+    "stagePerformance": "Performance mobile et ordinateur",
+    "stagePerformanceDesc": "Google Lighthouse · Core Web Vitals · données des vrais visiteurs Chrome",
+    "stageInspection": "Inspection de la page",
+    "stageInspectionDesc": "Capture d'écran · plateforme · version arabe et RTL · traceurs et consentement",
+    "stageReport": "Rédaction du rapport",
+    "stageReportDesc": "Score, priorités traduites, impact estimé sur les ventes",
+    "checksTitle": "Ce que VELIFA vérifie",
+    "checkVitals": "Core Web Vitals",
+    "checkField": "Données terrain (CrUX)",
+    "checkPlatform": "Salla, Zid, Shopify, WooCommerce…",
+    "checkArabic": "lang, dir, hreflang",
+    "checkPrivacy": "Traceurs avant consentement",
+    "checkPriorities": "Priorités en AR / EN / FR",
+    "ready": "Rapport prêt, ouverture…",
+    "live": "En direct",
     "errorTitle": "Analyse échouée",
-    "retry": "Réessayer",
-    "title": "Analyse en cours",
-    "duration": "Environ 20–30 secondes",
-    "stepIndicator": "Étape {current} sur {total}"
+    "errorDesc": "L'audit n'a pas pu aboutir : le site est peut-être inaccessible ou trop lent à répondre.",
+    "retry": "Réessayer"
   },
   "billing": {
     "title": "Abonnement",

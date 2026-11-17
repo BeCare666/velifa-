@@ -33,7 +33,10 @@
     "analyzeNow": "حلّل الآن",
     "privacyNote": "بالإرسال، أنت توافق على",
     "privacyLink": "سياسة الخصوصية",
-    "noSpam": "لا بريد مزعج."
+    "noSpam": "لا بريد مزعج.",
+    "captchaPending": "جارٍ التحقق من أنك لست روبوتًا…",
+    "captchaFailed": "تعذّر تحميل التحقق من أنك لست روبوتًا.",
+    "captchaRetry": "إعادة المحاولة"
   },
   "trust": {
     "noData": "لا يُعاد بيع أي بيانات",
@@ -471,15 +474,30 @@
     "next": "التالي"
   },
   "loading": {
-    "step1": "جارٍ الوصول إلى الموقع...",
-    "step2": "تحليل الأداء (موبايل + سطح المكتب)...",
-    "step3": "حساب مؤشرات Core Web Vitals...",
-    "step4": "إنشاء التقرير...",
+    "eyebrow": "التدقيق جارٍ",
+    "title": "تحليل",
+    "elapsed": "الوقت المنقضي",
+    "duration": "أقل من دقيقة عادةً",
+    "stageQueued": "في قائمة الانتظار",
+    "stageQueuedDesc": "تم حجز تدقيقك وسيبدأ بعد لحظات.",
+    "stagePerformance": "الأداء على الجوال والكمبيوتر",
+    "stagePerformanceDesc": "Google Lighthouse · مؤشرات Core Web Vitals · بيانات الزوار الحقيقيين على Chrome",
+    "stageInspection": "فحص الصفحة",
+    "stageInspectionDesc": "لقطة شاشة · المنصة · النسخة العربية واتجاه RTL · أدوات التتبع والموافقة",
+    "stageReport": "إعداد التقرير",
+    "stageReportDesc": "النتيجة، الأولويات مترجمة، الأثر المقدّر على المبيعات",
+    "checksTitle": "ما يفحصه VELIFA",
+    "checkVitals": "Core Web Vitals",
+    "checkField": "بيانات ميدانية (CrUX)",
+    "checkPlatform": "سلة، زد، Shopify، WooCommerce…",
+    "checkArabic": "lang و dir و hreflang",
+    "checkPrivacy": "أدوات تتبع قبل الموافقة",
+    "checkPriorities": "الأولويات بالعربية والإنجليزية والفرنسية",
+    "ready": "التقرير جاهز، جارٍ الفتح…",
+    "live": "مباشر",
     "errorTitle": "فشل التحليل",
-    "retry": "حاول مجدداً",
-    "title": "جارٍ التحليل",
-    "duration": "تقريباً 20–30 ثانية",
-    "stepIndicator": "الخطوة {current} من {total}"
+    "errorDesc": "تعذّر إكمال التدقيق: قد يكون الموقع غير متاح أو بطيئًا جدًا في الاستجابة.",
+    "retry": "إعادة المحاولة"
   },
   "billing": {
     "title": "الاشتراك",

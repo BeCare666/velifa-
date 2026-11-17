@@ -33,7 +33,10 @@
     "analyzeNow": "Analyze now",
     "privacyNote": "By submitting, you accept our",
     "privacyLink": "privacy policy",
-    "noSpam": "No spam."
+    "noSpam": "No spam.",
+    "captchaPending": "Bot check in progress…",
+    "captchaFailed": "The bot check could not load.",
+    "captchaRetry": "Try again"
   },
   "trust": {
     "noData": "No data resold",
@@ -468,15 +471,30 @@
     "next": "Next"
   },
   "loading": {
-    "step1": "Accessing the site...",
-    "step2": "Analyzing performance (mobile + desktop)...",
-    "step3": "Calculating Core Web Vitals...",
-    "step4": "Generating the report...",
+    "eyebrow": "Audit in progress",
+    "title": "Analyzing",
+    "elapsed": "Elapsed",
+    "duration": "Usually under a minute",
+    "stageQueued": "Queued",
+    "stageQueuedDesc": "Your audit is reserved and starts in a moment.",
+    "stagePerformance": "Mobile and desktop performance",
+    "stagePerformanceDesc": "Google Lighthouse · Core Web Vitals · real Chrome visitor data",
+    "stageInspection": "Page inspection",
+    "stageInspectionDesc": "Screenshot · platform · Arabic version and RTL · trackers and consent",
+    "stageReport": "Writing the report",
+    "stageReportDesc": "Score, translated priorities, estimated sales impact",
+    "checksTitle": "What VELIFA checks",
+    "checkVitals": "Core Web Vitals",
+    "checkField": "Field data (CrUX)",
+    "checkPlatform": "Salla, Zid, Shopify, WooCommerce…",
+    "checkArabic": "lang, dir, hreflang",
+    "checkPrivacy": "Trackers before consent",
+    "checkPriorities": "Priorities in AR / EN / FR",
+    "ready": "Report ready, opening…",
+    "live": "Live",
     "errorTitle": "Analysis failed",
-    "retry": "Try again",
-    "title": "Analysis in progress",
-    "duration": "Approximately 20–30 seconds",
-    "stepIndicator": "Step {current} of {total}"
+    "errorDesc": "The audit could not complete: the site may be unreachable or too slow to respond.",
+    "retry": "Try again"
   },
   "billing": {
     "title": "Subscription",

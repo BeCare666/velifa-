@@ -159,6 +159,22 @@ Repère de prix vérifié : SEOptimer marque blanche ≈ 39–59 $/mois.
 
 ---
 
+## Phase 5 — Après le premier déploiement : niveau haut de gamme
+
+**Objectif** : retours du propriétaire après déploiement (2026-11-17). Plan détaillé, constats avec fichiers et lignes :
+`docs/produit/app-haut-de-gamme.md` (lots H1 à H4).
+
+| ID | Tâche | Critère d'acceptation | Statut |
+|---|---|---|---|
+| 5.1 | Accueil : bouton d'audit bloqué sans explication (CAPTCHA en échec) ; impression qu'un compte est obligatoire | Message + « Réessayer » ; build OK | ✅ code ; 🔒 domaine Vercel à autoriser dans Turnstile |
+| 5.2 | Suivi en direct de l'audit (SSE nommé non écouté, attente infinie possible) | Tests SSE + build | ✅ |
+| 5.3 | Écran d'audit plein écran premium, étapes réelles du worker | Build + revue des 3 langues | ✅ build ; rendu réel → Redis de production |
+| 5.4 | Document de construction d'une application haut de gamme | `docs/produit/app-haut-de-gamme.md` | ✅ |
+| 5.5 | Lots H1–H3 du document (fiabilité, vérité/langue, expérience) | Critères de chaque chantier | ⬜ |
+| 5.6 | Lot H4 (fonctions pour clients exigeants) | Validation du propriétaire | 🔒 proposition à valider |
+
+---
+
 ## Actions requises de votre part (récapitulatif)
 
 1. Clés de service de production (Phase 1.12).
@@ -639,3 +655,20 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - À fournir : compte partenaire Zid, app créée (`ZID_CLIENT_ID`, `ZID_CLIENT_SECRET`, `ZID_REDIRECT_URI`), URLs déclarées
   après déploiement, abonnement aux événements App Market dans le tableau de bord partenaire.
 
+### 2026-11-17 — Phase 5 : retours après le premier déploiement (5.1 à 5.4)
+- Déploiement : Render (Start Command sans `&&` → corrigée par le propriétaire) ; Vercel (`vercel.json` référençait
+  des Secrets inexistants `@velifa_api_url` → bloc `env` retiré, commit `37e8566`) ; README aligné sur `render.yaml`.
+- **5.1** Cause trouvée : bouton désactivé tant que Turnstile n'a pas validé, sans aucun message en cas d'échec ;
+  connecté, le CAPTCHA n'est pas demandé → impression qu'un compte est requis (le backend n'en exige pas).
+  `useCaptcha` expose `pending` / `failed` ; accueil : libellé « Vérification anti-robot… », message + « Réessayer ».
+  Reste 🔒 : ajouter le domaine Vercel dans Cloudflare Turnstile (Hostnames).
+- **5.2** Bug : le backend envoie des événements SSE nommés `analysis-update`, le frontend n'écoutait que `onmessage`
+  → aucune mise à jour en direct, attente infinie si l'audit finissait avant l'ouverture du flux.
+  `addEventListener('analysis-update')` + interrogation toutes les 4 s en filet de sécurité.
+- **5.3** Le worker envoie ses étapes réelles (`performance`, `inspection`, `report`) ; écran plein écran
+  (domaine audité, chrono, anneau suivant l'étape réelle, 4 étapes, 6 contrôles réellement faits), AR/EN/FR.
+- **5.4** `docs/produit/app-haut-de-gamme.md` : critères mesurables, constats P1–P9 avec fichiers, lots H1–H4.
+- Preuves : `npx jest src/sse` → **3 tests réussis** (nouveau `sse.service.spec.ts`) ; `tsc` frontend et backend
+  exit 0 ; `next build` exit 0 (87 pages, `/[locale]/analyse/loading-page` généré en 3 langues).
+- ⚠️ Rendu réel non vérifié : sans Redis de production (`REDIS_URL`), la file ne tourne pas et l'écran reste
+  sur « Mise en file d'attente ».

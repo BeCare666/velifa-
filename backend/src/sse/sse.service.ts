@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable, Subject } from 'rxjs';
 
+/** Étape réelle du worker pendant `processing` (affichée en direct sur l'écran d'audit). */
+export type AnalysisStep = 'performance' | 'inspection' | 'report';
+
 export interface SseEvent {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   analysisId: string;
+  step?: AnalysisStep;
   redirectUrl?: string;
 }
 
