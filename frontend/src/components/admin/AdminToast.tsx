@@ -45,8 +45,8 @@ export function ToastContainer() {
           boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
         }}>
           {t.type === 'success'
-            ? <CheckCircle2 style={{ width: 15, height: 15, color: '#22c55e', flexShrink: 0 }} />
-            : <XCircle style={{ width: 15, height: 15, color: '#ef4444', flexShrink: 0 }} />
+            ? <CheckCircle2 style={{ width: 15, height: 15, color: 'var(--velifa-score-good)', flexShrink: 0 }} />
+            : <XCircle style={{ width: 15, height: 15, color: 'var(--velifa-score-poor)', flexShrink: 0 }} />
           }
           <span style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.85)', flex: 1 }}>{t.msg}</span>
           <button onClick={() => setToasts(p => p.filter(x => x.id !== t.id))}

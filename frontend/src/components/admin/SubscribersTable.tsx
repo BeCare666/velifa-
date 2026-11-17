@@ -7,9 +7,9 @@ import { api } from '@/lib/api';
 import SubscriberModal from './SubscriberModal';
 
 function scoreColor(score: number) {
-  if (score >= 80) return '#22c55e';
-  if (score >= 50) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 80) return 'var(--velifa-score-good)';
+  if (score >= 50) return 'var(--velifa-score-average)';
+  return 'var(--velifa-score-poor)';
 }
 
 function PlanBadge({ plan }: { plan: string }) {
@@ -82,7 +82,7 @@ export default function SubscribersTable() {
       </div>
 
       {error && (
-        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
           ⚠️ {error}
         </div>
       )}
@@ -148,17 +148,17 @@ export default function SubscribersTable() {
 
                 <td style={{ padding: '11px 16px' }}>
                   {u.totalProblems > 0 ? (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: '#ef4444' }}>{u.totalProblems}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>{u.totalProblems}</span>
                   ) : (
-                    <span style={{ fontSize: 10, color: '#22c55e' }}>0</span>
+                    <span style={{ fontSize: 10, color: 'var(--velifa-score-good)' }}>0</span>
                   )}
                 </td>
 
                 <td style={{ padding: '11px 16px' }}>
                   {u.suspended ? (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: '#ef4444' }}>Suspendu</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>Suspendu</span>
                   ) : (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(34,197,94,0.10)', color: '#22c55e' }}>Actif</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(34,197,94,0.10)', color: 'var(--velifa-score-good)' }}>Actif</span>
                   )}
                 </td>
 

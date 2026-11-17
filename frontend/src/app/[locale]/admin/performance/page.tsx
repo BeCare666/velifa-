@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Minus, Download, RefreshCw, AlertTriangle } f
 import { api } from '@/lib/api';
 
 const scoreColor = (s: number) =>
-  s >= 80 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
+  s >= 80 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
 
 const scoreBg = (s: number) =>
   s >= 80 ? 'rgba(34,197,94,0.10)' : s >= 50 ? 'rgba(245,158,11,0.10)' : 'rgba(239,68,68,0.10)';
@@ -24,8 +24,8 @@ const ISSUE_ICONS: Record<string, string> = {
 };
 
 function TrendIcon({ trend }: { trend: 'up' | 'down' | 'stable' }) {
-  if (trend === 'up')   return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#22c55e', fontSize: 11 }}><TrendingUp style={{ width: 12, height: 12 }} /> Amelioration</span>;
-  if (trend === 'down') return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#ef4444', fontSize: 11 }}><TrendingDown style={{ width: 12, height: 12 }} /> Degradation</span>;
+  if (trend === 'up')   return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--velifa-score-good)', fontSize: 11 }}><TrendingUp style={{ width: 12, height: 12 }} /> Amelioration</span>;
+  if (trend === 'down') return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--velifa-score-poor)', fontSize: 11 }}><TrendingDown style={{ width: 12, height: 12 }} /> Degradation</span>;
   return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }}><Minus style={{ width: 12, height: 12 }} /> Stable</span>;
 }
 
@@ -64,14 +64,14 @@ export default function AdminPerformancePage() {
   const goodCount     = data.filter(r => r.avgScore >= 80).length;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Performance des sites</h1>
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Performance des sites</h1>
             <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
               {loading ? '...' : `${data.length} sites analyses — tries du moins performant au plus performant`}
             </p>
@@ -96,9 +96,9 @@ export default function AdminPerformancePage() {
           <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
             {[
               { label: 'Total sites', value: data.length, color: 'rgb(var(--accent-rgb)/0.80)' },
-              { label: 'Critiques < 50', value: criticalCount, color: '#ef4444' },
-              { label: 'A ameliorer 50-79', value: avgCount, color: '#f59e0b' },
-              { label: 'Bons >= 80', value: goodCount, color: '#22c55e' },
+              { label: 'Critiques < 50', value: criticalCount, color: 'var(--velifa-score-poor)' },
+              { label: 'A ameliorer 50-79', value: avgCount, color: 'var(--velifa-score-average)' },
+              { label: 'Bons >= 80', value: goodCount, color: 'var(--velifa-score-good)' },
             ].map(s => (
               <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 18px', minWidth: 120 }}>
                 <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>{s.label}</p>
@@ -120,14 +120,14 @@ export default function AdminPerformancePage() {
               style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer',
                 background: filter === f.v ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)',
                 border: `1px solid ${filter === f.v ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`,
-                color: filter === f.v ? '#ef4444' : 'rgb(var(--accent-rgb)/0.50)' }}>
+                color: filter === f.v ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.50)' }}>
               {f.l}
             </button>
           ))}
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}
@@ -136,7 +136,7 @@ export default function AdminPerformancePage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                {['Rang', 'URL du site', 'Score moyen', 'Nb audits', 'Derniere analyse', 'Problemes detectes', 'Tendance'].map(h => (
+                {['Rang', 'URL du site', 'Score moyen', 'Nb audits', 'Dernière analyse', 'Problèmes détectés', 'Tendance'].map(h => (
                   <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
@@ -170,7 +170,7 @@ export default function AdminPerformancePage() {
                         <td style={{ padding: '12px 16px' }}>
                           <span style={{
                             fontSize: 12, fontWeight: 700,
-                            color: i === 0 ? '#ef4444' : i === 1 ? '#f97316' : i === 2 ? '#f59e0b' : 'rgb(var(--accent-rgb)/0.40)',
+                            color: i === 0 ? 'var(--velifa-score-poor)' : i === 1 ? '#f97316' : i === 2 ? 'var(--velifa-score-average)' : 'rgb(var(--accent-rgb)/0.40)',
                           }}>#{i + 1}</span>
                         </td>
 
@@ -193,7 +193,7 @@ export default function AdminPerformancePage() {
                           {r.auditCount}
                         </td>
 
-                        {/* Derniere analyse */}
+                        {/* Dernière analyse */}
                         <td style={{ padding: '12px 16px', fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>
                           {fmtDate(r.lastDate)}
                         </td>
@@ -201,11 +201,11 @@ export default function AdminPerformancePage() {
                         {/* Problemes */}
                         <td style={{ padding: '12px 16px', maxWidth: 200 }}>
                           {r.issues.length === 0
-                            ? <span style={{ fontSize: 11, color: '#22c55e' }}>Aucun probleme</span>
+                            ? <span style={{ fontSize: 11, color: 'var(--velifa-score-good)' }}>Aucun probleme</span>
                             : (
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                                 {r.issues.map((issue: string) => (
-                                  <span key={issue} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', color: '#ef4444', whiteSpace: 'nowrap' }}>
+                                  <span key={issue} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', color: 'var(--velifa-score-poor)', whiteSpace: 'nowrap' }}>
                                     {ISSUE_ICONS[issue] ?? '⚠'} {issue}
                                   </span>
                                 ))}

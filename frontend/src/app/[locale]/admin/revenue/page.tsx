@@ -56,13 +56,13 @@ export default function AdminRevenuePage() {
   ] : [];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Revenus</h1>
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Revenus</h1>
             <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>MRR estimé basé sur les abonnements actifs</p>
           </div>
           <button onClick={load} style={{ height: 36, width: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', cursor: 'pointer' }}>
@@ -71,7 +71,7 @@ export default function AdminRevenuePage() {
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 24 }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 24 }}>
             ⚠️ {error}
           </div>
         )}

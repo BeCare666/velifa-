@@ -10,10 +10,11 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { api } from '@/lib/api';
+import { ScoreBadge } from '@/components/ui';
 import { ToastContainer, toast } from '@/components/admin/AdminToast';
 
 const scoreColor = (s: number) =>
-  s >= 80 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
+  s >= 80 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
 
 const fmtDate = (v: any) =>
   v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
@@ -21,11 +22,6 @@ const fmtDate = (v: any) =>
 const fmtDay = (v: any) =>
   v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
 
-function ScoreBadge({ score }: { score: number | null }) {
-  const s = score ?? 0;
-  const c = scoreColor(s);
-  return <span style={{ fontSize: 12, fontWeight: 700, color: c, background: `${c}18`, border: `1px solid ${c}35`, borderRadius: 6, padding: '2px 8px' }}>{score ?? '—'}</span>;
-}
 
 function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
@@ -113,7 +109,7 @@ export default function UserDetailPage() {
   return (
     <>
       <ToastContainer />
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+      <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
         <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
         <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
@@ -125,7 +121,7 @@ export default function UserDetailPage() {
           </Link>
 
           {error && (
-            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '12px 16px', color: '#ef4444', fontSize: 13, marginBottom: 20 }}>
+            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '12px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 20 }}>
               ⚠️ {error}
             </div>
           )}
@@ -143,23 +139,23 @@ export default function UserDetailPage() {
               <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#ef4444', flexShrink: 0 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: 'var(--velifa-score-poor)', flexShrink: 0 }}>
                       {clerkId.slice(-2).toUpperCase()}
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <p style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.85)', margin: 0, fontFamily: 'monospace' }}>{clerkId}</p>
                         {user.suspended && (
-                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.30)', letterSpacing: '0.06em' }}>SUSPENDU</span>
+                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)', letterSpacing: '0.06em' }}>SUSPENDU</span>
                         )}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <PlanBadge plan={user.plan} />
                         <span style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)' }}>
-                          Derniere activite : {fmtDate(user.updatedAt)}
+                          Dernière activité : {fmtDate(user.updatedAt)}
                         </span>
                         {user.suspended && user.suspendedAt && (
-                          <span style={{ fontSize: 11, color: '#ef4444' }}>
+                          <span style={{ fontSize: 11, color: 'var(--velifa-score-poor)' }}>
                             Suspendu le {fmtDate(user.suspendedAt)}
                           </span>
                         )}
@@ -173,12 +169,12 @@ export default function UserDetailPage() {
                     </Link>
                     {user.suspended ? (
                       <button onClick={handleUnsuspend} disabled={actionLoading}
-                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: '#22c55e' }}>
+                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: 'var(--velifa-score-good)' }}>
                         <CheckCircle2 style={{ width: 13, height: 13 }} /> Reactiver
                       </button>
                     ) : (
                       <button onClick={handleSuspend} disabled={actionLoading}
-                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444' }}>
+                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: 'var(--velifa-score-poor)' }}>
                         <Ban style={{ width: 13, height: 13 }} /> Suspendre
                       </button>
                     )}
@@ -190,8 +186,8 @@ export default function UserDetailPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
                 {[
                   { label: 'Total audits',  value: stats?.totalAudits ?? 0,    color: 'rgb(var(--accent-rgb)/0.80)' },
-                  { label: 'Reussis',       value: stats?.completedAudits ?? 0, color: '#22c55e' },
-                  { label: 'Echoues',       value: stats?.failedAudits ?? 0,    color: '#ef4444' },
+                  { label: 'Réussis',       value: stats?.completedAudits ?? 0, color: 'var(--velifa-score-good)' },
+                  { label: 'Échoués',       value: stats?.failedAudits ?? 0,    color: 'var(--velifa-score-poor)' },
                   { label: 'Score moyen',   value: stats?.avgScore ? `${stats.avgScore}/100` : '—', color: stats?.avgScore ? scoreColor(stats.avgScore) : 'rgb(var(--accent-rgb)/0.40)' },
                   { label: 'Sites analyses', value: sites.length, color: 'var(--accent)' },
                 ].map(s => (
@@ -202,7 +198,7 @@ export default function UserDetailPage() {
                 ))}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
                 {/* Sites */}
                 <Card title="Sites analyses">
                   {sites.length === 0 ? (
@@ -268,7 +264,7 @@ export default function UserDetailPage() {
                           <td style={{ padding: '9px 16px' }}>
                             <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 7px',
                               background: a.status === 'completed' ? 'rgba(34,197,94,0.10)' : a.status === 'failed' ? 'rgba(239,68,68,0.10)' : 'rgba(245,158,11,0.10)',
-                              color: a.status === 'completed' ? '#22c55e' : a.status === 'failed' ? '#ef4444' : '#f59e0b' }}>
+                              color: a.status === 'completed' ? 'var(--velifa-score-good)' : a.status === 'failed' ? 'var(--velifa-score-poor)' : 'var(--velifa-score-average)' }}>
                               {a.status}
                             </span>
                           </td>

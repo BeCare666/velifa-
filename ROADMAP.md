@@ -727,3 +727,13 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   « Terminé » est exact (`/analyses/mine` ne renvoie que `status = 'completed'`).
 - Paramètres, Abonnement, Support : largeur, marges, titres et ombres alignés sur le tableau de bord.
 - Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
+
+### 2026-11-17 — 5.5 (suite) : accueil sous le hero et pages admin
+- Accueil : carrousel supprimé (texte français en dur jamais traduit, 4 photos de banque d'images, affirmations
+  inexactes « score calculé par Velifa » et « email après chaque audit ») → grille des 8 capacités livrées
+  (namespace `capabilities`, AR/EN/FR ; PDF annoncé « plan Business » = `canExportPdf`). Boutons d'appel `#` →
+  `#audit`. Aperçu tarifs : cartes vides → description existante du plan.
+- Admin (11 pages) : conteneur responsive, titres de la charte, grille fixe 2 colonnes → adaptative, 13 textes sans
+  accents corrigés, pastilles de score locales → `ScoreBadge` partagée (score absent ≠ 0 rouge), 119 couleurs de
+  statut → variables de score.
+- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).

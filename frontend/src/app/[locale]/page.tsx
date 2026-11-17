@@ -1,11 +1,9 @@
 'use client';
-import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Loader2, Zap, BarChart2, Mail, MessageCircle, ArrowRight,
-  Shield, Clock, Globe, CheckCircle2, ArrowUpRight, ChevronLeft, ChevronRight, Camera,
-  RefreshCw, Eye, X, Sparkles,
+  Shield, Clock, Globe, ArrowUpRight, RefreshCw, Eye, X, Sparkles, Gauge, Users, Store, Languages, ShieldCheck, ListChecks, GitCompare, FileText,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
@@ -351,136 +349,31 @@ function ReportMockup() {
   );
 }
 
-// ── Carrousel fonctionnalités ───────────────────────────────────────────────────
-const carouselSlides = [
-  {
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
-    icon: BarChart2,
-    accent: '#0CCE6B',
-    title: 'Score de performance complet',
-    description: '4 dimensions analysées en profondeur : Performance, Accessibilité, SEO et Bonnes Pratiques. Chaque score est calculé par Velifa et expliqué clairement.',
-    detail: 'Score Velifa · Métriques Core Web Vitals',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
-    icon: Globe,
-    accent: 'var(--accent)',
-    title: 'Core Web Vitals mesurés',
-    description: 'LCP, CLS, TBT et FCP — les métriques officielles de Google qui influencent directement votre classement dans les résultats de recherche.',
-    detail: 'Métriques Core Web Vitals Google · Critères de classement SEO',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80',
-    icon: Mail,
-    accent: '#6478FF',
-    title: 'Rapport par email',
-    description: 'Un email HTML designé Velifa est envoyé automatiquement après chaque audit. Contenu complet, screenshot, scores et recommandations.',
-    detail: 'HTML responsive · Compatible Gmail, Outlook, Apple Mail',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-    icon: Camera,
-    accent: '#FF6464',
-    title: 'Capture d\'écran intégrée',
-    description: 'Un aperçu visuel de votre page est inclus dans le rapport. Capture réelle via Chrome headless — pas de miniature approximative.',
-    detail: 'Capture Chrome headless · Cloudinary CDN',
-  },
-];
+// ── Capacités (uniquement des fonctions livrées, textes traduits) ───────────────
+const CAPABILITIES = [
+  { key: 'lighthouse', icon: Gauge,        span: 'lg:col-span-2' },
+  { key: 'field',      icon: Users,        span: '' },
+  { key: 'platforms',  icon: Store,        span: '' },
+  { key: 'arabic',     icon: Languages,    span: '' },
+  { key: 'privacy',    icon: ShieldCheck,  span: '' },
+  { key: 'priorities', icon: ListChecks,   span: '' },
+  { key: 'compare',    icon: GitCompare,   span: '' },
+  { key: 'pdf',        icon: FileText,     span: 'lg:col-span-2' },
+] as const;
 
-function FeatureCarousel() {
-  const [current, setCurrent] = useState(0);
-  const total = carouselSlides.length;
-
-  function prev() { setCurrent(c => (c - 1 + total) % total); }
-  function next() { setCurrent(c => (c + 1) % total); }
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrent(c => (c + 1) % total), 6000);
-    return () => clearInterval(timer);
-  }, [total]);
-
-  const slide = carouselSlides[current];
-  const Icon = slide.icon;
-
+function CapabilitiesGrid() {
+  const t = useTranslations('capabilities');
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Slide card with background image */}
-      <div
-        className="rounded-velifa-xl overflow-hidden relative transition-all duration-500"
-        style={{ minHeight: 400 }}
-      >
-        {/* Background image */}
-        <Image
-          src={slide.image}
-          alt={slide.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 1280px) 100vw, 1280px"
-          priority={current === 0}
-        />
-
-        {/* Dark overlay gradient */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(135deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.75) 60%, rgba(10,10,10,0.60) 100%)',
-          }}
-        />
-
-        {/* Content overlay */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center p-10 md:p-14"
-          style={{ minHeight: 400 }}>
-          {/* Icon */}
-          <div className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-            style={{ background: `${slide.accent}20`, border: `2px solid ${slide.accent}60` }}>
-            <Icon className="w-8 h-8" style={{ color: slide.accent }} />
-          </div>
-
-          <h3 className="font-heading font-bold text-xl md:text-2xl text-text mb-4 max-w-lg">
-            {slide.title}
-          </h3>
-          <p className="text-text-muted text-base leading-relaxed mb-6 max-w-md">
-            {slide.description}
-          </p>
-          <p className="text-xs" style={{ color: `${slide.accent}90` }}>
-            {slide.detail}
-          </p>
+    <div className="grid grid-cols-1 gap-px overflow-hidden rounded-velifa-xl border border-border bg-[color:var(--border)] sm:grid-cols-2 lg:grid-cols-4">
+      {CAPABILITIES.map(({ key, icon: Icon, span }) => (
+        <div key={key} className={`group relative bg-[color:var(--bg)] p-6 transition-colors hover:bg-[color:var(--bg-subtle)] sm:p-7 ${span}`}>
+          <span className="mb-5 grid h-10 w-10 place-items-center rounded-[11px] border border-border bg-[color:var(--surface)] text-text">
+            <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+          </span>
+          <h3 className="mb-2 text-[15px] font-semibold text-text">{t(`${key}.title`)}</h3>
+          <p className="text-sm leading-relaxed text-text-muted">{t(`${key}.desc`)}</p>
         </div>
-
-        {/* Navigation arrows */}
-        <button
-          onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm"
-          style={{ background: 'rgba(26,26,26,0.8)', border: '1px solid var(--border)' }}
-          aria-label="Slide précédent"
-        >
-          <ChevronLeft className="w-5 h-5 text-text-muted" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-sm"
-          style={{ background: 'rgba(26,26,26,0.8)', border: '1px solid var(--border)' }}
-          aria-label="Slide suivant"
-        >
-          <ChevronRight className="w-5 h-5 text-text-muted" />
-        </button>
-      </div>
-
-      {/* Dots */}
-      <div className="flex items-center justify-center gap-2 mt-6">
-        {carouselSlides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className="h-2 rounded-full transition-all duration-300"
-            style={{
-              width: i === current ? 28 : 8,
-              background: i === current ? 'var(--accent)' : 'var(--border)',
-            }}
-            aria-label={`Aller à la slide ${i + 1}`}
-          />
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
@@ -524,6 +417,7 @@ export default function HomePage() {
   const tHiW   = useTranslations('howItWorks');
   const tPP    = useTranslations('pricingPreview');
   const tCta   = useTranslations('cta');
+  const tCap   = useTranslations('capabilities');
 
   // Prix mensuels saisis dans le backoffice (GET /plans), en USD
   const [monthly, setMonthly] = useState<Record<string, number> | null>(null);
@@ -549,7 +443,7 @@ export default function HomePage() {
     name:    tPP(`${key}.name`),
     price:   monthly == null ? '…' : monthly[key] == null ? '—' : `$${monthly[key]}`,
     badge:   key === 'pro' ? tPP(`${key}.badge`) : undefined,
-    features: [] as string[],
+    desc:    tPP(`${key}.desc`),
   }));
 
   return (
@@ -611,19 +505,18 @@ export default function HomePage() {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* CARROUSEL FONCTIONNALITÉS */}
+      {/* CAPACITÉS (fonctions livrées) */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-6 sm:py-28">
         <RevealSection>
-          <div className="text-center mb-12">
-            <p className="velifa-eyebrow mb-4">{tFeat('eyebrow')}</p>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-text">
-              {tFeat('sectionTitle')}
-            </h2>
+          <div className="mx-auto mb-12 max-w-2xl text-center">
+            <p className="velifa-eyebrow mb-4">{tCap('eyebrow')}</p>
+            <h2 className="font-heading text-3xl font-semibold tracking-tight text-text md:text-[40px]">{tCap('title')}</h2>
+            <p className="mt-4 text-base text-text-muted">{tCap('subtitle')}</p>
           </div>
         </RevealSection>
         <RevealSection delay={100}>
-          <FeatureCarousel />
+          <CapabilitiesGrid />
         </RevealSection>
       </section>
 
@@ -634,7 +527,7 @@ export default function HomePage() {
         <RevealSection>
           <div className="text-center mb-14">
             <p className="velifa-eyebrow mb-4">{tFeat('eyebrow')}</p>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-text mb-4">
+            <h2 className="font-heading text-3xl md:text-[40px] font-semibold tracking-tight text-text mb-4">
               {tKF('sectionTitle')}
             </h2>
             <p className="text-text-muted max-w-xl mx-auto text-base">
@@ -676,7 +569,7 @@ export default function HomePage() {
           <RevealSection>
             <div className="text-center mb-14">
               <p className="velifa-eyebrow mb-4">{tHiW('eyebrow')}</p>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-text">
+              <h2 className="font-heading text-3xl md:text-[40px] font-semibold tracking-tight text-text">
                 {tHiW('stepsTitle')}
               </h2>
             </div>
@@ -704,7 +597,7 @@ export default function HomePage() {
 
           <RevealSection delay={200}>
             <div className="text-center">
-              <a href="#" className="velifa-btn inline-flex items-center gap-2">
+              <a href="#audit" className="velifa-btn inline-flex items-center gap-2">
                 {tHiW('ctaButton')} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
@@ -719,7 +612,7 @@ export default function HomePage() {
         <RevealSection>
           <div className="text-center mb-14">
             <p className="velifa-eyebrow mb-4">{tPP('eyebrow')}</p>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-text mb-4">
+            <h2 className="font-heading text-3xl md:text-[40px] font-semibold tracking-tight text-text mb-4">
               {tPP('previewTitle')}
             </h2>
             <p className="text-text-muted max-w-xl mx-auto text-base">
@@ -752,14 +645,7 @@ export default function HomePage() {
                     <span className="text-text-muted text-sm">{tPP('perMonth')}</span>
                   </div>
                 </div>
-                <ul className="space-y-2 flex-1 mb-6">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 score-good flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-text-muted">{f}</span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="flex-1 pb-2 text-center text-sm text-text-muted">{plan.desc}</p>
               </div>
             </RevealSection>
           ))}
@@ -781,13 +667,13 @@ export default function HomePage() {
       <section className="border-t border-border">
         <div className="max-w-7xl mx-auto px-6 py-20 text-center">
           <RevealSection>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold text-text mb-5">
+            <h2 className="font-heading text-3xl md:text-[40px] font-semibold tracking-tight text-text mb-5">
               {tCta('title')}
             </h2>
             <p className="text-text-muted mb-10 text-base">
               {tCta('subtitle')}
             </p>
-            <a href="#" className="velifa-btn inline-flex items-center gap-2">
+            <a href="#audit" className="velifa-btn inline-flex items-center gap-2">
               {tCta('button')}
               <ArrowRight className="w-4 h-4" />
             </a>

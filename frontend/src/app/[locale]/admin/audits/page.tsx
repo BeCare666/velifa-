@@ -5,20 +5,15 @@ import { useAuth } from '@clerk/nextjs';
 import { Search, ChevronLeft, ChevronRight, RefreshCw, ExternalLink, Download } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { ScoreBadge } from '@/components/ui';
 
-const scoreColor = (s: number) => s >= 90 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
 
-function ScoreBadge({ score }: { score: number | null }) {
-  const s = score ?? 0;
-  const c = scoreColor(s);
-  return <span style={{ fontSize: 12, fontWeight: 700, color: c, background: `${c}18`, border: `1px solid ${c}35`, borderRadius: 6, padding: '2px 8px' }}>{score ?? '—'}</span>;
-}
 
 function StatusBadge({ status }: { status: string }) {
   const cfg: Record<string, { color: string; bg: string }> = {
-    completed: { color: '#22c55e', bg: 'rgba(34,197,94,0.10)' },
-    failed:    { color: '#ef4444', bg: 'rgba(239,68,68,0.10)' },
-    pending:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.10)' },
+    completed: { color: 'var(--velifa-score-good)', bg: 'rgba(34,197,94,0.10)' },
+    failed:    { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.10)' },
+    pending:   { color: 'var(--velifa-score-average)', bg: 'rgba(245,158,11,0.10)' },
   };
   const { color, bg } = cfg[status] ?? { color: 'rgb(var(--accent-rgb)/0.35)', bg: 'rgb(var(--accent-rgb)/0.05)' };
   return <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 8px', color, background: bg }}>{status}</span>;
@@ -61,13 +56,13 @@ export default function AdminAuditsPage() {
     : 0;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Audits</h1>
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Audits</h1>
             <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
               {loading ? '...' : `${data?.total ?? 0} audits au total`}
               {userFilter && <span style={{ marginLeft: 8, color: 'var(--accent)', fontSize: 11 }}>filtre: {userFilter.slice(-12)}</span>}
@@ -88,9 +83,9 @@ export default function AdminAuditsPage() {
           <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
             {[
               { label: 'Cette page',  value: audits.length },
-              { label: 'Completes',   value: completed, color: '#22c55e' },
-              { label: 'Score moyen', value: avgScore ? `${avgScore}/100` : '—', color: avgScore >= 80 ? '#22c55e' : avgScore >= 50 ? '#f59e0b' : '#ef4444' },
-              { label: 'Echoues',     value: failed, color: failed > 0 ? '#ef4444' : undefined },
+              { label: 'Completes',   value: completed, color: 'var(--velifa-score-good)' },
+              { label: 'Score moyen', value: avgScore ? `${avgScore}/100` : '—', color: avgScore >= 80 ? 'var(--velifa-score-good)' : avgScore >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)' },
+              { label: 'Échoués',     value: failed, color: failed > 0 ? 'var(--velifa-score-poor)' : undefined },
             ].map(s => (
               <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 18px', minWidth: 120 }}>
                 <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>{s.label}</p>
@@ -111,7 +106,7 @@ export default function AdminAuditsPage() {
           </div>
           {['all', 'completed', 'failed', 'pending'].map(s => (
             <button key={s} onClick={() => { setStatusF(s); setPage(1); }}
-              style={{ height: 36, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer', background: statusF === s ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${statusF === s ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: statusF === s ? '#ef4444' : 'rgb(var(--accent-rgb)/0.50)' }}>
+              style={{ height: 36, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer', background: statusF === s ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${statusF === s ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: statusF === s ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.50)' }}>
               {s === 'all' ? 'Tous' : s}
             </button>
           ))}
@@ -127,7 +122,7 @@ export default function AdminAuditsPage() {
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}

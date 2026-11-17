@@ -10,7 +10,7 @@ function InfoRow({ label, value, mono = false, ok }: { label: string; value: Rea
     <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
       <span className="text-sm" style={{ color: 'rgb(var(--accent-rgb)/0.45)' }}>{label}</span>
       <span className={`text-sm font-medium ${mono ? 'font-mono' : ''}`}
-        style={{ color: ok === true ? '#0CCE6B' : ok === false ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.80)' }}>
+        style={{ color: ok === true ? 'var(--velifa-score-good)' : ok === false ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.80)' }}>
         {ok === true ? '✓ ' : ok === false ? '✗ ' : ''}{value}
       </span>
     </div>
@@ -21,7 +21,7 @@ function Section({ title, icon: Icon, children }: { title: string; icon: React.E
   return (
     <div className="rounded-[12px] overflow-hidden" style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
       <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
-        <Icon className="w-4 h-4" style={{ color: '#ef4444' }} strokeWidth={1.75} />
+        <Icon className="w-4 h-4" style={{ color: 'var(--velifa-score-poor)' }} strokeWidth={1.75} />
         <h2 className="text-sm font-semibold" style={{ color: 'rgb(var(--accent-rgb)/0.80)' }}>{title}</h2>
       </div>
       <div className="px-5 pb-2">{children}</div>
@@ -69,12 +69,12 @@ export default function AdminSettingsPage() {
     <div className="min-h-screen p-6 sm:p-8" style={{ background: 'var(--bg)' }}>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="font-heading font-bold text-2xl sm:text-3xl" style={{ color: 'rgb(var(--accent-rgb)/0.90)' }}>Paramètres admin</h1>
+          <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Paramètres admin</h1>
           <p className="text-sm mt-1" style={{ color: 'rgb(var(--accent-rgb)/0.40)' }}>Configuration et diagnostics système</p>
         </div>
 
         {loading ? (
-          <div className="py-20 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" style={{ color: '#ef4444' }} /></div>
+          <div className="py-20 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--velifa-score-poor)' }} /></div>
         ) : (
           <>
             {/* Emails admin */}
@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
               <div className="py-2">
                 {(sysData?.adminEmails ?? []).map((email: string) => (
                   <div key={email} className="flex items-center gap-2 py-2.5" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
-                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0CCE6B' }} />
+                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--velifa-score-good)' }} />
                     <span className="text-sm font-mono" style={{ color: 'rgb(var(--accent-rgb)/0.75)' }}>{email}</span>
                   </div>
                 ))}
@@ -124,7 +124,7 @@ export default function AdminSettingsPage() {
                   </button>
                 </div>
                 {emailResult && (
-                  <p className="text-xs px-1" style={{ color: emailResult.startsWith('✓') ? '#0CCE6B' : 'var(--velifa-score-poor)' }}>
+                  <p className="text-xs px-1" style={{ color: emailResult.startsWith('✓') ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
                     {emailResult}
                   </p>
                 )}

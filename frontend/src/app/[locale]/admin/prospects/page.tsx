@@ -19,14 +19,14 @@ const ISSUE_LABEL: Record<string, string> = {
   empty:            'Fichier vide',
 };
 
-const scoreColor = (s: number) => s >= 90 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
+const scoreColor = (s: number) => s >= 90 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
 
 function StatusBadge({ status }: { status: string | null }) {
   const cfg: Record<string, { color: string; bg: string; label: string }> = {
-    completed:  { color: '#22c55e', bg: 'rgba(34,197,94,0.10)',  label: 'terminé' },
-    failed:     { color: '#ef4444', bg: 'rgba(239,68,68,0.10)',  label: 'échec' },
+    completed:  { color: 'var(--velifa-score-good)', bg: 'rgba(34,197,94,0.10)',  label: 'terminé' },
+    failed:     { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.10)',  label: 'échec' },
     processing: { color: '#38bdf8', bg: 'rgba(56,189,248,0.10)', label: 'en cours' },
-    pending:    { color: '#f59e0b', bg: 'rgba(245,158,11,0.10)', label: 'programmé' },
+    pending:    { color: 'var(--velifa-score-average)', bg: 'rgba(245,158,11,0.10)', label: 'programmé' },
   };
   const c = cfg[status ?? ''] ?? { color: 'rgb(var(--accent-rgb)/0.35)', bg: 'rgb(var(--accent-rgb)/0.05)', label: status ?? '—' };
   return <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 8px', color: c.color, background: c.bg }}>{c.label}</span>;
@@ -88,9 +88,9 @@ export default function AdminProspectsPage() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Prospects</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Prospects</h1>
         <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4, marginBottom: 24 }}>
           Audit en lot : importez un CSV de boutiques, les audits sont lancés un par un à débit limité.
         </p>
@@ -126,7 +126,7 @@ export default function AdminProspectsPage() {
           {result && (
             <div style={{ marginTop: 14, fontSize: 13, color: 'rgb(var(--accent-rgb)/0.75)' }}>
               <p style={{ margin: 0 }}>
-                <b style={{ color: '#22c55e' }}>{result.queued}</b> audit(s) programmé(s)
+                <b style={{ color: 'var(--velifa-score-good)' }}>{result.queued}</b> audit(s) programmé(s)
                 {result.lastAuditAt && <> — dernier prévu vers {fmtDate(result.lastAuditAt)}</>}
               </p>
               {result.issues?.length > 0 && (
@@ -141,7 +141,7 @@ export default function AdminProspectsPage() {
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}

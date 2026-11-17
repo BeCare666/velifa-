@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 
 const PAGE_SIZE = 50;
 
-const scoreColor = (s: number) => s >= 90 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
+const scoreColor = (s: number) => s >= 90 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
 const fmtDate = (v: any) =>
   v ? new Date(v).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
 
@@ -38,11 +38,11 @@ export default function AdminLeadsPage() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Demandes</h1>
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Demandes</h1>
             <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
               {loading ? '…' : `${data?.total ?? 0} demande(s) « Je veux corriger » reçue(s) depuis les rapports`}
             </p>
@@ -53,7 +53,7 @@ export default function AdminLeadsPage() {
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
             ⚠️ {error}
           </div>
         )}
@@ -88,7 +88,7 @@ export default function AdminLeadsPage() {
                     )}
                     {l.phone && (
                       <a href={`https://wa.me/${l.phone}`} target="_blank" rel="noopener noreferrer" dir="ltr"
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#22c55e', textDecoration: 'none' }}>
+                        style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--velifa-score-good)', textDecoration: 'none' }}>
                         <MessageCircle style={{ width: 12, height: 12 }} /> +{l.phone}
                       </a>
                     )}

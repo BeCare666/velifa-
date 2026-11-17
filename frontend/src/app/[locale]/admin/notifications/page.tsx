@@ -24,11 +24,11 @@ export default function AdminNotificationsPage() {
   useEffect(() => { load(); }, [load]);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Notifications</h1>
+          <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Notifications</h1>
           <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
             Notifications administrateur
           </p>
@@ -45,7 +45,7 @@ export default function AdminNotificationsPage() {
                 <Bell style={{ width: 14, height: 14, color: 'rgb(var(--accent-rgb)/0.40)' }} strokeWidth={1.75} />
                 <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: 0 }}>Notifications admin</p>
                 {(notifs?.unread ?? 0) > 0 && (
-                  <span style={{ fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, background: '#ef4444', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, background: 'var(--velifa-score-poor)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
                     {notifs.unread}
                   </span>
                 )}
@@ -75,10 +75,10 @@ export default function AdminNotificationsPage() {
               <div>
                 {(notifs.notifications ?? []).map((n: any) => {
                   const typeColors: Record<string, { color: string; bg: string }> = {
-                    suspension: { color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
-                    info:       { color: '#22c55e', bg: 'rgba(34,197,94,0.08)' },
-                    warning:    { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
-                    critical:   { color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+                    suspension: { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.08)' },
+                    info:       { color: 'var(--velifa-score-good)', bg: 'rgba(34,197,94,0.08)' },
+                    warning:    { color: 'var(--velifa-score-average)', bg: 'rgba(245,158,11,0.08)' },
+                    critical:   { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.08)' },
                     lead:       { color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.10)' },
                   };
                   const { color, bg } = typeColors[n.type] ?? typeColors.info;

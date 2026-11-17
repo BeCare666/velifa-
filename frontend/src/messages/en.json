@@ -1056,5 +1056,42 @@
     "errorTitle": "Installation could not be completed",
     "errorBody": "We could not connect your store. Please try again from the Zid App Market or contact us.",
     "seePlans": "See VELIFA plans"
+  },
+  "capabilities": {
+    "eyebrow": "What VELIFA checks",
+    "title": "More than a score: a diagnosis built for the Gulf",
+    "subtitle": "Google's official measurements, plus the checks Western tools don't run.",
+    "lighthouse": {
+      "title": "4 Google Lighthouse scores",
+      "desc": "Performance, accessibility, SEO and best practices, on mobile and desktop."
+    },
+    "field": {
+      "title": "Real visitor data",
+      "desc": "Chrome UX Report measurements (28 days) when Google has them, kept apart from lab measurements."
+    },
+    "platforms": {
+      "title": "Salla, Zid, Shopify and more",
+      "desc": "Platform detected automatically: Salla, Zid, Shopify, WooCommerce, Magento, BigCommerce."
+    },
+    "arabic": {
+      "title": "Arabic version and RTL",
+      "desc": "Checks lang, dir, hreflang and the link to the other-language version."
+    },
+    "privacy": {
+      "title": "Trackers and consent",
+      "desc": "Trackers loaded before consent, consent tool, privacy policy link. An indicator, not legal advice."
+    },
+    "priorities": {
+      "title": "Translated priorities",
+      "desc": "Recommendations ranked by impact, in Arabic, English and French."
+    },
+    "compare": {
+      "title": "Before / after",
+      "desc": "Compare two audits of the same address to prove the result."
+    },
+    "pdf": {
+      "title": "PDF with your brand",
+      "desc": "Arabic or English PDF report with your agency's logo and colours (Business plan)."
+    }
   }
 }

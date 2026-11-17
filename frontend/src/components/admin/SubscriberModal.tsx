@@ -9,27 +9,27 @@ import { toast } from '@/components/admin/AdminToast';
 
 const ISSUE_INFO: Record<string, { label: string; severity: 'Critique' | 'Important' | 'Mineur'; color: string; text: string; icon: string; solution: string }> = {
   lcp: {
-    label: 'LCP lent', severity: 'Critique', color: '#ef4444', icon: '⏱',
+    label: 'LCP lent', severity: 'Critique', color: 'var(--velifa-score-poor)', icon: '⏱',
     text: "Temps de chargement principal trop lent. Le contenu principal met plus de 2.5s à apparaître. Impact : les visiteurs quittent le site avant de le voir.",
     solution: "Compresser et redimensionner les images (formats WebP/AVIF), activer la mise en cache et un CDN, charger les ressources critiques en priorité (preload) et différer le JS/CSS non essentiel.",
   },
   cls: {
-    label: 'Instabilité visuelle', severity: 'Important', color: '#f59e0b', icon: '📐',
+    label: 'Instabilité visuelle', severity: 'Important', color: 'var(--velifa-score-average)', icon: '📐',
     text: "Instabilité visuelle. Les éléments bougent pendant le chargement. Impact : mauvaise expérience utilisateur, clics accidentels.",
     solution: "Définir des dimensions (width/height) fixes pour les images et vidéos, réserver l'espace des publicités/iframes, et éviter d'insérer du contenu dynamique au-dessus du contenu existant.",
   },
   tbt: {
-    label: 'Page peu réactive', severity: 'Important', color: '#f59e0b', icon: '🐢',
+    label: 'Page peu réactive', severity: 'Important', color: 'var(--velifa-score-average)', icon: '🐢',
     text: "Page peu réactive. Le navigateur est bloqué pendant le chargement. Impact : l'utilisateur ne peut pas interagir avec la page rapidement.",
     solution: "Réduire et découper le JavaScript en petits morceaux (code splitting), supprimer le code inutilisé, et différer/charger en asynchrone les scripts tiers (analytics, chat, pubs).",
   },
   seo: {
-    label: 'Problèmes SEO', severity: 'Important', color: '#f59e0b', icon: '🔍',
+    label: 'Problèmes SEO', severity: 'Important', color: 'var(--velifa-score-average)', icon: '🔍',
     text: "Problèmes de référencement. Le site est mal optimisé pour les moteurs de recherche. Impact : moins de visiteurs organiques.",
     solution: "Ajouter des balises title/meta description uniques, des balises alt sur les images, une structure de titres (H1-H2) cohérente, et un fichier sitemap.xml accessible.",
   },
   accessibility: {
-    label: 'Problèmes d\'accessibilité', severity: 'Important', color: '#f59e0b', icon: '♿',
+    label: 'Problèmes d\'accessibilité', severity: 'Important', color: 'var(--velifa-score-average)', icon: '♿',
     text: "Problèmes d'accessibilité. Le site est difficile à utiliser pour les personnes handicapées. Impact : exclusion d'utilisateurs.",
     solution: "Ajouter des textes alternatifs aux images, garantir un contraste suffisant des couleurs, rendre le site navigable au clavier et utiliser des attributs ARIA appropriés.",
   },
@@ -41,14 +41,14 @@ const ISSUE_INFO: Record<string, { label: string; severity: 'Critique' | 'Import
 };
 
 function scoreColor(score: number) {
-  if (score >= 80) return '#22c55e';
-  if (score >= 50) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 80) return 'var(--velifa-score-good)';
+  if (score >= 50) return 'var(--velifa-score-average)';
+  return 'var(--velifa-score-poor)';
 }
 
 function TrendIcon({ trend }: { trend: string }) {
-  if (trend === 'up') return <span style={{ color: '#22c55e' }}>↑</span>;
-  if (trend === 'down') return <span style={{ color: '#ef4444' }}>↓</span>;
+  if (trend === 'up') return <span style={{ color: 'var(--velifa-score-good)' }}>↑</span>;
+  if (trend === 'down') return <span style={{ color: 'var(--velifa-score-poor)' }}>↓</span>;
   return <span style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>→</span>;
 }
 
@@ -133,7 +133,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                   {s.plan === 'business' ? 'Business' : 'Pro'}
                 </span>
                 {s.suspended && (
-                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
                 )}
               </div>
             </div>
@@ -162,7 +162,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                   { label: 'Sites audités', value: s.sitesCount },
                   { label: 'Audits totaux', value: s.auditsCount },
                   { label: 'Score moyen', value: `${s.avgScore}%`, color: scoreColor(s.avgScore) },
-                  { label: 'Problèmes', value: s.totalProblems, color: s.totalProblems > 0 ? '#ef4444' : '#22c55e' },
+                  { label: 'Problèmes', value: s.totalProblems, color: s.totalProblems > 0 ? 'var(--velifa-score-poor)' : 'var(--velifa-score-good)' },
                 ].map(kpi => (
                   <div key={kpi.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 16px' }}>
                     <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{kpi.label}</div>
@@ -173,9 +173,9 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
                 {[
-                  { label: 'Critique (<50)', pct: s.performanceDistribution?.critical ?? 0, color: '#ef4444' },
-                  { label: 'À améliorer (50-79)', pct: s.performanceDistribution?.needsImprovement ?? 0, color: '#f59e0b' },
-                  { label: 'Bon (80+)', pct: s.performanceDistribution?.good ?? 0, color: '#22c55e' },
+                  { label: 'Critique (<50)', pct: s.performanceDistribution?.critical ?? 0, color: 'var(--velifa-score-poor)' },
+                  { label: 'À améliorer (50-79)', pct: s.performanceDistribution?.needsImprovement ?? 0, color: 'var(--velifa-score-average)' },
+                  { label: 'Bon (80+)', pct: s.performanceDistribution?.good ?? 0, color: 'var(--velifa-score-good)' },
                 ].map(d => (
                   <div key={d.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 14px' }}>
                     <div style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.45)', marginBottom: 6 }}>{d.label}</div>
@@ -228,9 +228,9 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                         <td style={{ padding: '10px 12px', fontSize: 14 }}><TrendIcon trend={site.trend} /></td>
                         <td style={{ padding: '10px 12px' }}>
                           {site.issues?.length ? (
-                            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: '#ef4444' }}>{site.issues.length}</span>
+                            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>{site.issues.length}</span>
                           ) : (
-                            <span style={{ fontSize: 10, color: '#22c55e' }}>OK</span>
+                            <span style={{ fontSize: 10, color: 'var(--velifa-score-good)' }}>OK</span>
                           )}
                         </td>
                       </tr>
@@ -280,7 +280,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                           </div>
                           <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.55)', lineHeight: 1.6, margin: '0 0 8px' }}>{info.text}</p>
                           <div style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 8, padding: '8px 12px' }}>
-                            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#22c55e', margin: '0 0 4px' }}>Solution recommandée</p>
+                            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--velifa-score-good)', margin: '0 0 4px' }}>Solution recommandée</p>
                             <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', lineHeight: 1.6, margin: 0 }}>{info.solution}</p>
                           </div>
                         </div>
@@ -298,7 +298,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', marginBottom: 10 }}>Statut du compte</div>
                 {!confirmSuspend ? (
                   <button onClick={() => setConfirmSuspend(true)} disabled={busy}
-                    style={{ height: 34, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: s.suspended ? 'rgba(34,197,94,0.10)' : 'rgba(239,68,68,0.07)', border: `1px solid ${s.suspended ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.18)'}`, color: s.suspended ? '#22c55e' : '#ef4444' }}>
+                    style={{ height: 34, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: s.suspended ? 'rgba(34,197,94,0.10)' : 'rgba(239,68,68,0.07)', border: `1px solid ${s.suspended ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.18)'}`, color: s.suspended ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
                     {s.suspended ? <CheckCircle2 style={{ width: 13, height: 13 }} /> : <Ban style={{ width: 13, height: 13 }} />}
                     {s.suspended ? 'Réactiver le compte' : 'Suspendre le compte'}
                   </button>
@@ -309,7 +309,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                     </p>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={() => setConfirmSuspend(false)} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.60)' }}>Annuler</button>
-                      <button onClick={doSuspend} disabled={busy} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#ef4444' }}>Confirmer</button>
+                      <button onClick={doSuspend} disabled={busy} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--velifa-score-poor)' }}>Confirmer</button>
                     </div>
                   </div>
                 )}

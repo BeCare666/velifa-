@@ -109,9 +109,9 @@ export default function AdminPlansPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Plans et prix</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Plans et prix</h1>
         <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.40)', marginTop: 4, marginBottom: 8, lineHeight: 1.6 }}>
           Prix en USD affichés sur la page Tarifs, variantes Lemon Squeezy utilisées au paiement, et limites appliquées par le serveur.
           Les fonctions réservées au plan Business (audits programmés, PDF, widget, API) ne se modifient pas ici.
@@ -123,7 +123,7 @@ export default function AdminPlansPage() {
             <RefreshCw style={{ width: 11, height: 11, display: 'inline' }} /> Recharger les variantes
           </button>
         </p>
-        {variantsError && <p style={{ fontSize: 12, color: '#f59e0b', marginBottom: 16 }}>{variantsError}</p>}
+        {variantsError && <p style={{ fontSize: 12, color: 'var(--velifa-score-average)', marginBottom: 16 }}>{variantsError}</p>}
 
         <div style={{ display: 'grid', gap: 16 }}>
           {codes.map((code) => forms[code] && (
@@ -147,7 +147,7 @@ export default function AdminPlansPage() {
                   style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}>
                   <Save style={{ width: 13, height: 13 }} /> Enregistrer
                 </button>
-                {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? '#ef4444' : 'rgb(var(--accent-rgb)/0.55)' }}>{status[code]}</span>}
+                {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.55)' }}>{status[code]}</span>}
               </div>
             </div>
           ))}

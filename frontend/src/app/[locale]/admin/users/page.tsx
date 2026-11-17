@@ -34,7 +34,7 @@ function ConfirmDialog({ msg, onConfirm, onCancel }: { msg: string; onConfirm: (
           <button onClick={onCancel} style={{ height: 34, padding: '0 18px', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.60)' }}>
             Annuler
           </button>
-          <button onClick={onConfirm} style={{ height: 34, padding: '0 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#ef4444' }}>
+          <button onClick={onConfirm} style={{ height: 34, padding: '0 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--velifa-score-poor)' }}>
             Confirmer
           </button>
         </div>
@@ -121,13 +121,13 @@ export default function AdminUsersPage() {
       {confirm && <ConfirmDialog msg={confirm.msg} onConfirm={executePlanChange} onCancel={() => setConfirm(null)} />}
       {confirmSuspend && <ConfirmDialog msg={confirmSuspend.msg} onConfirm={executeSuspend} onCancel={() => setConfirmSuspend(null)} />}
 
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
+      <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
         <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
         <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Utilisateurs</h1>
+              <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Utilisateurs</h1>
               <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
                 {data ? `${data.total} utilisateurs au total` : '...'}
               </p>
@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
             </div>
             {['all', 'free', 'pro', 'business'].map(p => (
               <button key={p} onClick={() => { setPlan(p); setPage(1); load(1, search, p); }}
-                style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: planFilter === p ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${planFilter === p ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: planFilter === p ? '#ef4444' : 'rgb(var(--accent-rgb)/0.55)', transition: 'all 150ms' }}>
+                style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: planFilter === p ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${planFilter === p ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: planFilter === p ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.55)', transition: 'all 150ms' }}>
                 {p === 'all' ? 'Tous' : p.charAt(0).toUpperCase() + p.slice(1)}
               </button>
             ))}
@@ -165,7 +165,7 @@ export default function AdminUsersPage() {
           </div>
 
           {error && (
-            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
               ⚠️ {error}
             </div>
           )}
@@ -175,7 +175,7 @@ export default function AdminUsersPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                  {['Utilisateur', 'Plan', 'Statut', 'Audits', 'Derniere activite', 'Suspension', 'Actions'].map(h => (
+                  {['Utilisateur', 'Plan', 'Statut', 'Audits', 'Dernière activité', 'Suspension', 'Actions'].map(h => (
                     <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                   ))}
                 </tr>
@@ -198,7 +198,7 @@ export default function AdminUsersPage() {
 
                         <td style={{ padding: '11px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: u.suspended ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.10)', border: `1px solid ${u.suspended ? 'rgba(239,68,68,0.35)' : 'rgba(239,68,68,0.18)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#ef4444' }}>
+                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: u.suspended ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.10)', border: `1px solid ${u.suspended ? 'rgba(239,68,68,0.35)' : 'rgba(239,68,68,0.18)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'var(--velifa-score-poor)' }}>
                               {(u.clerkUserId ?? 'U').slice(-2).toUpperCase()}
                             </div>
                             <div style={{ minWidth: 0 }}>
@@ -206,7 +206,7 @@ export default function AdminUsersPage() {
                                 {u.clerkUserId}
                               </span>
                               {u.suspended && (
-                                <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
+                                <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
                               )}
                             </div>
                           </div>
@@ -215,7 +215,7 @@ export default function AdminUsersPage() {
                         <td style={{ padding: '11px 16px' }}><PlanBadge plan={u.plan} /></td>
 
                         <td style={{ padding: '11px 16px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 8px', background: u.status === 'active' ? 'rgba(34,197,94,0.10)' : 'rgb(var(--accent-rgb)/0.05)', color: u.status === 'active' ? '#22c55e' : 'rgb(var(--accent-rgb)/0.35)' }}>
+                          <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 8px', background: u.status === 'active' ? 'rgba(34,197,94,0.10)' : 'rgb(var(--accent-rgb)/0.05)', color: u.status === 'active' ? 'var(--velifa-score-good)' : 'rgb(var(--accent-rgb)/0.35)' }}>
                             {u.status ?? 'inactive'}
                           </span>
                         </td>
@@ -229,13 +229,13 @@ export default function AdminUsersPage() {
                           {u.suspended ? (
                             <button onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'unsuspend', msg: `Reactiver le compte ${u.clerkUserId.slice(-8)} ?` })}
                               disabled={suspending === u.clerkUserId}
-                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: '#22c55e', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: 'var(--velifa-score-good)', display: 'flex', alignItems: 'center', gap: 4 }}>
                               <CheckCircle2 style={{ width: 10, height: 10 }} /> Reactiver
                             </button>
                           ) : (
                             <button onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'suspend', msg: `Suspendre ${u.clerkUserId.slice(-8)} ? Il ne pourra plus lancer d'audits.` })}
                               disabled={suspending === u.clerkUserId}
-                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.18)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.18)', color: 'var(--velifa-score-poor)', display: 'flex', alignItems: 'center', gap: 4 }}>
                               <Ban style={{ width: 10, height: 10 }} /> Suspendre
                             </button>
                           )}
@@ -260,7 +260,7 @@ export default function AdminUsersPage() {
                             <Link href={`/admin/users/${u.clerkUserId}`}
                               style={{ height: 28, width: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', textDecoration: 'none', transition: 'all 150ms', flexShrink: 0 }}
                               title="Profil utilisateur"
-                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgba(239,68,68,0.30)'; e.currentTarget.style.color = '#ef4444'; }}
+                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgba(239,68,68,0.30)'; e.currentTarget.style.color = 'var(--velifa-score-poor)'; }}
                               onMouseLeave={(e: any) => { e.currentTarget.style.borderColor = 'rgb(var(--accent-rgb)/0.09)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'; }}>
                               <User style={{ width: 12, height: 12 }} />
                             </Link>
