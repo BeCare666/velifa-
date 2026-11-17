@@ -22,5 +22,7 @@ describe('HealthController', () => {
   it('503 si Redis lève une erreur', async () => {
     const err = await make(true, 'throw').check().catch((e) => e);
     expect((err as HttpException).getStatus()).toBe(503);
+    // Le filtre global ne renvoie que `message` : il doit nommer le service en panne
+    expect((err as HttpException).getResponse()).toMatchObject({ message: 'degraded: database ok, redis down' });
   });
 });

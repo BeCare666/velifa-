@@ -30,7 +30,11 @@ export class HealthController {
       withTimeout(this.queue.client.ping()).then((r) => r === 'PONG').catch(() => false),
     ]);
     const body = { status: database && redis ? 'ok' : 'degraded', database, redis };
-    if (body.status !== 'ok') throw new HttpException(body, HttpStatus.SERVICE_UNAVAILABLE);
+    if (body.status !== 'ok') {
+      // Le filtre global ne renvoie que `message` : on y indique quel service est en panne (non sensible).
+      const message = `degraded: database ${database ? 'ok' : 'down'}, redis ${redis ? 'ok' : 'down'}`;
+      throw new HttpException({ ...body, message }, HttpStatus.SERVICE_UNAVAILABLE);
+    }
     return body;
   }
 }

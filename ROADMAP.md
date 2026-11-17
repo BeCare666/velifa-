@@ -672,3 +672,15 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   exit 0 ; `next build` exit 0 (87 pages, `/[locale]/analyse/loading-page` généré en 3 langues).
 - ⚠️ Rendu réel non vérifié : sans Redis de production (`REDIS_URL`), la file ne tourne pas et l'écran reste
   sur « Mise en file d'attente ».
+
+### 2026-11-17 — Vérification en ligne (https://velifa-ae.vercel.app) et connexion Redis
+- Site Vercel : 200, nouvelle version servie ; API configurée `https://velifa.onrender.com/api/v1` ; CORS du backend
+  accepte `https://velifa-ae.vercel.app` (préflight 204).
+- Backend Render : `/plans` → 200 (lu en base : **TiDB OK**) ; `/health` → **503** → **Redis injoignable**.
+- **Bug trouvé** (`redis.module.ts`) : hors `rediss://` exact, les options passaient un champ `url` qu'ioredis
+  **ignore** → connexion silencieuse à `localhost:6379`. Remplacé par `redisOptionsFromUrl` (URL décomposée, TLS pour
+  `rediss://` et tout hôte `*.upstash.io`, URL REST `https://` refusée avec un message clair).
+- `/health` en panne renvoie désormais quel service est en cause (le filtre global ne renvoyait que
+  « An error occurred »).
+- Preuves : `npx jest src/redis` → **6 tests réussis** ; `npx jest src/health` → **3 réussis** ; `tsc` exit 0.
+- Reste : vérifier `/health` → 200 après redéploiement ; audit réel de bout en bout depuis le site.

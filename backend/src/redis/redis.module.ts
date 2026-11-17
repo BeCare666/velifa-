@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import Redis from 'ioredis';
+import { redisOptionsFromUrl } from './redis-options';
 
 export const BULL_ANALYSES_QUEUE = 'analyses';
 
@@ -12,31 +12,7 @@ export const BULL_ANALYSES_QUEUE = 'analyses';
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => {
         const redisUrl = config.get<string>('redis.url', 'redis://localhost:6379');
-        const isUpstash = redisUrl.startsWith('rediss://');
-
-        // Standard case
-        let redisOptions: any = {
-          url: redisUrl,
-          maxRetriesPerRequest: null,
-          enableReadyCheck: false,
-          connectTimeout: 10000,
-        };
-
-        if (isUpstash) {
-          // Upstash with explicit TLS
-          const urlMatch = redisUrl.match(/rediss:\/\/([^@]+)@(.+):(\d+)/);
-          if (urlMatch) {
-            redisOptions = {
-              host: urlMatch[2],
-              port: parseInt(urlMatch[3]),
-              password: urlMatch[1].replace('default:', ''),
-              tls: {},
-              maxRetriesPerRequest: null,
-              enableReadyCheck: false,
-              connectTimeout: 10000,
-            };
-          }
-        }
+        const redisOptions = redisOptionsFromUrl(redisUrl);
 
         return {
           redis: redisOptions,
