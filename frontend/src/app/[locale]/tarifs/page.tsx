@@ -69,10 +69,10 @@ function CheckoutButton({
 
   const platinumStyle: React.CSSProperties = platinum
     ? {
-        background: 'linear-gradient(135deg, rgba(200,200,200,0.18) 0%, rgba(140,140,140,0.10) 100%)',
-        border: '1px solid rgba(200,200,200,0.55)',
-        color: '#E8E8E8',
-        boxShadow: '0 4px 16px rgba(200,200,200,0.10)',
+        background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.18) 0%, rgba(140,140,140,0.10) 100%)',
+        border: '1px solid rgb(var(--accent-rgb)/0.55)',
+        color: 'var(--text)',
+        boxShadow: '0 4px 16px rgb(var(--accent-rgb)/0.10)',
       }
     : {};
 
@@ -234,9 +234,9 @@ export default function TarifsPage() {
             const cardStyle = isBizCard
               ? {
                   borderWidth: '2px',
-                  borderColor: 'rgba(200,200,200,0.55)',
-                  boxShadow: '0 0 0 1px rgba(200,200,200,0.12), 0 16px 48px rgba(0,0,0,0.55), 0 8px 24px rgba(200,200,200,0.08)',
-                  background: 'linear-gradient(160deg, rgba(48,48,48,0.95) 0%, rgba(18,18,18,0.99) 60%)',
+                  borderColor: 'rgb(var(--accent-rgb)/0.55)',
+                  boxShadow: '0 0 0 1px rgb(var(--accent-rgb)/0.12), 0 16px 48px rgba(0,0,0,0.55), 0 8px 24px rgb(var(--accent-rgb)/0.08)',
+                  background: 'linear-gradient(160deg, rgba(48,48,48,0.95) 0%, var(--surface) 60%)',
                 }
               : plan.featured
                 ? { borderWidth: '2px', boxShadow: 'var(--shadow-accent)' }
@@ -255,9 +255,9 @@ export default function TarifsPage() {
                       className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-xs font-bold tracking-wide"
                       style={{
                         background: 'linear-gradient(135deg, #3a3a3a 0%, #1a1a1a 100%)',
-                        border: '1px solid rgba(200,200,200,0.55)',
-                        color: '#E8E8E8',
-                        boxShadow: '0 2px 12px rgba(200,200,200,0.15)',
+                        border: '1px solid rgb(var(--accent-rgb)/0.55)',
+                        color: 'var(--text)',
+                        boxShadow: '0 2px 12px rgb(var(--accent-rgb)/0.15)',
                       }}
                     >
                       <Gem className="w-3 h-3" />
@@ -278,14 +278,14 @@ export default function TarifsPage() {
               <div className="text-center mb-6 pt-2">
                 <h2
                   className={`font-heading font-bold text-lg mb-1 ${plan.featured ? 'velifa-accent-text' : 'text-text'}`}
-                  style={isBizCard ? { color: '#E8E8E8' } : undefined}
+                  style={isBizCard ? { color: 'var(--text)' } : undefined}
                 >
                   {plan.name}
                 </h2>
                 <div className="flex items-baseline justify-center gap-1">
                   <span
                     className="font-heading font-bold text-text"
-                    style={isBizCard ? { fontSize: '3.25rem', color: '#E8E8E8' } : { fontSize: '3rem' }}
+                    style={isBizCard ? { fontSize: '3.25rem', color: 'var(--text)' } : { fontSize: '3rem' }}
                   >
                     {plan.price}
                   </span>
@@ -300,7 +300,7 @@ export default function TarifsPage() {
 
               <div
                 className="velifa-divider mb-6"
-                style={isBizCard ? { background: 'linear-gradient(90deg, transparent, rgba(200,200,200,0.30), transparent)' } : undefined}
+                style={isBizCard ? { background: 'linear-gradient(90deg, transparent, rgb(var(--accent-rgb)/0.30), transparent)' } : undefined}
               />
 
               {/* Features */}
@@ -309,7 +309,7 @@ export default function TarifsPage() {
                   <li key={f} className="flex items-start gap-3">
                     <Check
                       className="w-4 h-4 flex-shrink-0 mt-0.5"
-                      style={{ color: isBizCard ? '#C8C8C8' : '#0CCE6B' }}
+                      style={{ color: isBizCard ? 'var(--text)' : '#0CCE6B' }}
                     />
                     <span className="text-sm text-text">{f}</span>
                   </li>
@@ -327,9 +327,9 @@ export default function TarifsPage() {
                     className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-[var(--velifa-radius-md)] font-heading font-semibold text-sm tracking-wide"
                     style={isBizCard
                       ? {
-                          background: 'rgba(200,200,200,0.10)',
-                          border: '1px solid rgba(200,200,200,0.45)',
-                          color: '#E8E8E8',
+                          background: 'rgb(var(--accent-rgb)/0.10)',
+                          border: '1px solid rgb(var(--accent-rgb)/0.45)',
+                          color: 'var(--text)',
                         }
                       : {
                           background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.12) 0%, rgb(var(--accent-rgb)/0.18) 100%)',

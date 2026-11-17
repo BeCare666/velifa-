@@ -69,7 +69,7 @@ function useElapsed(running: boolean) {
 /** Fond plein écran : couvre l'en-tête et tout le site pendant l'audit. */
 function Shell({ children }: { children?: React.ReactNode }) {
   return (
-    <main className="fixed inset-0 z-[60] overflow-y-auto bg-[#070707] text-text">
+    <main className="fixed inset-0 z-[60] overflow-y-auto bg-bg text-text">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -106,14 +106,14 @@ function Scanner({ index, done }: { index: number; done: boolean }) {
             <stop offset="100%" stopColor="var(--accent)" />
           </linearGradient>
         </defs>
-        <circle cx="150" cy="150" r={R} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2" />
+        <circle cx="150" cy="150" r={R} fill="none" stroke="rgb(var(--accent-rgb)/0.06)" strokeWidth="2" />
         <circle
           cx="150" cy="150" r={R} fill="none" stroke="url(#velifa-arc)" strokeWidth="3" strokeLinecap="round"
           strokeDasharray={C} strokeDashoffset={C * (1 - ratio)}
           style={{ transition: 'stroke-dashoffset 900ms cubic-bezier(0.22,1,0.36,1)', filter: 'drop-shadow(0 0 8px rgb(var(--accent-rgb)/0.15))' }}
         />
         <circle cx="150" cy="150" r="104" fill="none" stroke="rgb(var(--accent-rgb)/0.14)" strokeWidth="1" strokeDasharray="2 8" />
-        <circle cx="150" cy="150" r="78" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+        <circle cx="150" cy="150" r="78" fill="none" stroke="rgb(var(--accent-rgb)/0.05)" strokeWidth="1" />
       </svg>
 
       {!done && (

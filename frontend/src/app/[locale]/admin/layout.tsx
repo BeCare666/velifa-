@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isLoaded } = useUser();
 
   if (!isLoaded) return (
-    <div style={{minHeight:'100vh',background:'#080808',
+    <div style={{minHeight:'100vh',background: 'var(--bg)',
       display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{width:32,height:32,borderRadius:'50%',
         border:'2px solid var(--accent)',borderTopColor:'transparent',
@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 
   if (!user) return (
-    <div style={{minHeight:'100vh',background:'#080808',
+    <div style={{minHeight:'100vh',background: 'var(--bg)',
       display:'flex',alignItems:'center',justifyContent:'center',
       flexDirection:'column',gap:16,color:'white'}}>
       <p>Connectez-vous pour accéder à l&apos;admin</p>
@@ -32,11 +32,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isAdmin = ADMINS.includes(email) || ADMIN_USER_IDS.includes(userId);
 
   if (!isAdmin) return (
-    <div style={{minHeight:'100vh',background:'#080808',
+    <div style={{minHeight:'100vh',background: 'var(--bg)',
       display:'flex',alignItems:'center',justifyContent:'center',
       flexDirection:'column',gap:16,color:'white'}}>
       <p style={{fontSize:24}}>⛔ Accès refusé</p>
-      <p style={{color:'rgba(255,255,255,0.5)'}}>{email}</p>
+      <p style={{color:'rgb(var(--accent-rgb)/0.5)'}}>{email}</p>
       <a href="/dashboard" style={{color:'var(--accent)'}}>
         Retour au dashboard
       </a>

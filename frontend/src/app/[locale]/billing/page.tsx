@@ -30,9 +30,9 @@ function PlanBadge({ plan, freeLabel }: { plan: 'pro' | 'business' | null; freeL
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
       style={{
-        background: 'rgba(200,200,200,0.12)',
-        border: '1px solid rgba(200,200,200,0.40)',
-        color: '#E8E8E8',
+        background: 'rgb(var(--accent-rgb)/0.12)',
+        border: '1px solid rgb(var(--accent-rgb)/0.40)',
+        color: 'var(--text)',
       }}
     >
       <Gem className="w-3 h-3" />
@@ -84,11 +84,11 @@ export default function BillingPage() {
       `}</style>
 
       <div className="min-h-screen bg-bg">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 sm:py-16 space-y-6">
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
 
           {/* Header */}
           <div className="fade-up">
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-text tracking-tight">
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
               {t('title')}
             </h1>
             <p className="text-text-muted mt-2 text-sm">{t('subtitle')}</p>
@@ -100,13 +100,13 @@ export default function BillingPage() {
             style={{
               background: isPaid
                 ? plan === 'business'
-                  ? 'linear-gradient(135deg, rgba(200,200,200,0.07) 0%, rgba(26,26,26,0.95) 100%)'
-                  : 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.10) 0%, rgba(26,26,26,0.95) 100%)'
+                  ? 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.07) 0%, var(--surface) 100%)'
+                  : 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.10) 0%, var(--surface) 100%)'
                 : 'var(--surface)',
               border: isPaid
-                ? plan === 'business' ? '1px solid rgba(200,200,200,0.38)' : '1px solid rgb(var(--accent-rgb)/0.35)'
+                ? plan === 'business' ? '1px solid rgb(var(--accent-rgb)/0.38)' : '1px solid rgb(var(--accent-rgb)/0.35)'
                 : '1px solid var(--border)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
+              boxShadow: 'var(--shadow-sm)',
               animationDelay: '60ms',
             }}
           >
@@ -115,12 +115,12 @@ export default function BillingPage() {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
-                    background: plan === 'business' ? 'rgba(200,200,200,0.12)' : 'rgb(var(--accent-rgb)/0.12)',
-                    border: plan === 'business' ? '1px solid rgba(200,200,200,0.30)' : '1px solid rgb(var(--accent-rgb)/0.28)',
+                    background: plan === 'business' ? 'rgb(var(--accent-rgb)/0.12)' : 'rgb(var(--accent-rgb)/0.12)',
+                    border: plan === 'business' ? '1px solid rgb(var(--accent-rgb)/0.30)' : '1px solid rgb(var(--accent-rgb)/0.28)',
                   }}
                 >
                   {plan === 'business'
-                    ? <Gem className="w-5 h-5" style={{ color: '#E8E8E8' }} />
+                    ? <Gem className="w-5 h-5" style={{ color: 'var(--text)' }} />
                     : plan === 'pro'
                       ? <Sparkles className="w-5 h-5 text-accent" />
                       : <CreditCard className="w-5 h-5 text-text-subtle" />
@@ -183,7 +183,7 @@ export default function BillingPage() {
             style={{
               background: 'var(--surface)',
               border: '1px solid var(--border)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
+              boxShadow: 'var(--shadow-sm)',
               animationDelay: '100ms',
             }}
           >
@@ -212,7 +212,7 @@ export default function BillingPage() {
               style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--border)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
+                boxShadow: 'var(--shadow-sm)',
                 animationDelay: '140ms',
               }}
             >
@@ -229,7 +229,7 @@ export default function BillingPage() {
                   style={{
                     background: 'rgba(255,78,66,0.08)',
                     border: '1px solid rgba(255,78,66,0.25)',
-                    color: '#FF4E42',
+                    color: 'var(--velifa-score-poor)',
                   }}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />

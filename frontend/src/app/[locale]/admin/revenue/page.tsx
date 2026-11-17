@@ -15,19 +15,19 @@ function KpiCard({ label, value, sub, icon: Icon }: {
 }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.025)',
-      border: '1px solid rgba(255,255,255,0.07)',
+      background: 'rgb(var(--accent-rgb)/0.025)',
+      border: '1px solid rgb(var(--accent-rgb)/0.07)',
       borderRadius: 12, padding: '18px 20px',
       transition: 'border-color 150ms',
     }}
-      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.14)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}>
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgb(var(--accent-rgb)/0.14)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgb(var(--accent-rgb)/0.07)'; }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <Icon style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.40)', flexShrink: 0 }} strokeWidth={1.75} />
-        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.30)' }}>{label}</span>
+        <Icon style={{ width: 14, height: 14, color: 'rgb(var(--accent-rgb)/0.40)', flexShrink: 0 }} strokeWidth={1.75} />
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.30)' }}>{label}</span>
       </div>
-      <p style={{ fontSize: 24, fontWeight: 700, color: 'rgba(255,255,255,0.90)', margin: 0 }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', marginTop: 6 }}>{sub}</p>}
+      <p style={{ fontSize: 24, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>{value}</p>
+      {sub && <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', marginTop: 6 }}>{sub}</p>}
     </div>
   );
 }
@@ -56,16 +56,16 @@ export default function AdminRevenuePage() {
   ] : [];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: '32px 32px 64px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.90)', margin: 0 }}>Revenus</h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.38)', marginTop: 4 }}>MRR estimé basé sur les abonnements actifs</p>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Revenus</h1>
+            <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>MRR estimé basé sur les abonnements actifs</p>
           </div>
-          <button onClick={load} style={{ height: 36, width: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.40)', cursor: 'pointer' }}>
+          <button onClick={load} style={{ height: 36, width: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', cursor: 'pointer' }}>
             <RefreshCw style={{ width: 14, height: 14 }} />
           </button>
         </div>
@@ -78,10 +78,10 @@ export default function AdminRevenuePage() {
 
         {loading ? (
           <>
-            <div style={{ height: 130, borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 16, animation: 'pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ height: 130, borderRadius: 16, background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', marginBottom: 16, animation: 'pulse 1.5s ease-in-out infinite' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px 24px', height: 100, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div key={i} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 24px', height: 100, animation: 'pulse 1.5s ease-in-out infinite' }} />
               ))}
             </div>
           </>
@@ -107,14 +107,14 @@ export default function AdminRevenuePage() {
               </div>
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
                 <div>
-                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0 0 6px' }}>Pro</p>
+                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: '0 0 6px' }}>Pro</p>
                   <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', margin: 0 }}>${fmt((data?.proCount ?? 0) * (data?.priceProUsd ?? 0))}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.proCount} × ${data?.priceProUsd}</p>
+                  <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', margin: '4px 0 0' }}>{data?.proCount} × ${data?.priceProUsd}</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0 0 6px' }}>Business</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#a8a8a8', margin: 0 }}>${fmt((data?.businessCount ?? 0) * (data?.priceBusinessUsd ?? 0))}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.businessCount} × ${data?.priceBusinessUsd}</p>
+                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: '0 0 6px' }}>Business</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', margin: 0 }}>${fmt((data?.businessCount ?? 0) * (data?.priceBusinessUsd ?? 0))}</p>
+                  <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', margin: '4px 0 0' }}>{data?.businessCount} × ${data?.priceBusinessUsd}</p>
                 </div>
               </div>
             </div>
@@ -132,45 +132,45 @@ export default function AdminRevenuePage() {
         {!loading && data && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px 20px 12px' }}>
-              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 20 }}>
+            <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 20px 12px' }}>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', marginBottom: 20 }}>
                 Revenu par plan
               </p>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={chartData} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
-                  <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, fontSize: 12 }}
+                  <CartesianGrid stroke="rgb(var(--accent-rgb)/0.04)" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: 'var(--surface-raised)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, fontSize: 12 }}
                     formatter={(v: any) => [`$${v}`, 'Revenu']} />
                   <Bar dataKey="montant" fill="var(--accent)" radius={[4, 4, 0, 0]} name="Revenu ($)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>
+            <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
+                <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)' }}>
                   Abonnements actifs ({data.subscriptions?.length ?? 0})
                 </p>
               </div>
               <div style={{ maxHeight: 340, overflowY: 'auto' }}>
                 {(data.subscriptions ?? []).length === 0 ? (
-                  <p style={{ padding: '24px', fontSize: 13, color: 'rgba(255,255,255,0.30)', textAlign: 'center' }}>Aucun abonnement actif</p>
+                  <p style={{ padding: '24px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun abonnement actif</p>
                 ) : (data.subscriptions ?? []).map((s: any, i: number) => (
-                  <div key={s.clerkUserId} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.10)', border: `1px solid ${s.plan === 'business' ? 'rgba(168,168,168,0.20)' : 'rgb(var(--accent-rgb)/0.20)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)', flexShrink: 0 }}>
+                  <div key={s.clerkUserId} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.10)', border: `1px solid ${s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.20)' : 'rgb(var(--accent-rgb)/0.20)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)', flexShrink: 0 }}>
                       {(s.clerkUserId ?? 'U').slice(-2).toUpperCase()}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.clerkUserId}</p>
-                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 2 }}>Depuis {fmtDate(s.since)}</p>
+                      <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.55)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.clerkUserId}</p>
+                      <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', marginTop: 2 }}>Depuis {fmtDate(s.since)}</p>
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '3px 8px', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.12)', color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)' }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '3px 8px', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.12)', color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)' }}>
                         {s.plan}
                       </span>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.70)', marginTop: 4 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.70)', marginTop: 4 }}>
                         {s.plan === 'business' ? `$${data.priceBusinessUsd}` : `$${data.priceProUsd}`}/mois
                       </p>
                     </div>

@@ -64,7 +64,7 @@ function Section({ title, icon: Icon, children }: {
   return (
     <div
       className="rounded-[var(--velifa-radius-lg)] overflow-hidden"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(0,0,0,0.45)' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
     >
       <div
         className="flex items-center gap-2 px-6 py-4"
@@ -95,19 +95,19 @@ export default function SupportPage() {
       `}</style>
 
       <div className="min-h-screen bg-bg">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 sm:py-16 space-y-6">
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
 
           {/* Header + badge plan */}
           <div className="fade-up">
             
             <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="font-heading font-bold text-3xl sm:text-4xl text-text tracking-tight">
+              <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
                 Support
               </h1>
               {isBusiness && (
                 <span
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-                  style={{ background: 'rgba(200,200,200,0.12)', border: '1px solid rgba(200,200,200,0.35)', color: '#E8E8E8' }}
+                  style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--text)' }}
                 >
                   <Gem className="w-3 h-3" />
                   Support prioritaire 💎
@@ -188,9 +188,9 @@ export default function SupportPage() {
                 <div
                   className="mt-4 flex items-center gap-2 px-4 py-3 rounded-[var(--velifa-radius-md)] text-xs"
                   style={{
-                    background: 'rgba(200,200,200,0.06)',
-                    border: '1px solid rgba(200,200,200,0.25)',
-                    color: '#C8C8C8',
+                    background: 'rgb(var(--accent-rgb)/0.06)',
+                    border: '1px solid rgb(var(--accent-rgb)/0.25)',
+                    color: 'var(--text)',
                   }}
                 >
                   <Gem className="w-3.5 h-3.5 flex-shrink-0" />

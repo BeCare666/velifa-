@@ -137,7 +137,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
           style={{
             background: 'linear-gradient(135deg, #1a1a1a 0%, #111111 100%)',
             border: '1px solid rgb(var(--accent-rgb)/0.25)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.80), 0 0 0 1px rgba(255,255,255,0.04)',
+            boxShadow: '0 24px 64px rgba(0,0,0,0.80), 0 0 0 1px rgb(var(--accent-rgb)/0.04)',
             animation: 'modalIn 0.3s cubic-bezier(0.22,1,0.36,1)',
           }}
         >
@@ -152,9 +152,9 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
           <button
             onClick={dismiss}
             className="absolute top-4 end-4 p-1.5 rounded-[8px] text-text-subtle transition-colors"
-            style={{ color: 'rgba(255,255,255,0.40)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.80)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.40)'; }}
+            style={{ color: 'rgb(var(--accent-rgb)/0.40)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.08)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.80)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'; }}
             aria-label={t('close')}
           >
             <X className="w-4 h-4" />
@@ -174,7 +174,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                   <p className="font-heading font-bold text-base" style={{ color: '#0CCE6B' }}>
                     {sentMessage || t('sentGeneric')}
                   </p>
-                  <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                  <p className="text-sm mt-1" style={{ color: 'rgb(var(--accent-rgb)/0.55)' }}>
                     {t('checkInbox')}
                   </p>
                 </div>
@@ -191,10 +191,10 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                     <Mail className="w-5 h-5" style={{ color: 'var(--accent)' }} />
                   </div>
                   <div>
-                    <h2 className="font-heading font-bold text-base" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                    <h2 className="font-heading font-bold text-base" style={{ color: 'rgb(var(--accent-rgb)/0.92)' }}>
                       {t('title')}
                     </h2>
-                    <p className="text-sm mt-1 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                    <p className="text-sm mt-1 leading-relaxed" style={{ color: 'rgb(var(--accent-rgb)/0.45)' }}>
                       {t('subtitle')}
                     </p>
                   </div>
@@ -204,7 +204,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Champ email */}
                   <div>
-                    <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>
                       {t('byEmail')}
                     </label>
                     <input
@@ -217,18 +217,18 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                       disabled={sending}
                       className="w-full px-4 py-3 rounded-[10px] text-sm outline-none transition-all disabled:opacity-50"
                       style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        border: error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgba(255,255,255,0.12)',
-                        color: 'rgba(255,255,255,0.90)',
+                        background: 'rgb(var(--accent-rgb)/0.05)',
+                        border: error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgb(var(--accent-rgb)/0.12)',
+                        color: 'rgb(var(--accent-rgb)/0.90)',
                       }}
                       onFocus={(e) => { e.currentTarget.style.border = '1px solid rgb(var(--accent-rgb)/0.50)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--accent-rgb)/0.08)'; }}
-                      onBlur={(e) => { e.currentTarget.style.border = error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgba(255,255,255,0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      onBlur={(e) => { e.currentTarget.style.border = error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgb(var(--accent-rgb)/0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
                     />
                   </div>
 
                   {/* Champ WhatsApp */}
                   <div>
-                    <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <label className="block text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>
                       {t('byWhatsapp')}
                     </label>
                     <div className="flex gap-1.5" dir="ltr">
@@ -238,14 +238,14 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                         disabled={sending}
                         className="px-2 py-3 rounded-[10px] text-sm outline-none transition-all disabled:opacity-50"
                         style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          color: 'rgba(255,255,255,0.90)',
+                          background: 'rgb(var(--accent-rgb)/0.05)',
+                          border: '1px solid rgb(var(--accent-rgb)/0.12)',
+                          color: 'rgb(var(--accent-rgb)/0.90)',
                           maxWidth: '88px',
                         }}
                       >
                         {COUNTRY_CODES.map((c) => (
-                          <option key={c || 'other'} value={c} style={{ background: '#1a1a1a' }}>
+                          <option key={c || 'other'} value={c} style={{ background: 'var(--surface-raised)' }}>
                             {c || t('other')}
                           </option>
                         ))}
@@ -260,7 +260,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                         style={{
                           background: 'rgba(37,211,102,0.06)',
                           border: '1px solid rgba(37,211,102,0.25)',
-                          color: 'rgba(255,255,255,0.90)',
+                          color: 'rgb(var(--accent-rgb)/0.90)',
                         }}
                         onFocus={(e) => { e.currentTarget.style.border = '1px solid rgba(37,211,102,0.55)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,211,102,0.10)'; }}
                         onBlur={(e) => { e.currentTarget.style.border = '1px solid rgba(37,211,102,0.25)'; e.currentTarget.style.boxShadow = 'none'; }}
@@ -270,7 +270,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                 </div>
 
                 {error && (
-                  <p className="text-xs -mt-2" style={{ color: '#FF4E42' }}>{error}</p>
+                  <p className="text-xs -mt-2" style={{ color: 'var(--velifa-score-poor)' }}>{error}</p>
                 )}
 
                 {/* Boutons */}
@@ -296,12 +296,12 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                     disabled={sending}
                     className="flex-1 py-2.5 rounded-[10px] text-sm font-medium transition-all"
                     style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.10)',
-                      color: 'rgba(255,255,255,0.55)',
+                      background: 'rgb(var(--accent-rgb)/0.05)',
+                      border: '1px solid rgb(var(--accent-rgb)/0.10)',
+                      color: 'rgb(var(--accent-rgb)/0.55)',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.80)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.08)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.80)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.05)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.55)'; }}
                   >
                     {t('noThanks')}
                   </button>

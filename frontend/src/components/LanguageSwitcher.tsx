@@ -49,17 +49,17 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
           onClick={() => setOpen((o) => !o)}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-[8px] text-sm transition-colors duration-150"
           style={{
-            color: 'rgba(255,255,255,0.65)',
-            background: open ? 'rgba(255,255,255,0.05)' : 'transparent',
+            color: 'rgb(var(--accent-rgb)/0.65)',
+            background: open ? 'rgb(var(--accent-rgb)/0.05)' : 'transparent',
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
           onMouseLeave={(e) => { if (!open) e.currentTarget.style.background = 'transparent'; }}
         >
           <span className="text-base leading-none">{current.flag}</span>
           <span className="flex-1 text-left">{current.name}</span>
           <ChevronDown
             className="w-3.5 h-3.5 flex-shrink-0 transition-transform duration-150"
-            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.30)' }}
+            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgb(var(--accent-rgb)/0.30)' }}
           />
         </button>
 
@@ -67,8 +67,8 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
           <div
             className="absolute bottom-full left-0 mb-1 w-full rounded-[10px] overflow-hidden"
             style={{
-              background: '#1a1a1a',
-              border: '1px solid rgba(255,255,255,0.10)',
+              background: 'var(--surface-raised)',
+              border: '1px solid rgb(var(--accent-rgb)/0.10)',
               boxShadow: '0 8px 32px rgba(0,0,0,0.60)',
               zIndex: 200,
             }}
@@ -79,11 +79,11 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
                 onClick={() => switchLocale(l.code)}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors duration-100"
                 style={{
-                  color: l.code === locale ? 'var(--accent)' : 'rgba(255,255,255,0.75)',
+                  color: l.code === locale ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.75)',
                   background: l.code === locale ? 'rgb(var(--accent-rgb)/0.08)' : 'transparent',
                   fontWeight: l.code === locale ? 600 : 400,
                 }}
-                onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.05)'; }}
                 onMouseLeave={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'transparent'; }}
               >
                 <span className="text-base leading-none">{l.flag}</span>
@@ -106,18 +106,18 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] text-xs font-medium transition-colors duration-150"
         style={{
-          background: open ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          color: 'rgba(255,255,255,0.75)',
+          background: open ? 'rgb(var(--accent-rgb)/0.07)' : 'rgb(var(--accent-rgb)/0.04)',
+          border: '1px solid rgb(var(--accent-rgb)/0.10)',
+          color: 'rgb(var(--accent-rgb)/0.75)',
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
-        onMouseLeave={(e) => { if (!open) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.07)'; }}
+        onMouseLeave={(e) => { if (!open) e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
       >
         <span className="text-sm leading-none">{current.flag}</span>
         <span>{current.label}</span>
         <ChevronDown
           className="w-3 h-3 transition-transform duration-150"
-          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgba(255,255,255,0.40)' }}
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', color: 'rgb(var(--accent-rgb)/0.40)' }}
         />
       </button>
 
@@ -125,8 +125,8 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
         <div
           className="absolute top-full right-0 mt-1.5 rounded-[10px] overflow-hidden"
           style={{
-            background: '#1a1a1a',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'var(--surface-raised)',
+            border: '1px solid rgb(var(--accent-rgb)/0.10)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.70)',
             minWidth: 140,
             zIndex: 9999,
@@ -138,11 +138,11 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
               onClick={() => switchLocale(l.code)}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors duration-100"
               style={{
-                color: l.code === locale ? 'var(--accent)' : 'rgba(255,255,255,0.75)',
+                color: l.code === locale ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.75)',
                 background: l.code === locale ? 'rgb(var(--accent-rgb)/0.08)' : 'transparent',
                 fontWeight: l.code === locale ? 600 : 400,
               }}
-              onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+              onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.05)'; }}
               onMouseLeave={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'transparent'; }}
             >
               <span className="text-base leading-none">{l.flag}</span>

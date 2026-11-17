@@ -43,7 +43,7 @@ function Section({ title, icon: Icon, children }: {
   return (
     <div
       className="rounded-[var(--velifa-radius-lg)] overflow-hidden"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 4px 20px rgba(0,0,0,0.45)' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
     >
       <div
         className="flex items-center gap-2 px-6 py-4"
@@ -118,11 +118,11 @@ export default function SettingsPage() {
       `}</style>
 
       <div className="min-h-screen bg-bg">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 sm:py-16 space-y-6">
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
 
           {/* Header */}
           <div className="fade-up">
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-text tracking-tight">
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
               {t('title')}
             </h1>
             <p className="text-text-muted mt-2 text-sm">{t('subtitle')}</p>
@@ -222,7 +222,7 @@ export default function SettingsPage() {
                     style={{
                       background: 'rgba(255,78,66,0.10)',
                       border: '1px solid rgba(255,78,66,0.30)',
-                      color: '#FF4E42',
+                      color: 'var(--velifa-score-poor)',
                     }}
                   >
                     <Shield className="w-3.5 h-3.5" />

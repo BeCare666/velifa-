@@ -13,7 +13,7 @@ function scoreColor(score: number) {
 }
 
 function PlanBadge({ plan }: { plan: string }) {
-  if (plan === 'business') return <span style={{ fontSize: 10, fontWeight: 600, color: '#a8a8a8', background: 'rgba(168,168,168,0.10)', borderRadius: 99, padding: '3px 8px' }}>Business</span>;
+  if (plan === 'business') return <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text)', background: 'rgb(var(--accent-rgb)/0.10)', borderRadius: 99, padding: '3px 8px' }}>Business</span>;
   return <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', background: 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '3px 8px' }}>Pro</span>;
 }
 
@@ -66,8 +66,8 @@ export default function SubscribersTable() {
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.85)', margin: 0 }}>Utilisateurs abonnés</h2>
-        <button onClick={load} style={{ height: 32, width: 32, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.40)' }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.85)', margin: 0 }}>Utilisateurs abonnés</h2>
+        <button onClick={load} style={{ height: 32, width: 32, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)' }}>
           <RefreshCw style={{ width: 13, height: 13 }} />
         </button>
       </div>
@@ -75,7 +75,7 @@ export default function SubscribersTable() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
         {([['all', 'Tous'], ['pro', 'Pro'], ['business', 'Business'], ['suspended', 'Suspendus']] as const).map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)}
-            style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: filter === key ? 'rgb(var(--accent-rgb)/0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${filter === key ? 'rgb(var(--accent-rgb)/0.30)' : 'rgba(255,255,255,0.09)'}`, color: filter === key ? 'var(--accent)' : 'rgba(255,255,255,0.55)' }}>
+            style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: filter === key ? 'rgb(var(--accent-rgb)/0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${filter === key ? 'rgb(var(--accent-rgb)/0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: filter === key ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.55)' }}>
             {label}
           </button>
         ))}
@@ -87,47 +87,47 @@ export default function SubscribersTable() {
         </div>
       )}
 
-      <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Utilisateur</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Plan</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Sites</th>
-              <th onClick={() => toggleSort('avgScore')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
+            <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
+              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Utilisateur</th>
+              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Plan</th>
+              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Sites</th>
+              <th onClick={() => toggleSort('avgScore')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
                 Score moyen {sortKey === 'avgScore' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
               </th>
-              <th onClick={() => toggleSort('totalProblems')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
+              <th onClick={() => toggleSort('totalProblems')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
                 Problèmes {sortKey === 'totalProblems' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
               </th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Statut</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Actions</th>
+              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Statut</th>
+              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <tr key={i} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
                   {Array.from({ length: 7 }).map((_, j) => (
                     <td key={j} style={{ padding: '14px 16px' }}>
-                      <div style={{ height: 14, borderRadius: 4, background: 'rgba(255,255,255,0.06)', width: j === 0 ? '70%' : '50%', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                      <div style={{ height: 14, borderRadius: 4, background: 'rgb(var(--accent-rgb)/0.06)', width: j === 0 ? '70%' : '50%', animation: 'pulse 1.5s ease-in-out infinite' }} />
                     </td>
                   ))}
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '24px 16px', textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>Aucun abonné trouvé.</td></tr>
+              <tr><td colSpan={7} style={{ padding: '24px 16px', textAlign: 'center', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun abonné trouvé.</td></tr>
             ) : filtered.map((u, i) => (
-              <tr key={u.clerkUserId} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)', transition: 'background 150ms' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.04)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'; }}>
+              <tr key={u.clerkUserId} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)', transition: 'background 150ms' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)'; }}>
 
                 <td style={{ padding: '11px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--accent)' }}>
                       {(u.email ?? u.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.email ?? u.clerkUserId}
                     </span>
                   </div>
@@ -135,12 +135,12 @@ export default function SubscribersTable() {
 
                 <td style={{ padding: '11px 16px' }}><PlanBadge plan={u.plan} /></td>
 
-                <td style={{ padding: '11px 16px', fontSize: 13, color: 'rgba(255,255,255,0.60)', fontWeight: 600 }}>{u.sitesCount}</td>
+                <td style={{ padding: '11px 16px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.60)', fontWeight: 600 }}>{u.sitesCount}</td>
 
                 <td style={{ padding: '11px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: scoreColor(u.avgScore) }}>{u.avgScore}%</span>
-                    <div style={{ width: 50, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                    <div style={{ width: 50, height: 4, borderRadius: 2, background: 'rgb(var(--accent-rgb)/0.06)', overflow: 'hidden' }}>
                       <div style={{ width: `${u.avgScore}%`, height: '100%', background: scoreColor(u.avgScore) }} />
                     </div>
                   </div>

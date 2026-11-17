@@ -34,7 +34,7 @@ const ISSUE_INFO: Record<string, { label: string; severity: 'Critique' | 'Import
     solution: "Ajouter des textes alternatifs aux images, garantir un contraste suffisant des couleurs, rendre le site navigable au clavier et utiliser des attributs ARIA appropriés.",
   },
   best_practices: {
-    label: 'Mauvaises pratiques', severity: 'Mineur', color: 'rgba(255,255,255,0.45)', icon: '⚠️',
+    label: 'Mauvaises pratiques', severity: 'Mineur', color: 'rgb(var(--accent-rgb)/0.45)', icon: '⚠️',
     text: "Mauvaises pratiques web. Problèmes de sécurité ou de performance potentiels.",
     solution: "Utiliser HTTPS partout, mettre à jour les bibliothèques avec failles connues, éviter les erreurs console et corriger les ressources avec un mauvais ratio d'aspect.",
   },
@@ -49,7 +49,7 @@ function scoreColor(score: number) {
 function TrendIcon({ trend }: { trend: string }) {
   if (trend === 'up') return <span style={{ color: '#22c55e' }}>↑</span>;
   if (trend === 'down') return <span style={{ color: '#ef4444' }}>↓</span>;
-  return <span style={{ color: 'rgba(255,255,255,0.35)' }}>→</span>;
+  return <span style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>→</span>;
 }
 
 export default function SubscriberModal({ subscriber, onClose, onChanged }: { subscriber: any; onClose: () => void; onChanged: () => void }) {
@@ -115,21 +115,21 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
       onClick={onClose}>
-      <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 16, width: '100%', maxWidth: 880, maxHeight: '88vh', display: 'flex', flexDirection: 'column', animation: 'modalIn .22s cubic-bezier(.22,1,.36,1)', overflow: 'hidden' }}
+      <div style={{ background: 'var(--surface)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 16, width: '100%', maxWidth: 880, maxHeight: '88vh', display: 'flex', flexDirection: 'column', animation: 'modalIn .22s cubic-bezier(.22,1,.36,1)', overflow: 'hidden' }}
         onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
               {(s.email ?? s.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.90)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.90)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {s.email ?? s.clerkUserId}
               </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
-                <span style={{ fontSize: 10, fontWeight: 600, color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '2px 8px' }}>
+                <span style={{ fontSize: 10, fontWeight: 600, color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '2px 8px' }}>
                   {s.plan === 'business' ? 'Business' : 'Pro'}
                 </span>
                 {s.suspended && (
@@ -138,16 +138,16 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
               </div>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.50)', cursor: 'pointer', flexShrink: 0 }}>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.50)', cursor: 'pointer', flexShrink: 0 }}>
             <X style={{ width: 14, height: 14 }} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, padding: '10px 22px 0', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', gap: 4, padding: '10px 22px 0', borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ padding: '8px 14px', fontSize: 12, fontWeight: 600, borderRadius: '8px 8px 0 0', cursor: 'pointer', background: tab === t.key ? 'rgb(var(--accent-rgb)/0.10)' : 'transparent', border: 'none', borderBottom: tab === t.key ? '2px solid var(--accent)' : '2px solid transparent', color: tab === t.key ? 'var(--accent)' : 'rgba(255,255,255,0.45)' }}>
+              style={{ padding: '8px 14px', fontSize: 12, fontWeight: 600, borderRadius: '8px 8px 0 0', cursor: 'pointer', background: tab === t.key ? 'rgb(var(--accent-rgb)/0.10)' : 'transparent', border: 'none', borderBottom: tab === t.key ? '2px solid var(--accent)' : '2px solid transparent', color: tab === t.key ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.45)' }}>
               {t.label}
             </button>
           ))}
@@ -164,9 +164,9 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                   { label: 'Score moyen', value: `${s.avgScore}%`, color: scoreColor(s.avgScore) },
                   { label: 'Problèmes', value: s.totalProblems, color: s.totalProblems > 0 ? '#ef4444' : '#22c55e' },
                 ].map(kpi => (
-                  <div key={kpi.label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '14px 16px' }}>
-                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{kpi.label}</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: kpi.color ?? 'rgba(255,255,255,0.85)' }}>{kpi.value}</div>
+                  <div key={kpi.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 16px' }}>
+                    <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{kpi.label}</div>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: kpi.color ?? 'rgb(var(--accent-rgb)/0.85)' }}>{kpi.value}</div>
                   </div>
                 ))}
               </div>
@@ -177,8 +177,8 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                   { label: 'À améliorer (50-79)', pct: s.performanceDistribution?.needsImprovement ?? 0, color: '#f59e0b' },
                   { label: 'Bon (80+)', pct: s.performanceDistribution?.good ?? 0, color: '#22c55e' },
                 ].map(d => (
-                  <div key={d.label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 6 }}>{d.label}</div>
+                  <div key={d.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.45)', marginBottom: 6 }}>{d.label}</div>
                     <div style={{ fontSize: 18, fontWeight: 700, color: d.color }}>{d.pct}%</div>
                   </div>
                 ))}
@@ -186,45 +186,45 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.18)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Pire site</div>
+                  <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Pire site</div>
                   {s.worstSite ? (
                     <>
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.worstSite.url}</div>
+                      <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.worstSite.url}</div>
                       <div style={{ fontSize: 18, fontWeight: 700, color: scoreColor(s.worstSite.score) }}>{s.worstSite.score}%</div>
                     </>
-                  ) : <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)' }}>—</div>}
+                  ) : <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.30)' }}>—</div>}
                 </div>
                 <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Meilleur site</div>
+                  <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Meilleur site</div>
                   {s.bestSite ? (
                     <>
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.bestSite.url}</div>
+                      <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.bestSite.url}</div>
                       <div style={{ fontSize: 18, fontWeight: 700, color: scoreColor(s.bestSite.score) }}>{s.bestSite.score}%</div>
                     </>
-                  ) : <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)' }}>—</div>}
+                  ) : <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.30)' }}>—</div>}
                 </div>
               </div>
             </div>
           )}
 
           {tab === 'sites' && (
-            <div style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                  <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
                     {['URL', 'Score moyen', 'Audits', 'Tendance', 'Problèmes'].map(h => (
-                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase' }}>{h}</th>
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {(s.sites ?? []).map((site: any) => (
                     <>
-                      <tr key={site.url} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}
+                      <tr key={site.url} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', cursor: 'pointer' }}
                         onClick={() => setExpanded(expanded === site.url ? null : site.url)}>
-                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgba(255,255,255,0.70)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</td>
+                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgb(var(--accent-rgb)/0.70)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</td>
                         <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: scoreColor(site.avgScore) }}>{site.avgScore}%</td>
-                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{site.count}</td>
+                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgb(var(--accent-rgb)/0.55)' }}>{site.count}</td>
                         <td style={{ padding: '10px 12px', fontSize: 14 }}><TrendIcon trend={site.trend} /></td>
                         <td style={{ padding: '10px 12px' }}>
                           {site.issues?.length ? (
@@ -235,17 +235,17 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                         </td>
                       </tr>
                       {expanded === site.url && (
-                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                        <tr style={{ background: 'rgb(var(--accent-rgb)/0.02)' }}>
                           <td colSpan={5} style={{ padding: '10px 16px' }}>
                             {site.issues?.length ? (
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                                 {site.issues.map((iss: string) => (
-                                  <span key={iss} style={{ fontSize: 11, color: ISSUE_INFO[iss]?.color, background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '4px 8px' }}>
+                                  <span key={iss} style={{ fontSize: 11, color: ISSUE_INFO[iss]?.color, background: 'rgb(var(--accent-rgb)/0.04)', borderRadius: 6, padding: '4px 8px' }}>
                                     {ISSUE_INFO[iss]?.icon} {ISSUE_INFO[iss]?.label}
                                   </span>
                                 ))}
                               </div>
-                            ) : <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>Aucun problème détecté.</span>}
+                            ) : <span style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun problème détecté.</span>}
                           </td>
                         </tr>
                       )}
@@ -259,12 +259,12 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
           {tab === 'issues' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               {Object.keys(issueMap).length === 0 && (
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>Aucun problème détecté sur les sites de cet utilisateur. 🎉</div>
+                <div style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun problème détecté sur les sites de cet utilisateur. 🎉</div>
               )}
               {(s.sites ?? []).filter((site: any) => site.issues?.length).map((site: any) => (
-                <div key={site.url} style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, overflow: 'hidden' }}>
-                  <div style={{ padding: '10px 16px', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</span>
+                <div key={site.url} style={{ border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 16px', background: 'rgb(var(--accent-rgb)/0.03)', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: scoreColor(site.avgScore) }}>{site.avgScore}%</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 14 }}>
@@ -272,16 +272,16 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                       const info = ISSUE_INFO[key];
                       if (!info) return null;
                       return (
-                        <div key={key} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '14px 16px' }}>
+                        <div key={key} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 16px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                             <span style={{ fontSize: 16 }}>{info.icon}</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{info.label}</span>
-                            <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99, color: info.color, background: 'rgba(255,255,255,0.05)' }}>{info.severity}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.85)' }}>{info.label}</span>
+                            <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99, color: info.color, background: 'rgb(var(--accent-rgb)/0.05)' }}>{info.severity}</span>
                           </div>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: '0 0 8px' }}>{info.text}</p>
+                          <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.55)', lineHeight: 1.6, margin: '0 0 8px' }}>{info.text}</p>
                           <div style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 8, padding: '8px 12px' }}>
                             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#22c55e', margin: '0 0 4px' }}>Solution recommandée</p>
-                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, margin: 0 }}>{info.solution}</p>
+                            <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', lineHeight: 1.6, margin: 0 }}>{info.solution}</p>
                           </div>
                         </div>
                       );
@@ -294,8 +294,8 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
 
           {tab === 'actions' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 10 }}>Statut du compte</div>
+              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', marginBottom: 10 }}>Statut du compte</div>
                 {!confirmSuspend ? (
                   <button onClick={() => setConfirmSuspend(true)} disabled={busy}
                     style={{ height: 34, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: s.suspended ? 'rgba(34,197,94,0.10)' : 'rgba(239,68,68,0.07)', border: `1px solid ${s.suspended ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.18)'}`, color: s.suspended ? '#22c55e' : '#ef4444' }}>
@@ -304,21 +304,21 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                   </button>
                 ) : (
                   <div>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginBottom: 10 }}>
+                    <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', marginBottom: 10 }}>
                       {s.suspended ? 'Réactiver ce compte ?' : 'Suspendre ce compte ? L\'utilisateur ne pourra plus lancer d\'audits.'}
                     </p>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setConfirmSuspend(false)} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.60)' }}>Annuler</button>
+                      <button onClick={() => setConfirmSuspend(false)} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.60)' }}>Annuler</button>
                       <button onClick={doSuspend} disabled={busy} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: '#ef4444' }}>Confirmer</button>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 10 }}>Changer le plan</div>
+              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', marginBottom: 10 }}>Changer le plan</div>
                 <select defaultValue={s.plan} disabled={busy} onChange={e => changePlan(e.target.value)}
-                  style={{ height: 34, padding: '0 12px', borderRadius: 8, fontSize: 12, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)', cursor: 'pointer', outline: 'none' }}>
+                  style={{ height: 34, padding: '0 12px', borderRadius: 8, fontSize: 12, background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.12)', color: 'rgb(var(--accent-rgb)/0.75)', cursor: 'pointer', outline: 'none' }}>
                   <option value="free">Gratuit</option>
                   <option value="pro">Pro</option>
                   <option value="business">Business</option>
@@ -332,7 +332,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                 </Link>
                 {s.email && (
                   <a href={`mailto:${s.email}`}
-                    style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.65)', textDecoration: 'none' }}>
+                    style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.65)', textDecoration: 'none' }}>
                     <Mail style={{ width: 13, height: 13 }} /> Envoyer un email
                   </a>
                 )}

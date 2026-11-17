@@ -10,7 +10,7 @@ import DashboardSidebar from '@/components/layout/DashboardSidebar';
 export default function AnalyseLayout({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useAuth();
   return (
-    <div className="flex min-h-screen" style={{ background: '#0a0a0a' }}>
+    <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
       {isSignedIn && <DashboardSidebar />}
       <main className={`flex-1 min-w-0 overflow-x-hidden ${isSignedIn ? 'pt-14 md:pt-0' : ''}`}>
         {children}

@@ -718,3 +718,12 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
 - Reste : paramètres, abonnement, support, 9 pages admin ; sections de l'accueil sous le hero ; vérification
   visuelle mobile et arabe.
+
+### 2026-11-17 — 5.5 (suite) : neutres en dur, page Mes audits, pages compte
+- 581 couleurs neutres codées en dur (blancs / argent translucides, fonds sombres `#0d0d0d`, `#141414`, `#1a1a1a`…)
+  remplacées par les variables de la charte dans 30 fichiers (9 pages admin, modales, sélecteur de langue, tarifs) :
+  contraste correct en thème clair.
+- « Mes audits » refaite avec `components/ui` (filtres en pastilles, tableau, pagination RTL). Vérifié : le statut
+  « Terminé » est exact (`/analyses/mine` ne renvoie que `status = 'completed'`).
+- Paramètres, Abonnement, Support : largeur, marges, titres et ombres alignés sur le tableau de bord.
+- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).

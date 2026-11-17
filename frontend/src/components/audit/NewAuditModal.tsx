@@ -110,7 +110,7 @@ export default function NewAuditModal({ onClose }: Props) {
           style={{
             background: 'linear-gradient(145deg, #1c1c1c 0%, #111111 100%)',
             border:     '1px solid rgb(var(--accent-rgb)/0.22)',
-            boxShadow:  '0 32px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.03)',
+            boxShadow:  '0 32px 80px rgba(0,0,0,0.85), 0 0 0 1px rgb(var(--accent-rgb)/0.03)',
           }}
         >
           {/* Lueur dorée subtile en haut */}
@@ -123,9 +123,9 @@ export default function NewAuditModal({ onClose }: Props) {
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 rounded-[8px] transition-all"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.75)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; }}
+            style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgb(var(--accent-rgb)/0.08)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.75)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.35)'; }}
             aria-label="Fermer"
           >
             <X className="w-4 h-4" />
@@ -143,12 +143,12 @@ export default function NewAuditModal({ onClose }: Props) {
                 </div>
                 <h2
                   className="font-heading font-bold text-lg tracking-tight"
-                  style={{ color: 'rgba(255,255,255,0.92)' }}
+                  style={{ color: 'rgb(var(--accent-rgb)/0.92)' }}
                 >
                   ✦ Nouvel audit
                 </h2>
               </div>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.42)', paddingLeft: '2.5rem' }}>
+              <p className="text-sm" style={{ color: 'rgb(var(--accent-rgb)/0.42)', paddingLeft: '2.5rem' }}>
                 Analysez les performances de votre site en 30 secondes
               </p>
             </div>
@@ -160,7 +160,7 @@ export default function NewAuditModal({ onClose }: Props) {
               <div>
                 <label
                   className="block text-xs font-semibold tracking-widest uppercase mb-2"
-                  style={{ color: 'rgba(255,255,255,0.35)' }}
+                  style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}
                 >
                   URL du site
                 </label>
@@ -174,9 +174,9 @@ export default function NewAuditModal({ onClose }: Props) {
                   disabled={loading}
                   className="w-full px-4 py-3.5 rounded-[12px] text-sm outline-none transition-all disabled:opacity-50"
                   style={{
-                    background:  'rgba(255,255,255,0.05)',
-                    border:      error ? '1px solid rgba(255,78,66,0.55)' : '1px solid rgba(255,255,255,0.10)',
-                    color:       'rgba(255,255,255,0.90)',
+                    background:  'rgb(var(--accent-rgb)/0.05)',
+                    border:      error ? '1px solid rgba(255,78,66,0.55)' : '1px solid rgb(var(--accent-rgb)/0.10)',
+                    color:       'rgb(var(--accent-rgb)/0.90)',
                     fontSize:    '0.9375rem',
                   }}
                   onFocus={(e) => {
@@ -186,7 +186,7 @@ export default function NewAuditModal({ onClose }: Props) {
                   onBlur={(e) => {
                     e.currentTarget.style.border = error
                       ? '1px solid rgba(255,78,66,0.55)'
-                      : '1px solid rgba(255,255,255,0.10)';
+                      : '1px solid rgb(var(--accent-rgb)/0.10)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 />
@@ -204,10 +204,10 @@ export default function NewAuditModal({ onClose }: Props) {
                   <div className="flex items-start gap-2.5">
                     <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                     <div>
-                      <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                      <p className="text-sm font-medium" style={{ color: 'rgb(var(--accent-rgb)/0.85)' }}>
                         Ce site a déjà été analysé récemment
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                      <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--accent-rgb)/0.45)' }}>
                         Un rapport existe (moins de 24h). Voir ou relancer ?
                       </p>
                     </div>
@@ -232,9 +232,9 @@ export default function NewAuditModal({ onClose }: Props) {
                       disabled={loading}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[8px] text-xs font-medium transition-all disabled:opacity-50"
                       style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        border:     '1px solid rgba(255,255,255,0.12)',
-                        color:      'rgba(255,255,255,0.65)',
+                        background: 'rgb(var(--accent-rgb)/0.05)',
+                        border:     '1px solid rgb(var(--accent-rgb)/0.12)',
+                        color:      'rgb(var(--accent-rgb)/0.65)',
                       }}
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -259,7 +259,7 @@ export default function NewAuditModal({ onClose }: Props) {
                       <p className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>
                         Limite d&apos;audits atteinte
                       </p>
-                      <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                      <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'rgb(var(--accent-rgb)/0.50)' }}>
                         Le plan gratuit est limité à 3 audits par 24h. Passez Pro pour des audits illimités.
                       </p>
                     </div>
@@ -284,7 +284,7 @@ export default function NewAuditModal({ onClose }: Props) {
               {error && (
                 <p
                   className="text-xs px-1"
-                  style={{ color: '#FF4E42' }}
+                  style={{ color: 'var(--velifa-score-poor)' }}
                 >
                   {error}
                 </p>
@@ -318,7 +318,7 @@ export default function NewAuditModal({ onClose }: Props) {
             {/* Note discrète */}
             <p
               className="text-center text-[11px]"
-              style={{ color: 'rgba(255,255,255,0.22)', marginTop: '0.25rem' }}
+              style={{ color: 'rgb(var(--accent-rgb)/0.22)', marginTop: '0.25rem' }}
             >
               Analyse Lighthouse — résultats en ~30 secondes
             </p>

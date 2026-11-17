@@ -7,10 +7,10 @@ import { api } from '@/lib/api';
 
 function InfoRow({ label, value, mono = false, ok }: { label: string; value: React.ReactNode; mono?: boolean; ok?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <span className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>{label}</span>
+    <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
+      <span className="text-sm" style={{ color: 'rgb(var(--accent-rgb)/0.45)' }}>{label}</span>
       <span className={`text-sm font-medium ${mono ? 'font-mono' : ''}`}
-        style={{ color: ok === true ? '#0CCE6B' : ok === false ? '#FF4E42' : 'rgba(255,255,255,0.80)' }}>
+        style={{ color: ok === true ? '#0CCE6B' : ok === false ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.80)' }}>
         {ok === true ? '✓ ' : ok === false ? '✗ ' : ''}{value}
       </span>
     </div>
@@ -19,10 +19,10 @@ function InfoRow({ label, value, mono = false, ok }: { label: string; value: Rea
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="rounded-[12px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}>
-      <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-[12px] overflow-hidden" style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
+      <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
         <Icon className="w-4 h-4" style={{ color: '#ef4444' }} strokeWidth={1.75} />
-        <h2 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>{title}</h2>
+        <h2 className="text-sm font-semibold" style={{ color: 'rgb(var(--accent-rgb)/0.80)' }}>{title}</h2>
       </div>
       <div className="px-5 pb-2">{children}</div>
     </div>
@@ -66,11 +66,11 @@ export default function AdminSettingsPage() {
   const uptimeM = sysData ? Math.floor((sysData.uptimeSeconds % 3600) / 60) : 0;
 
   return (
-    <div className="min-h-screen p-6 sm:p-8" style={{ background: '#0a0a0a' }}>
+    <div className="min-h-screen p-6 sm:p-8" style={{ background: 'var(--bg)' }}>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
-          <h1 className="font-heading font-bold text-2xl sm:text-3xl" style={{ color: 'rgba(255,255,255,0.90)' }}>Paramètres admin</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.40)' }}>Configuration et diagnostics système</p>
+          <h1 className="font-heading font-bold text-2xl sm:text-3xl" style={{ color: 'rgb(var(--accent-rgb)/0.90)' }}>Paramètres admin</h1>
+          <p className="text-sm mt-1" style={{ color: 'rgb(var(--accent-rgb)/0.40)' }}>Configuration et diagnostics système</p>
         </div>
 
         {loading ? (
@@ -81,12 +81,12 @@ export default function AdminSettingsPage() {
             <Section title="Emails administrateurs" icon={Shield}>
               <div className="py-2">
                 {(sysData?.adminEmails ?? []).map((email: string) => (
-                  <div key={email} className="flex items-center gap-2 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={email} className="flex items-center gap-2 py-2.5" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
                     <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#0CCE6B' }} />
-                    <span className="text-sm font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>{email}</span>
+                    <span className="text-sm font-mono" style={{ color: 'rgb(var(--accent-rgb)/0.75)' }}>{email}</span>
                   </div>
                 ))}
-                <p className="text-xs py-3" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                <p className="text-xs py-3" style={{ color: 'rgb(var(--accent-rgb)/0.30)' }}>
                   Modifiable via la variable d'environnement ADMIN_EMAILS
                 </p>
               </div>
@@ -109,8 +109,8 @@ export default function AdminSettingsPage() {
               <div className="py-3 space-y-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Email de test Brevo</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    <p className="text-sm font-medium" style={{ color: 'rgb(var(--accent-rgb)/0.80)' }}>Email de test Brevo</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>
                       Envoie un rapport de test à academytechs3@gmail.com
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export default function AdminSettingsPage() {
                   </button>
                 </div>
                 {emailResult && (
-                  <p className="text-xs px-1" style={{ color: emailResult.startsWith('✓') ? '#0CCE6B' : '#FF4E42' }}>
+                  <p className="text-xs px-1" style={{ color: emailResult.startsWith('✓') ? '#0CCE6B' : 'var(--velifa-score-poor)' }}>
                     {emailResult}
                   </p>
                 )}

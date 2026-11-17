@@ -26,7 +26,7 @@ const ISSUE_ICONS: Record<string, string> = {
 function TrendIcon({ trend }: { trend: 'up' | 'down' | 'stable' }) {
   if (trend === 'up')   return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#22c55e', fontSize: 11 }}><TrendingUp style={{ width: 12, height: 12 }} /> Amelioration</span>;
   if (trend === 'down') return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: '#ef4444', fontSize: 11 }}><TrendingDown style={{ width: 12, height: 12 }} /> Degradation</span>;
-  return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'rgba(255,255,255,0.35)', fontSize: 11 }}><Minus style={{ width: 12, height: 12 }} /> Stable</span>;
+  return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }}><Minus style={{ width: 12, height: 12 }} /> Stable</span>;
 }
 
 const fmtDate = (v: any) =>
@@ -64,20 +64,20 @@ export default function AdminPerformancePage() {
   const goodCount     = data.filter(r => r.avgScore >= 80).length;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: '32px 32px 64px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.90)', margin: 0 }}>Performance des sites</h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.38)', marginTop: 4 }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Performance des sites</h1>
+            <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
               {loading ? '...' : `${data.length} sites analyses — tries du moins performant au plus performant`}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => load()} style={{ height: 34, width: 34, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.40)' }}>
+            <button onClick={() => load()} style={{ height: 34, width: 34, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)' }}>
               <RefreshCw style={{ width: 14, height: 14 }} />
             </button>
             <button type="button"
@@ -85,7 +85,7 @@ export default function AdminPerformancePage() {
                 try { await api.admin.exportPerformance(await getToken()); }
                 catch (e: any) { setError(e.message ?? 'Export impossible'); }
               }}
-              style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
+              style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.55)', textDecoration: 'none' }}>
               <Download style={{ width: 13, height: 13 }} /> Exporter CSV
             </button>
           </div>
@@ -95,13 +95,13 @@ export default function AdminPerformancePage() {
         {!loading && (
           <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
             {[
-              { label: 'Total sites', value: data.length, color: 'rgba(255,255,255,0.80)' },
+              { label: 'Total sites', value: data.length, color: 'rgb(var(--accent-rgb)/0.80)' },
               { label: 'Critiques < 50', value: criticalCount, color: '#ef4444' },
               { label: 'A ameliorer 50-79', value: avgCount, color: '#f59e0b' },
               { label: 'Bons >= 80', value: goodCount, color: '#22c55e' },
             ].map(s => (
-              <div key={s.label} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '12px 18px', minWidth: 120 }}>
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>{s.label}</p>
+              <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 18px', minWidth: 120 }}>
+                <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>{s.label}</p>
                 <p style={{ fontSize: 22, fontWeight: 700, color: s.color, margin: 0 }}>{s.value}</p>
               </div>
             ))}
@@ -118,9 +118,9 @@ export default function AdminPerformancePage() {
           ].map(f => (
             <button key={f.v} onClick={() => setFilter(f.v as any)}
               style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                background: filter === f.v ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${filter === f.v ? 'rgba(239,68,68,0.30)' : 'rgba(255,255,255,0.09)'}`,
-                color: filter === f.v ? '#ef4444' : 'rgba(255,255,255,0.50)' }}>
+                background: filter === f.v ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)',
+                border: `1px solid ${filter === f.v ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`,
+                color: filter === f.v ? '#ef4444' : 'rgb(var(--accent-rgb)/0.50)' }}>
               {f.l}
             </button>
           ))}
@@ -132,22 +132,22 @@ export default function AdminPerformancePage() {
           </div>
         )}
 
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
                 {['Rang', 'URL du site', 'Score moyen', 'Nb audits', 'Derniere analyse', 'Problemes detectes', 'Tendance'].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
                       {Array.from({ length: 7 }).map((_, j) => (
                         <td key={j} style={{ padding: '14px 16px' }}>
-                          <div style={{ height: 14, borderRadius: 4, background: 'rgba(255,255,255,0.06)', width: j === 1 ? '70%' : '40%', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                          <div style={{ height: 14, borderRadius: 4, background: 'rgb(var(--accent-rgb)/0.06)', width: j === 1 ? '70%' : '40%', animation: 'pulse 1.5s ease-in-out infinite' }} />
                         </td>
                       ))}
                     </tr>
@@ -155,28 +155,28 @@ export default function AdminPerformancePage() {
                 : filtered.length === 0
                   ? (
                     <tr>
-                      <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.30)', fontSize: 13 }}>
+                      <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: 'rgb(var(--accent-rgb)/0.30)', fontSize: 13 }}>
                         Aucun site dans cette categorie
                       </td>
                     </tr>
                   )
                   : filtered.map((r, i) => (
                       <tr key={r.url}
-                        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)', transition: 'background 150ms' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.04)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'; }}>
+                        style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)', transition: 'background 150ms' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)'; }}>
 
                         {/* Rang */}
                         <td style={{ padding: '12px 16px' }}>
                           <span style={{
                             fontSize: 12, fontWeight: 700,
-                            color: i === 0 ? '#ef4444' : i === 1 ? '#f97316' : i === 2 ? '#f59e0b' : 'rgba(255,255,255,0.40)',
+                            color: i === 0 ? '#ef4444' : i === 1 ? '#f97316' : i === 2 ? '#f59e0b' : 'rgb(var(--accent-rgb)/0.40)',
                           }}>#{i + 1}</span>
                         </td>
 
                         {/* URL */}
                         <td style={{ padding: '12px 16px', maxWidth: 260 }}>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={r.url}>
+                          <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={r.url}>
                             {r.url}
                           </p>
                         </td>
@@ -189,12 +189,12 @@ export default function AdminPerformancePage() {
                         </td>
 
                         {/* Nb audits */}
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'rgba(255,255,255,0.60)', fontWeight: 600 }}>
+                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.60)', fontWeight: 600 }}>
                           {r.auditCount}
                         </td>
 
                         {/* Derniere analyse */}
-                        <td style={{ padding: '12px 16px', fontSize: 11, color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '12px 16px', fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>
                           {fmtDate(r.lastDate)}
                         </td>
 
@@ -218,7 +218,7 @@ export default function AdminPerformancePage() {
                         <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
                           <TrendIcon trend={r.trend} />
                           {r.lastScore != null && r.prevScore != null && (
-                            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', margin: '2px 0 0' }}>
+                            <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.25)', margin: '2px 0 0' }}>
                               {r.prevScore} → {r.lastScore}
                             </p>
                           )}
@@ -231,7 +231,7 @@ export default function AdminPerformancePage() {
         </div>
 
         {!loading && data.length > 0 && (
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 12, textAlign: 'right' }}>
+          <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.25)', marginTop: 12, textAlign: 'right' }}>
             {filtered.length} site{filtered.length > 1 ? 's' : ''} affiches sur {data.length}
           </p>
         )}

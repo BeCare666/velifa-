@@ -15,9 +15,9 @@ const ERRORS: Record<string, string> = {
 
 const LABEL: Record<string, string> = { free: 'Gratuit', pro: 'Pro', business: 'Business (agence)' };
 
-const box = { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: 20 } as const;
-const inp = { width: '100%', height: 34, padding: '0 10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, color: 'rgba(255,255,255,0.85)', fontSize: 13, boxSizing: 'border-box' } as const;
-const lbl = { display: 'block', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.40)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 } as const;
+const box = { background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: 20 } as const;
+const inp = { width: '100%', height: 34, padding: '0 10px', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, color: 'rgb(var(--accent-rgb)/0.85)', fontSize: 13, boxSizing: 'border-box' } as const;
+const lbl = { display: 'block', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.40)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 } as const;
 
 type Form = {
   priceMonthly: string; priceYearly: string; lemonVariantMonthly: string; lemonVariantYearly: string;
@@ -109,14 +109,14 @@ export default function AdminPlansPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: '32px 32px 64px' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.90)', margin: 0 }}>Plans et prix</h1>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', marginTop: 4, marginBottom: 8, lineHeight: 1.6 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>Plans et prix</h1>
+        <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.40)', marginTop: 4, marginBottom: 8, lineHeight: 1.6 }}>
           Prix en USD affichés sur la page Tarifs, variantes Lemon Squeezy utilisées au paiement, et limites appliquées par le serveur.
           Les fonctions réservées au plan Business (audits programmés, PDF, widget, API) ne se modifient pas ici.
         </p>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', marginBottom: 24 }}>
+        <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.40)', marginBottom: 24 }}>
           Le prix affiché doit correspondre au prix de la variante Lemon Squeezy choisie (c’est elle qui est facturée).
           Les produits se créent dans le tableau de bord Lemon Squeezy (l’API ne permet que de les lire).
           <button type="button" onClick={loadVariants} style={{ marginLeft: 8, background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12 }}>
@@ -147,7 +147,7 @@ export default function AdminPlansPage() {
                   style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}>
                   <Save style={{ width: 13, height: 13 }} /> Enregistrer
                 </button>
-                {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? '#ef4444' : 'rgba(255,255,255,0.55)' }}>{status[code]}</span>}
+                {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? '#ef4444' : 'rgb(var(--accent-rgb)/0.55)' }}>{status[code]}</span>}
               </div>
             </div>
           ))}

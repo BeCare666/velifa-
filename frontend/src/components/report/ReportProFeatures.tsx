@@ -68,7 +68,7 @@ function TechBadge({ tech }: { tech: DetectedTech }) {
           {tech.version && (
             <span
               className="text-[10px] px-1.5 py-0.5 rounded font-mono"
-              style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}
+              style={{ background: 'rgb(var(--accent-rgb)/0.08)', color: 'var(--text-muted)' }}
             >
               v{tech.version}
             </span>
@@ -113,9 +113,9 @@ const LS_CAT_FR: Record<string, string> = {
 };
 
 // ── Helpers métriques détaillées (Business) ───────────────────────────────
-const SILVER = '#C8C8C8';
-const SILVER_BORDER = 'rgba(200,200,200,0.38)';
-const SILVER_BG = 'rgba(200,200,200,0.07)';
+const SILVER = 'var(--text)';
+const SILVER_BORDER = 'rgb(var(--accent-rgb)/0.38)';
+const SILVER_BG = 'rgb(var(--accent-rgb)/0.07)';
 
 function formatMetricValue(audit: any): string {
   if (!audit) return '—';
@@ -133,7 +133,7 @@ function getMetricColor(score: number | null): string {
   if (score == null) return 'var(--text-subtle)';
   if (score >= 0.9) return '#0CCE6B';
   if (score >= 0.5) return '#FFA400';
-  return '#FF4E42';
+  return 'var(--velifa-score-poor)';
 }
 
 function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
@@ -170,7 +170,7 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, rgba(48,48,48,0.90) 0%, rgba(18,18,18,0.98) 100%)',
+        background: 'linear-gradient(135deg, rgba(48,48,48,0.90) 0%, var(--surface) 100%)',
         border: `1px solid ${SILVER_BORDER}`,
         borderRadius: 'var(--velifa-radius-lg)',
         padding: '1.5rem',
@@ -200,7 +200,7 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
             <div
               key={key}
               className="flex flex-col gap-1 p-3 rounded-[var(--velifa-radius-md)]"
-              style={{ background: SILVER_BG, border: `1px solid rgba(200,200,200,0.15)` }}
+              style={{ background: SILVER_BG, border: `1px solid rgb(var(--accent-rgb)/0.15)` }}
             >
               <div className="flex items-center justify-between">
                 <span
@@ -237,7 +237,7 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
               <div
                 key={title}
                 className="flex items-center gap-3 p-3 rounded-[var(--velifa-radius-md)]"
-                style={{ background: SILVER_BG, border: `1px solid rgba(200,200,200,0.12)` }}
+                style={{ background: SILVER_BG, border: `1px solid rgb(var(--accent-rgb)/0.12)` }}
               >
                 <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: getMetricColor(score) }} />
                 <span className="flex-1 text-sm text-text truncate">{title}</span>
@@ -274,7 +274,7 @@ export default function ReportProFeatures({
       <div
         className="rounded-[var(--velifa-radius-lg)] border p-6 flex flex-col sm:flex-row sm:items-center gap-5"
         style={{
-          background: 'linear-gradient(135deg, rgba(18,18,18,0.98) 0%, rgba(30,24,10,0.98) 100%)',
+          background: 'linear-gradient(135deg, var(--surface) 0%, rgba(30,24,10,0.98) 100%)',
           border: '1px solid rgb(var(--accent-rgb)/0.25)',
           boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
         }}
@@ -325,10 +325,10 @@ export default function ReportProFeatures({
           <span
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase"
             style={{
-              background: 'linear-gradient(135deg, rgba(232,232,232,0.14) 0%, rgba(180,180,180,0.08) 100%)',
+              background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.14) 0%, rgb(var(--accent-rgb)/0.08) 100%)',
               border: `1px solid ${SILVER_BORDER}`,
               color: SILVER,
-              boxShadow: '0 2px 12px rgba(200,200,200,0.10)',
+              boxShadow: '0 2px 12px rgb(var(--accent-rgb)/0.10)',
             }}
           >
             <Gem className="w-3 h-3" />
@@ -354,7 +354,7 @@ export default function ReportProFeatures({
       {/* ── Section technologies détectées ─────────────────────── */}
       <div
         style={{
-          background: 'linear-gradient(135deg, rgba(36,36,36,0.9) 0%, rgba(18,18,18,0.95) 100%)',
+          background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface) 100%)',
           border: '1px solid var(--border)',
           borderRadius: 'var(--velifa-radius-lg)',
           padding: '1.5rem',

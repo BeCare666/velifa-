@@ -31,8 +31,8 @@ function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
   const cfg: Record<string, { label: string; color: string; bg: string }> = {
     pro:      { label: 'Pro',      color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.12)' },
-    business: { label: 'Business', color: '#a8a8a8', bg: 'rgba(168,168,168,0.10)' },
-    free:     { label: 'Gratuit',  color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.05)' },
+    business: { label: 'Business', color: 'var(--text)', bg: 'rgb(var(--accent-rgb)/0.10)' },
+    free:     { label: 'Gratuit',  color: 'rgb(var(--accent-rgb)/0.35)', bg: 'rgb(var(--accent-rgb)/0.05)' },
   };
   const { label, color, bg } = cfg[p] ?? cfg.free;
   return <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, borderRadius: 99, padding: '4px 10px' }}>{label}</span>;
@@ -40,9 +40,9 @@ function PlanBadge({ plan }: { plan: string | null }) {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: 0 }}>{title}</p>
+    <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ padding: '12px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: 0 }}>{title}</p>
       </div>
       {children}
     </div>
@@ -52,8 +52,8 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-      <p style={{ color: 'rgba(255,255,255,0.55)', margin: '0 0 4px' }}>{fmtDay(label)}</p>
+    <div style={{ background: 'var(--surface-raised)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
+      <p style={{ color: 'rgb(var(--accent-rgb)/0.55)', margin: '0 0 4px' }}>{fmtDay(label)}</p>
       <p style={{ color: 'var(--accent)', margin: 0 }}>Score : <strong>{payload[0]?.value}</strong></p>
     </div>
   );
@@ -113,14 +113,14 @@ export default function UserDetailPage() {
   return (
     <>
       <ToastContainer />
-      <div style={{ minHeight: '100vh', background: '#0d0d0d', padding: '32px 32px 64px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px 32px 64px' }}>
         <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
         <div style={{ maxWidth: 1600, margin: '0 auto' }}>
 
           {/* Back */}
-          <Link href="/admin/users" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.40)', fontSize: 12, textDecoration: 'none', marginBottom: 20, transition: 'color 150ms' }}
-            onMouseEnter={(e: any) => e.currentTarget.style.color = 'rgba(255,255,255,0.70)'}
-            onMouseLeave={(e: any) => e.currentTarget.style.color = 'rgba(255,255,255,0.40)'}>
+          <Link href="/admin/users" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgb(var(--accent-rgb)/0.40)', fontSize: 12, textDecoration: 'none', marginBottom: 20, transition: 'color 150ms' }}
+            onMouseEnter={(e: any) => e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.70)'}
+            onMouseLeave={(e: any) => e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'}>
             <ChevronLeft style={{ width: 14, height: 14 }} /> Retour aux utilisateurs
           </Link>
 
@@ -133,14 +133,14 @@ export default function UserDetailPage() {
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {[100, 120, 200].map((h, i) => (
-                <div key={i} style={{ height: h, borderRadius: 12, background: 'rgba(255,255,255,0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div key={i} style={{ height: h, borderRadius: 12, background: 'rgb(var(--accent-rgb)/0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
               ))}
             </div>
           ) : user ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* Header utilisateur */}
-              <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '20px 24px' }}>
+              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#ef4444', flexShrink: 0 }}>
@@ -148,14 +148,14 @@ export default function UserDetailPage() {
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', margin: 0, fontFamily: 'monospace' }}>{clerkId}</p>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.85)', margin: 0, fontFamily: 'monospace' }}>{clerkId}</p>
                         {user.suspended && (
                           <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.30)', letterSpacing: '0.06em' }}>SUSPENDU</span>
                         )}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                         <PlanBadge plan={user.plan} />
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        <span style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)' }}>
                           Derniere activite : {fmtDate(user.updatedAt)}
                         </span>
                         {user.suspended && user.suspendedAt && (
@@ -168,7 +168,7 @@ export default function UserDetailPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <Link href={`/admin/audits?user=${clerkId}`}
-                      style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
+                      style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.55)', textDecoration: 'none' }}>
                       <BarChart2 style={{ width: 13, height: 13 }} /> Voir audits
                     </Link>
                     {user.suspended ? (
@@ -189,14 +189,14 @@ export default function UserDetailPage() {
               {/* Stats KPIs */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
                 {[
-                  { label: 'Total audits',  value: stats?.totalAudits ?? 0,    color: 'rgba(255,255,255,0.80)' },
+                  { label: 'Total audits',  value: stats?.totalAudits ?? 0,    color: 'rgb(var(--accent-rgb)/0.80)' },
                   { label: 'Reussis',       value: stats?.completedAudits ?? 0, color: '#22c55e' },
                   { label: 'Echoues',       value: stats?.failedAudits ?? 0,    color: '#ef4444' },
-                  { label: 'Score moyen',   value: stats?.avgScore ? `${stats.avgScore}/100` : '—', color: stats?.avgScore ? scoreColor(stats.avgScore) : 'rgba(255,255,255,0.40)' },
+                  { label: 'Score moyen',   value: stats?.avgScore ? `${stats.avgScore}/100` : '—', color: stats?.avgScore ? scoreColor(stats.avgScore) : 'rgb(var(--accent-rgb)/0.40)' },
                   { label: 'Sites analyses', value: sites.length, color: 'var(--accent)' },
                 ].map(s => (
-                  <div key={s.label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '14px 18px' }}>
-                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>{s.label}</p>
+                  <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 18px' }}>
+                    <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>{s.label}</p>
                     <p style={{ fontSize: 22, fontWeight: 700, color: s.color, margin: 0 }}>{s.value}</p>
                   </div>
                 ))}
@@ -206,14 +206,14 @@ export default function UserDetailPage() {
                 {/* Sites */}
                 <Card title="Sites analyses">
                   {sites.length === 0 ? (
-                    <p style={{ padding: '20px', fontSize: 13, color: 'rgba(255,255,255,0.30)', textAlign: 'center' }}>Aucun site analyse</p>
+                    <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun site analyse</p>
                   ) : (
                     <div>
                       {sites.slice(0, 10).map((site: any, i: number) => (
-                        <div key={site.url} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <div key={site.url} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={site.url}>{site.url}</p>
-                            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', margin: '2px 0 0' }}>{site.count} audit{site.count > 1 ? 's' : ''} — derniere fois le {fmtDate(site.lastDate)}</p>
+                            <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={site.url}>{site.url}</p>
+                            <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', margin: '2px 0 0' }}>{site.count} audit{site.count > 1 ? 's' : ''} — derniere fois le {fmtDate(site.lastDate)}</p>
                           </div>
                           <ScoreBadge score={site.avgScore} />
                         </div>
@@ -225,14 +225,14 @@ export default function UserDetailPage() {
                 {/* Score evolution */}
                 <Card title="Evolution des scores (30j)">
                   {history.length < 2 ? (
-                    <p style={{ padding: '20px', fontSize: 13, color: 'rgba(255,255,255,0.30)', textAlign: 'center' }}>Pas assez de donnees</p>
+                    <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Pas assez de donnees</p>
                   ) : (
                     <div style={{ padding: '16px 8px 8px' }}>
                       <ResponsiveContainer width="100%" height={180}>
                         <LineChart data={history} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
-                          <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="day" tick={{ fill: 'rgba(255,255,255,0.28)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtDay} />
-                          <YAxis domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.28)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                          <CartesianGrid stroke="rgb(var(--accent-rgb)/0.04)" strokeDasharray="3 3" vertical={false} />
+                          <XAxis dataKey="day" tick={{ fill: 'rgb(var(--accent-rgb)/0.28)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtDay} />
+                          <YAxis domain={[0, 100]} tick={{ fill: 'rgb(var(--accent-rgb)/0.28)', fontSize: 10 }} axisLine={false} tickLine={false} />
                           <Tooltip content={<CustomTooltip />} />
                           <Line dataKey="score" stroke="var(--accent)" strokeWidth={2} dot={{ fill: 'var(--accent)', r: 3 }} />
                         </LineChart>
@@ -245,23 +245,23 @@ export default function UserDetailPage() {
               {/* Historique audits */}
               <Card title="Historique des audits">
                 {audits.length === 0 ? (
-                  <p style={{ padding: '20px', fontSize: 13, color: 'rgba(255,255,255,0.30)', textAlign: 'center' }}>Aucun audit</p>
+                  <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun audit</p>
                 ) : (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
                         {['URL', 'Score', 'SEO', 'Statut', 'Date'].map(h => (
-                          <th key={h} style={{ padding: '8px 16px', textAlign: 'left', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
+                          <th key={h} style={{ padding: '8px 16px', textAlign: 'left', fontSize: 9, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {audits.map((a: any, i: number) => (
-                        <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 120ms' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.04)'; }}
+                        <tr key={a.id} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', transition: 'background 120ms' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = ''; }}>
                           <td style={{ padding: '9px 16px', maxWidth: 220 }}>
-                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.70)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{a.url}</p>
+                            <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.70)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{a.url}</p>
                           </td>
                           <td style={{ padding: '9px 16px' }}><ScoreBadge score={a.score} /></td>
                           <td style={{ padding: '9px 16px' }}><ScoreBadge score={a.scoreSeo} /></td>
@@ -272,7 +272,7 @@ export default function UserDetailPage() {
                               {a.status}
                             </span>
                           </td>
-                          <td style={{ padding: '9px 16px', fontSize: 10, color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>{fmtDate(a.createdAt)}</td>
+                          <td style={{ padding: '9px 16px', fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>{fmtDate(a.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -281,7 +281,7 @@ export default function UserDetailPage() {
               </Card>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.35)', fontSize: 14 }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgb(var(--accent-rgb)/0.35)', fontSize: 14 }}>
               Utilisateur introuvable
             </div>
           )}

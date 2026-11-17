@@ -48,9 +48,9 @@ export function ToastContainer() {
             ? <CheckCircle2 style={{ width: 15, height: 15, color: '#22c55e', flexShrink: 0 }} />
             : <XCircle style={{ width: 15, height: 15, color: '#ef4444', flexShrink: 0 }} />
           }
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', flex: 1 }}>{t.msg}</span>
+          <span style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.85)', flex: 1 }}>{t.msg}</span>
           <button onClick={() => setToasts(p => p.filter(x => x.id !== t.id))}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', padding: 0 }}>
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgb(var(--accent-rgb)/0.35)', padding: 0 }}>
             <X style={{ width: 13, height: 13 }} />
           </button>
         </div>
