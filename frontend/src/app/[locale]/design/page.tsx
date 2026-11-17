@@ -34,7 +34,7 @@ export default function DesignPage() {
           <div className="velifa-card">
             <h3 style={{ marginTop: 0 }}>Sample Card</h3>
             <p style={{ color: 'var(--text-muted)', marginBottom: 0 }}>
-              This is a velifa-card with a dark surface and gold border accent.
+              This is a velifa-card with a dark surface and subtle border.
             </p>
           </div>
         </section>

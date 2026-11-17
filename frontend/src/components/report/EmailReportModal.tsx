@@ -136,7 +136,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
           className="relative w-full max-w-md rounded-[16px] overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #1a1a1a 0%, #111111 100%)',
-            border: '1px solid rgba(212,175,55,0.25)',
+            border: '1px solid rgb(var(--accent-rgb)/0.25)',
             boxShadow: '0 24px 64px rgba(0,0,0,0.80), 0 0 0 1px rgba(255,255,255,0.04)',
             animation: 'modalIn 0.3s cubic-bezier(0.22,1,0.36,1)',
           }}
@@ -186,9 +186,9 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                 <div className="flex items-start gap-4">
                   <div
                     className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.25)' }}
+                    style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.25)' }}
                   >
-                    <Mail className="w-5 h-5" style={{ color: '#D4AF37' }} />
+                    <Mail className="w-5 h-5" style={{ color: 'var(--accent)' }} />
                   </div>
                   <div>
                     <h2 className="font-heading font-bold text-base" style={{ color: 'rgba(255,255,255,0.92)' }}>
@@ -221,7 +221,7 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                         border: error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgba(255,255,255,0.12)',
                         color: 'rgba(255,255,255,0.90)',
                       }}
-                      onFocus={(e) => { e.currentTarget.style.border = '1px solid rgba(212,175,55,0.50)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(212,175,55,0.08)'; }}
+                      onFocus={(e) => { e.currentTarget.style.border = '1px solid rgb(var(--accent-rgb)/0.50)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--accent-rgb)/0.08)'; }}
                       onBlur={(e) => { e.currentTarget.style.border = error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgba(255,255,255,0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
                     />
                   </div>
@@ -280,9 +280,9 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                     disabled={sending || (!email.trim() && !whatsapp.trim())}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-[10px] text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: 'linear-gradient(135deg, #D4AF37 0%, #A87B1E 100%)',
-                      color: '#0A0A0A',
-                      boxShadow: '0 4px 16px rgba(212,175,55,0.25)',
+                      background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%)',
+                      color: 'var(--text-on-accent)',
+                      boxShadow: '0 4px 16px rgb(var(--accent-rgb)/0.08)',
                     }}
                   >
                     {sending

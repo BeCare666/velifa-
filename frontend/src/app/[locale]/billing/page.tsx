@@ -17,8 +17,8 @@ function PlanBadge({ plan, freeLabel }: { plan: 'pro' | 'business' | null; freeL
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
       style={{
-        background: 'rgba(212,175,55,0.15)',
-        border: '1px solid rgba(212,175,55,0.40)',
+        background: 'rgb(var(--accent-rgb)/0.15)',
+        border: '1px solid rgb(var(--accent-rgb)/0.40)',
         color: 'var(--accent)',
       }}
     >
@@ -101,10 +101,10 @@ export default function BillingPage() {
               background: isPaid
                 ? plan === 'business'
                   ? 'linear-gradient(135deg, rgba(200,200,200,0.07) 0%, rgba(26,26,26,0.95) 100%)'
-                  : 'linear-gradient(135deg, rgba(212,175,55,0.10) 0%, rgba(26,26,26,0.95) 100%)'
+                  : 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.10) 0%, rgba(26,26,26,0.95) 100%)'
                 : 'var(--surface)',
               border: isPaid
-                ? plan === 'business' ? '1px solid rgba(200,200,200,0.38)' : '1px solid rgba(212,175,55,0.35)'
+                ? plan === 'business' ? '1px solid rgba(200,200,200,0.38)' : '1px solid rgb(var(--accent-rgb)/0.35)'
                 : '1px solid var(--border)',
               boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
               animationDelay: '60ms',
@@ -115,8 +115,8 @@ export default function BillingPage() {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
-                    background: plan === 'business' ? 'rgba(200,200,200,0.12)' : 'rgba(212,175,55,0.12)',
-                    border: plan === 'business' ? '1px solid rgba(200,200,200,0.30)' : '1px solid rgba(212,175,55,0.28)',
+                    background: plan === 'business' ? 'rgba(200,200,200,0.12)' : 'rgb(var(--accent-rgb)/0.12)',
+                    border: plan === 'business' ? '1px solid rgba(200,200,200,0.30)' : '1px solid rgb(var(--accent-rgb)/0.28)',
                   }}
                 >
                   {plan === 'business'

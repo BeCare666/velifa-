@@ -30,7 +30,7 @@ function ScoreBadge({ score }: { score: number | null }) {
 function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
   const cfg: Record<string, { label: string; color: string; bg: string }> = {
-    pro:      { label: 'Pro',      color: '#D4AF37', bg: 'rgba(212,175,55,0.12)' },
+    pro:      { label: 'Pro',      color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.12)' },
     business: { label: 'Business', color: '#a8a8a8', bg: 'rgba(168,168,168,0.10)' },
     free:     { label: 'Gratuit',  color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.05)' },
   };
@@ -54,7 +54,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return (
     <div style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
       <p style={{ color: 'rgba(255,255,255,0.55)', margin: '0 0 4px' }}>{fmtDay(label)}</p>
-      <p style={{ color: '#D4AF37', margin: 0 }}>Score : <strong>{payload[0]?.value}</strong></p>
+      <p style={{ color: 'var(--accent)', margin: 0 }}>Score : <strong>{payload[0]?.value}</strong></p>
     </div>
   );
 };
@@ -193,7 +193,7 @@ export default function UserDetailPage() {
                   { label: 'Reussis',       value: stats?.completedAudits ?? 0, color: '#22c55e' },
                   { label: 'Echoues',       value: stats?.failedAudits ?? 0,    color: '#ef4444' },
                   { label: 'Score moyen',   value: stats?.avgScore ? `${stats.avgScore}/100` : '—', color: stats?.avgScore ? scoreColor(stats.avgScore) : 'rgba(255,255,255,0.40)' },
-                  { label: 'Sites analyses', value: sites.length, color: '#D4AF37' },
+                  { label: 'Sites analyses', value: sites.length, color: 'var(--accent)' },
                 ].map(s => (
                   <div key={s.label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '14px 18px' }}>
                     <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>{s.label}</p>
@@ -234,7 +234,7 @@ export default function UserDetailPage() {
                           <XAxis dataKey="day" tick={{ fill: 'rgba(255,255,255,0.28)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtDay} />
                           <YAxis domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.28)', fontSize: 10 }} axisLine={false} tickLine={false} />
                           <Tooltip content={<CustomTooltip />} />
-                          <Line dataKey="score" stroke="#D4AF37" strokeWidth={2} dot={{ fill: '#D4AF37', r: 3 }} />
+                          <Line dataKey="score" stroke="var(--accent)" strokeWidth={2} dot={{ fill: 'var(--accent)', r: 3 }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>

@@ -109,14 +109,14 @@ export default function NewAuditModal({ onClose }: Props) {
           className="modal-card relative w-full max-w-[500px] rounded-[18px] overflow-hidden"
           style={{
             background: 'linear-gradient(145deg, #1c1c1c 0%, #111111 100%)',
-            border:     '1px solid rgba(212,175,55,0.22)',
+            border:     '1px solid rgb(var(--accent-rgb)/0.22)',
             boxShadow:  '0 32px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.03)',
           }}
         >
           {/* Lueur dorée subtile en haut */}
           <div
             className="absolute top-0 left-0 right-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.45) 50%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(90deg, transparent 0%, rgb(var(--accent-rgb)/0.45) 50%, transparent 100%)' }}
           />
 
           {/* Bouton fermer */}
@@ -137,9 +137,9 @@ export default function NewAuditModal({ onClose }: Props) {
               <div className="flex items-center gap-2.5 mb-2">
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.25)' }}
+                  style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.25)' }}
                 >
-                  <Zap className="w-4 h-4" style={{ color: '#D4AF37' }} />
+                  <Zap className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                 </div>
                 <h2
                   className="font-heading font-bold text-lg tracking-tight"
@@ -180,8 +180,8 @@ export default function NewAuditModal({ onClose }: Props) {
                     fontSize:    '0.9375rem',
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.border = '1px solid rgba(212,175,55,0.50)';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(212,175,55,0.08)';
+                    e.currentTarget.style.border = '1px solid rgb(var(--accent-rgb)/0.50)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--accent-rgb)/0.08)';
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.border = error
@@ -197,12 +197,12 @@ export default function NewAuditModal({ onClose }: Props) {
                 <div
                   className="rounded-[12px] p-4 space-y-3"
                   style={{
-                    background:   'rgba(212,175,55,0.07)',
-                    border:       '1px solid rgba(212,175,55,0.30)',
+                    background:   'rgb(var(--accent-rgb)/0.07)',
+                    border:       '1px solid rgb(var(--accent-rgb)/0.30)',
                   }}
                 >
                   <div className="flex items-start gap-2.5">
-                    <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#D4AF37' }} />
+                    <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                     <div>
                       <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
                         Ce site a déjà été analysé récemment
@@ -218,9 +218,9 @@ export default function NewAuditModal({ onClose }: Props) {
                       onClick={() => { onClose(); router.push(`/analyse/${cachedInfo.id}`); }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-[8px] text-xs font-semibold transition-all"
                       style={{
-                        background: 'rgba(212,175,55,0.15)',
-                        border:     '1px solid rgba(212,175,55,0.35)',
-                        color:      '#D4AF37',
+                        background: 'rgb(var(--accent-rgb)/0.15)',
+                        border:     '1px solid rgb(var(--accent-rgb)/0.35)',
+                        color:      'var(--accent)',
                       }}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -249,14 +249,14 @@ export default function NewAuditModal({ onClose }: Props) {
                 <div
                   className="rounded-[12px] p-4 space-y-3"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(168,123,30,0.05) 100%)',
-                    border:     '1px solid rgba(212,175,55,0.30)',
+                    background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.08) 0%, rgb(var(--accent-rgb)/0.05) 100%)',
+                    border:     '1px solid rgb(var(--accent-rgb)/0.30)',
                   }}
                 >
                   <div className="flex items-start gap-2.5">
-                    <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: '#D4AF37' }} />
+                    <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
                     <div>
-                      <p className="text-sm font-semibold" style={{ color: '#D4AF37' }}>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>
                         Limite d&apos;audits atteinte
                       </p>
                       <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
@@ -269,9 +269,9 @@ export default function NewAuditModal({ onClose }: Props) {
                     onClick={() => { onClose(); router.push('/tarifs'); }}
                     className="flex items-center gap-1.5 text-xs font-semibold py-2 px-3 rounded-[8px] transition-all"
                     style={{
-                      background: 'rgba(212,175,55,0.15)',
-                      border:     '1px solid rgba(212,175,55,0.35)',
-                      color:      '#D4AF37',
+                      background: 'rgb(var(--accent-rgb)/0.15)',
+                      border:     '1px solid rgb(var(--accent-rgb)/0.35)',
+                      color:      'var(--accent)',
                     }}
                   >
                     <Sparkles className="w-3 h-3" />
@@ -300,9 +300,9 @@ export default function NewAuditModal({ onClose }: Props) {
                   disabled={loading || !url.trim() || !captcha.ready}
                   className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[12px] text-sm font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
                   style={{
-                    background:  'linear-gradient(135deg, #D4AF37 0%, #A87B1E 100%)',
-                    color:       '#0A0A0A',
-                    boxShadow:   loading ? 'none' : '0 6px 20px rgba(212,175,55,0.30)',
+                    background:  'linear-gradient(135deg, var(--accent) 0%, var(--accent) 100%)',
+                    color:       'var(--text-on-accent)',
+                    boxShadow:   loading ? 'none' : '0 6px 20px rgb(var(--accent-rgb)/0.08)',
                     letterSpacing: '0.01em',
                   }}
                 >

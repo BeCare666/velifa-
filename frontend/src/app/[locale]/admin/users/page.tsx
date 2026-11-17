@@ -11,7 +11,7 @@ import SubscribersTable from '@/components/admin/SubscribersTable';
 function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
   const cfg: Record<string, { label: string; color: string; bg: string }> = {
-    pro:      { label: 'Pro',      color: '#D4AF37', bg: 'rgba(212,175,55,0.12)' },
+    pro:      { label: 'Pro',      color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.12)' },
     business: { label: 'Business', color: '#a8a8a8', bg: 'rgba(168,168,168,0.10)' },
     free:     { label: 'Gratuit',  color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.05)' },
   };
@@ -253,7 +253,7 @@ export default function AdminUsersPage() {
                                 <option value="business">Business</option>
                               </select>
                               {changing === u.clerkUserId && (
-                                <div style={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, borderRadius: '50%', border: '2px solid rgba(212,175,55,0.30)', borderTopColor: '#D4AF37', animation: 'spin 0.8s linear infinite' }} />
+                                <div style={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, borderRadius: '50%', border: '2px solid rgb(var(--accent-rgb)/0.30)', borderTopColor: 'var(--accent)', animation: 'spin 0.8s linear infinite' }} />
                               )}
                             </div>
                             {/* Profil utilisateur */}
@@ -268,7 +268,7 @@ export default function AdminUsersPage() {
                             <Link href={`/admin/audits?user=${u.clerkUserId}`}
                               style={{ height: 28, width: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', color: 'rgba(255,255,255,0.40)', textDecoration: 'none', transition: 'all 150ms', flexShrink: 0 }}
                               title="Voir ses audits"
-                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgba(212,175,55,0.30)'; e.currentTarget.style.color = '#D4AF37'; }}
+                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgb(var(--accent-rgb)/0.30)'; e.currentTarget.style.color = 'var(--accent)'; }}
                               onMouseLeave={(e: any) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.09)'; e.currentTarget.style.color = 'rgba(255,255,255,0.40)'; }}>
                               <BarChart2 style={{ width: 12, height: 12 }} />
                             </Link>

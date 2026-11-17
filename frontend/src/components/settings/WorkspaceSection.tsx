@@ -26,7 +26,7 @@ export default function WorkspaceSection() {
   const [busy, setBusy]           = useState(false);
   const [error, setError]         = useState('');
   const [saved, setSaved]         = useState(false);
-  const [form, setForm]           = useState({ name: '', logoUrl: '', brandColor: '#D4AF37', defaultLocale: 'ar' });
+  const [form, setForm]           = useState({ name: '', logoUrl: '', brandColor: 'var(--accent)', defaultLocale: 'ar' });
   const [memberEmail, setMemberEmail] = useState('');
 
   const showError = (e: any) => {

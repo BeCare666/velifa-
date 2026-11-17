@@ -74,8 +74,8 @@ function AuditForm() {
       {/* ── Barre d'audit : un seul champ, large, visible dès l'arrivée ─────── */}
       <label htmlFor="audit-url" className="sr-only">{t('urlLabel')}</label>
       <div
-        className="rounded-[22px] p-px shadow-[0_24px_80px_rgba(0,0,0,0.55)] transition-shadow duration-300 focus-within:shadow-[0_0_0_4px_rgba(212,175,55,0.18),0_24px_80px_rgba(0,0,0,0.55)]"
-        style={{ background: 'linear-gradient(135deg, rgba(244,216,138,0.75), rgba(212,175,55,0.35) 45%, rgba(168,123,30,0.65))' }}
+        className="rounded-[22px] p-px shadow-[0_24px_80px_rgba(0,0,0,0.55)] transition-shadow duration-300 focus-within:shadow-[0_0_0_4px_rgb(var(--accent-rgb)/0.18),0_24px_80px_rgba(0,0,0,0.55)]"
+        style={{ background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.75), rgb(var(--accent-rgb)/0.35) 45%, rgb(var(--accent-rgb)/0.65))' }}
       >
         <div className="flex flex-col sm:flex-row items-stretch gap-2 rounded-[21px] bg-[#0b0b0b]/95 backdrop-blur-md p-2">
           <div className="flex flex-1 min-w-0 items-center gap-3 px-4">
@@ -139,8 +139,8 @@ function AuditForm() {
         <div
           className="mt-4 rounded-velifa-lg border p-5 space-y-3"
           style={{
-            background: 'linear-gradient(135deg, rgba(212,175,55,0.10) 0%, rgba(168,123,30,0.06) 100%)',
-            borderColor: 'rgba(212,175,55,0.40)',
+            background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.10) 0%, rgb(var(--accent-rgb)/0.06) 100%)',
+            borderColor: 'rgb(var(--accent-rgb)/0.40)',
           }}
         >
           <div className="flex items-start gap-3">
@@ -248,7 +248,7 @@ function ReportMockup() {
       {/* Glow effect */}
       <div className="absolute inset-0 rounded-velifa-xl opacity-40"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(212,175,55,0.15) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at center, rgb(var(--accent-rgb)/0.15) 0%, transparent 70%)',
           filter: 'blur(20px)',
         }} />
 
@@ -257,7 +257,7 @@ function ReportMockup() {
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.1)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgb(var(--accent-rgb)/0.1)',
         }}>
 
         {/* Browser bar */}
@@ -364,7 +364,7 @@ const carouselSlides = [
   {
     image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
     icon: Globe,
-    accent: '#D4AF37',
+    accent: 'var(--accent)',
     title: 'Core Web Vitals mesurés',
     description: 'LCP, CLS, TBT et FCP — les métriques officielles de Google qui influencent directement votre classement dans les résultats de recherche.',
     detail: 'Métriques Core Web Vitals Google · Critères de classement SEO',
@@ -492,72 +492,30 @@ const STEP_KEYS = ['step1', 'step2', 'step3'] as const;
 const PLAN_KEYS = ['free', 'pro', 'business'] as const;
 
 // ── Hero Background Carousel ─────────────────────────────────────────────────────
-const heroImages = [
-  'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80',   // circuits / tech abstraits
-  'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1600&q=80',   // network / data flows
-  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80',   // digital globe / analytics
-];
-
+// Fond du hero : noir profond, trame fine qui s'estompe, lumière zénithale.
+// Remplace l'ancien carrousel de photos (images de banque Unsplash : circuits, câbles, globe).
 function HeroBackground() {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrent(c => (c + 1) % heroImages.length), 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-      {heroImages.map((src, i) => (
-        <div
-          key={src}
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{ opacity: i === current ? 1 : 0 }}
-        >
-          <Image
-            src={src}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority={i === 0}
-          />
-          {/* Ken Burns slow zoom */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: i === current ? 'scale(1.05)' : 'scale(1)',
-              transition: 'transform 5s ease-out',
-              transformOrigin: 'center',
-            }}
-          />
-        </div>
-      ))}
-      {/* Overlay */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(135deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.70) 50%, rgba(10,10,10,0.92) 100%)',
+          backgroundImage:
+            'linear-gradient(rgb(var(--accent-rgb)/0.045) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--accent-rgb)/0.045) 1px, transparent 1px)',
+          backgroundSize: '72px 72px',
+          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%)',
         }}
       />
-      {/* Dot indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-        {heroImages.map((_, i) => (
-          <div
-            key={i}
-            className="h-1.5 rounded-full transition-all duration-500"
-            style={{
-              width: i === current ? 28 : 8,
-              background: i === current ? 'var(--accent)' : 'rgba(255,255,255,0.25)',
-            }}
-          />
-        ))}
-      </div>
+      <div
+        className="absolute left-1/2 top-0 h-[520px] w-[1100px] max-w-[200%] -translate-x-1/2 -translate-y-1/3 rounded-full"
+        style={{ background: 'radial-gradient(closest-side, rgb(var(--accent-rgb)/0.09), transparent)' }}
+      />
+      <div className="absolute inset-x-0 bottom-0 h-40" style={{ background: 'linear-gradient(transparent, var(--bg))' }} />
     </div>
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const tHero  = useTranslations('hero');
   const tTrust = useTranslations('trust');
@@ -613,14 +571,16 @@ export default function HomePage() {
 
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-text leading-[1.08] mb-5 tracking-tight">
             {tHero('title')}{' '}
-            <span className="velifa-gold-text">{tHero('titleHighlight')}</span>
+            <span className="velifa-accent-text">{tHero('titleHighlight')}</span>
           </h1>
 
           <p className="text-base sm:text-lg text-text-muted mb-8 leading-relaxed max-w-2xl mx-auto">
             {tHero('subtitle')}
           </p>
 
-          <AuditForm />
+          <div id="audit" className="scroll-mt-28">
+            <AuditForm />
+          </div>
 
           {/* Aperçu d'un rapport, sous le formulaire (grand écran) */}
           <div className="hidden lg:block mt-14 opacity-90">
@@ -686,7 +646,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {keyFeatures.map(({ icon: Icon, title, desc }, i) => (
             <RevealSection key={title} delay={i * 80}>
-              <div className="velifa-card hover:border-accent transition-all duration-300 hover:shadow-gold group cursor-default h-full">
+              <div className="velifa-card hover:border-accent transition-all duration-300 hover:shadow-accent group cursor-default h-full">
                 <div className="w-10 h-10 rounded-velifa-md flex items-center justify-center mb-4 transition-colors"
                   style={{ background: 'var(--accent-soft)' }}>
                   <Icon className="w-5 h-5 text-accent" />
@@ -772,19 +732,19 @@ export default function HomePage() {
           {plansPreview.map((plan, i) => (
             <RevealSection key={plan.name} delay={i * 80}>
               <div
-                className={`velifa-card relative flex flex-col hover:border-accent transition-all duration-300 hover:shadow-gold ${plan.badge ? 'border-accent' : ''}`}
-                style={plan.badge ? { borderWidth: '2px', boxShadow: 'var(--shadow-gold)' } : {}}
+                className={`velifa-card relative flex flex-col hover:border-accent transition-all duration-300 hover:shadow-accent ${plan.badge ? 'border-accent' : ''}`}
+                style={plan.badge ? { borderWidth: '2px', boxShadow: 'var(--shadow-accent)' } : {}}
               >
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-velifa-black"
-                      style={{ background: 'var(--velifa-gradient-gold)' }}>
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-[color:var(--text-on-accent)]"
+                      style={{ background: 'var(--brand-gradient)' }}>
                       {plan.badge}
                     </span>
                   </div>
                 )}
                 <div className="text-center mb-4 pt-2">
-                  <h3 className={`font-heading font-bold text-lg mb-1 ${plan.badge ? 'velifa-gold-text' : 'text-text'}`}>
+                  <h3 className={`font-heading font-bold text-lg mb-1 ${plan.badge ? 'velifa-accent-text' : 'text-text'}`}>
                     {plan.name}
                   </h3>
                   <div className="flex items-baseline justify-center gap-1">

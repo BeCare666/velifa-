@@ -118,7 +118,7 @@ export default function AdminSettingsPage() {
                     onClick={sendTestEmail}
                     disabled={emailSending}
                     className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-xs font-semibold transition-all disabled:opacity-50"
-                    style={{ background: 'rgba(212,175,55,0.10)', border: '1px solid rgba(212,175,55,0.28)', color: '#D4AF37' }}>
+                    style={{ background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.28)', color: 'var(--accent)' }}>
                     {emailSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
                     {emailSending ? 'Envoi…' : 'Envoyer test'}
                   </button>

@@ -70,7 +70,7 @@ export default function AdminAuditsPage() {
             <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.90)', margin: 0 }}>Audits</h1>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.38)', marginTop: 4 }}>
               {loading ? '...' : `${data?.total ?? 0} audits au total`}
-              {userFilter && <span style={{ marginLeft: 8, color: '#D4AF37', fontSize: 11 }}>filtre: {userFilter.slice(-12)}</span>}
+              {userFilter && <span style={{ marginLeft: 8, color: 'var(--accent)', fontSize: 11 }}>filtre: {userFilter.slice(-12)}</span>}
             </p>
           </div>
           <button type="button"
@@ -117,7 +117,7 @@ export default function AdminAuditsPage() {
           ))}
           {[{ v: 'all', l: 'Tous scores' }, { v: 'good', l: '>= 90' }, { v: 'average', l: '50-89' }, { v: 'poor', l: '< 50' }].map(s => (
             <button key={s.v} onClick={() => { setScoreF(s.v); setPage(1); }}
-              style={{ height: 36, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer', background: scoreF === s.v ? 'rgba(212,175,55,0.10)' : 'rgba(255,255,255,0.04)', border: `1px solid ${scoreF === s.v ? 'rgba(212,175,55,0.28)' : 'rgba(255,255,255,0.09)'}`, color: scoreF === s.v ? '#D4AF37' : 'rgba(255,255,255,0.50)' }}>
+              style={{ height: 36, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer', background: scoreF === s.v ? 'rgb(var(--accent-rgb)/0.10)' : 'rgba(255,255,255,0.04)', border: `1px solid ${scoreF === s.v ? 'rgb(var(--accent-rgb)/0.28)' : 'rgba(255,255,255,0.09)'}`, color: scoreF === s.v ? 'var(--accent)' : 'rgba(255,255,255,0.50)' }}>
               {s.l}
             </button>
           ))}
@@ -169,7 +169,7 @@ export default function AdminAuditsPage() {
                       <td style={{ padding: '11px 16px' }}>
                         <a href={`/analyse/${a.id}`} target="_blank" rel="noopener noreferrer"
                           style={{ display: 'inline-flex', alignItems: 'center', color: 'rgba(255,255,255,0.28)', textDecoration: 'none', transition: 'color 150ms' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#D4AF37'; }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.28)'; }}>
                           <ExternalLink style={{ width: 12, height: 12 }} />
                         </a>

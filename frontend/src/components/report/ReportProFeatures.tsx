@@ -21,21 +21,21 @@ const CATEGORY_ICON: Record<TechCategory, React.ReactNode> = {
 };
 
 const CATEGORY_COLOR: Record<TechCategory, string> = {
-  'E-commerce':   'rgba(212,175,55,0.15)',   // or
+  'E-commerce':   'rgb(var(--accent-rgb)/0.15)',   // or
   'CMS':          'rgba(139,92,246,0.15)',   // violet
   'Framework JS': 'rgba(59,130,246,0.15)',   // bleu
   'Analytics':    'rgba(16,185,129,0.15)',   // vert
   'Serveur':      'rgba(245,158,11,0.15)',   // ambre
 };
 const CATEGORY_BORDER: Record<TechCategory, string> = {
-  'E-commerce':   'rgba(212,175,55,0.40)',
+  'E-commerce':   'rgb(var(--accent-rgb)/0.40)',
   'CMS':          'rgba(139,92,246,0.35)',
   'Framework JS': 'rgba(59,130,246,0.35)',
   'Analytics':    'rgba(16,185,129,0.35)',
   'Serveur':      'rgba(245,158,11,0.35)',
 };
 const CATEGORY_TEXT: Record<TechCategory, string> = {
-  'E-commerce':   '#D4AF37',
+  'E-commerce':   'var(--accent)',
   'CMS':          '#a78bfa',
   'Framework JS': '#60a5fa',
   'Analytics':    '#34d399',
@@ -275,13 +275,13 @@ export default function ReportProFeatures({
         className="rounded-[var(--velifa-radius-lg)] border p-6 flex flex-col sm:flex-row sm:items-center gap-5"
         style={{
           background: 'linear-gradient(135deg, rgba(18,18,18,0.98) 0%, rgba(30,24,10,0.98) 100%)',
-          border: '1px solid rgba(212,175,55,0.25)',
+          border: '1px solid rgb(var(--accent-rgb)/0.25)',
           boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
         }}
       >
         <div
           className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.3)' }}
+          style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.3)' }}
         >
           <Lock className="w-5 h-5" style={{ color: 'var(--accent)' }} />
         </div>
@@ -338,10 +338,10 @@ export default function ReportProFeatures({
           <span
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase"
             style={{
-              background: 'linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(168,123,30,0.25) 100%)',
-              border: '1px solid rgba(212,175,55,0.45)',
+              background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.18) 0%, rgb(var(--accent-rgb)/0.25) 100%)',
+              border: '1px solid rgb(var(--accent-rgb)/0.45)',
               color: 'var(--accent)',
-              boxShadow: '0 2px 12px rgba(212,175,55,0.15)',
+              boxShadow: '0 2px 12px rgb(var(--accent-rgb)/0.15)',
             }}
           >
             <Sparkles className="w-3 h-3" />
@@ -369,7 +369,7 @@ export default function ReportProFeatures({
           {hasTech && (
             <span
               className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(212,175,55,0.12)', color: 'var(--accent)' }}
+              style={{ background: 'rgb(var(--accent-rgb)/0.12)', color: 'var(--accent)' }}
             >
               {t('found', { count: technologies!.length })}
             </span>
@@ -448,8 +448,8 @@ export default function ReportProFeatures({
       <div
         className="flex items-center justify-between gap-4 p-4 rounded-[var(--velifa-radius-lg)]"
         style={{
-          background: 'rgba(212,175,55,0.05)',
-          border: '1px dashed rgba(212,175,55,0.30)',
+          background: 'rgb(var(--accent-rgb)/0.05)',
+          border: '1px dashed rgb(var(--accent-rgb)/0.30)',
         }}
       >
         <div className="flex items-center gap-3">

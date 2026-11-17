@@ -90,25 +90,25 @@ export default function AdminRevenuePage() {
             {/* Hero MRR banner */}
             <div style={{
               position: 'relative', overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03) 60%)',
-              border: '1px solid rgba(212,175,55,0.25)', borderRadius: 16,
+              background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.14), rgb(var(--accent-rgb)/0.03) 60%)',
+              border: '1px solid rgb(var(--accent-rgb)/0.25)', borderRadius: 16,
               padding: '26px 32px', marginBottom: 16,
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
             }}>
-              <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(212,175,55,0.08)', filter: 'blur(10px)' }} />
+              <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgb(var(--accent-rgb)/0.08)', filter: 'blur(10px)' }} />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <Sparkles style={{ width: 14, height: 14, color: '#D4AF37' }} strokeWidth={1.75} />
-                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,175,55,0.80)' }}>Revenu mensuel récurrent</span>
+                  <Sparkles style={{ width: 14, height: 14, color: 'var(--accent)' }} strokeWidth={1.75} />
+                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.80)' }}>Revenu mensuel récurrent</span>
                 </div>
-                <p style={{ fontSize: 42, fontWeight: 800, color: '#D4AF37', margin: 0, letterSpacing: '-0.01em' }}>
+                <p style={{ fontSize: 42, fontWeight: 800, color: 'var(--accent)', margin: 0, letterSpacing: '-0.01em' }}>
                   ${fmt(data?.estimatedMonthly ?? 0)} <span style={{ fontSize: 22, fontWeight: 600 }}>/ mois (estimation)</span>
                 </p>
               </div>
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
                 <div>
                   <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0 0 6px' }}>Pro</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#D4AF37', margin: 0 }}>${fmt((data?.proCount ?? 0) * (data?.priceProUsd ?? 0))}</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', margin: 0 }}>${fmt((data?.proCount ?? 0) * (data?.priceProUsd ?? 0))}</p>
                   <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', margin: '4px 0 0' }}>{data?.proCount} × ${data?.priceProUsd}</p>
                 </div>
                 <div>
@@ -143,7 +143,7 @@ export default function AdminRevenuePage() {
                   <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 8, fontSize: 12 }}
                     formatter={(v: any) => [`$${v}`, 'Revenu']} />
-                  <Bar dataKey="montant" fill="#D4AF37" radius={[4, 4, 0, 0]} name="Revenu ($)" />
+                  <Bar dataKey="montant" fill="var(--accent)" radius={[4, 4, 0, 0]} name="Revenu ($)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -159,7 +159,7 @@ export default function AdminRevenuePage() {
                   <p style={{ padding: '24px', fontSize: 13, color: 'rgba(255,255,255,0.30)', textAlign: 'center' }}>Aucun abonnement actif</p>
                 ) : (data.subscriptions ?? []).map((s: any, i: number) => (
                   <div key={s.clerkUserId} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgba(212,175,55,0.10)', border: `1px solid ${s.plan === 'business' ? 'rgba(168,168,168,0.20)' : 'rgba(212,175,55,0.20)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: s.plan === 'business' ? '#a8a8a8' : '#D4AF37', flexShrink: 0 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.10)', border: `1px solid ${s.plan === 'business' ? 'rgba(168,168,168,0.20)' : 'rgb(var(--accent-rgb)/0.20)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)', flexShrink: 0 }}>
                       {(s.clerkUserId ?? 'U').slice(-2).toUpperCase()}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -167,7 +167,7 @@ export default function AdminRevenuePage() {
                       <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', marginTop: 2 }}>Depuis {fmtDate(s.since)}</p>
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '3px 8px', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgba(212,175,55,0.12)', color: s.plan === 'business' ? '#a8a8a8' : '#D4AF37' }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '3px 8px', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.12)', color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)' }}>
                         {s.plan}
                       </span>
                       <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.70)', marginTop: 4 }}>

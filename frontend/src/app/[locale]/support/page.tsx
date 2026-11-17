@@ -116,7 +116,7 @@ export default function SupportPage() {
               {isPro && (
                 <span
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-                  style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.35)', color: 'var(--accent)' }}
+                  style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}
                 >
                   <Sparkles className="w-3 h-3" />
                   Pro
@@ -155,7 +155,7 @@ export default function SupportPage() {
                 >
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.25)' }}
+                    style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.25)' }}
                   >
                     <Mail className="w-4 h-4 text-accent" />
                   </div>
@@ -217,7 +217,7 @@ export default function SupportPage() {
                   >
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.18)' }}
+                      style={{ background: 'rgb(var(--accent-rgb)/0.08)', border: '1px solid rgb(var(--accent-rgb)/0.18)' }}
                     >
                       <Zap className="w-3.5 h-3.5 text-accent" />
                     </div>

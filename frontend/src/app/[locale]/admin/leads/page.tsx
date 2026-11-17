@@ -82,7 +82,7 @@ export default function AdminLeadsPage() {
                   <td style={cell}>
                     {l.name && <div style={{ color: 'rgba(255,255,255,0.85)' }}>{l.name}</div>}
                     {l.email && (
-                      <a href={`mailto:${l.email}`} style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#D4AF37', textDecoration: 'none' }}>
+                      <a href={`mailto:${l.email}`} style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--accent)', textDecoration: 'none' }}>
                         <Mail style={{ width: 12, height: 12 }} /> {l.email}
                       </a>
                     )}
@@ -97,7 +97,7 @@ export default function AdminLeadsPage() {
                   <td style={cell}>{l.locale}</td>
                   <td style={cell}>
                     {l.reportUrl && (
-                      <a href={l.reportUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#D4AF37' }} aria-label="Ouvrir le rapport">
+                      <a href={l.reportUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }} aria-label="Ouvrir le rapport">
                         <ExternalLink style={{ width: 14, height: 14 }} />
                       </a>
                     )}

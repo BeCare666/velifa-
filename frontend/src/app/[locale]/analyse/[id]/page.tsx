@@ -162,7 +162,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
                 </span>
                 {platform && (
                   <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full font-medium"
-                    style={{ background: 'rgba(212,175,55,0.12)', color: 'var(--accent)', border: '1px solid rgba(212,175,55,0.35)' }}>
+                    style={{ background: 'rgb(var(--accent-rgb)/0.12)', color: 'var(--accent)', border: '1px solid rgb(var(--accent-rgb)/0.35)' }}>
                     <ShoppingBag className="w-3.5 h-3.5" /> {t('platform', { platform })}
                   </span>
                 )}
@@ -250,7 +250,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
                           {r.itemCount > 0 && <span>{t('recs.items', { count: r.itemCount })}</span>}
                         </div>
                         {hosted && group && (
-                          <p className="text-xs mt-2 p-2 rounded-velifa-md" style={{ background: 'rgba(212,175,55,0.08)', color: 'var(--text-muted)' }}>
+                          <p className="text-xs mt-2 p-2 rounded-velifa-md" style={{ background: 'rgb(var(--accent-rgb)/0.08)', color: 'var(--text-muted)' }}>
                             <strong style={{ color: 'var(--accent)' }}>{t('recs.tipOn', { platform: platform! })} </strong>
                             {t(`recs.tips.${group}`)}
                           </p>
@@ -265,7 +265,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* ── Impact business (sourcé) ────────────────────────────────── */}
-        <div className="velifa-card" style={{ borderColor: 'rgba(212,175,55,0.35)' }}>
+        <div className="velifa-card" style={{ borderColor: 'rgb(var(--accent-rgb)/0.35)' }}>
           <SectionTitle icon={TrendingUp} title={t('impact.title')} />
           <p className="text-sm text-text leading-relaxed">{t('impact.body')}</p>
           <p className="text-xs text-text-muted mt-2">{t('impact.caveat')}</p>

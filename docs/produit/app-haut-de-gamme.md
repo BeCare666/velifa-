@@ -35,6 +35,10 @@ Un client premium ne juge pas sur une couleur, il juge sur des détails qui ne m
 | P2 | Suivi en direct cassé : le backend envoie des événements SSE **nommés** `analysis-update` (`analyses.controller.ts`), le frontend n'écoutait que `onmessage` → aucune mise à jour en direct ; si l'audit finissait avant l'ouverture du flux, la page attendait indéfiniment (`useAnalysisStatus.ts`) | `addEventListener('analysis-update')` + interrogation périodique permanente en filet de sécurité |
 | P3 | Écran d'attente générique, étapes fictives (« Étape 3 » jamais atteinte : le worker n'envoyait que `processing`) | Le worker envoie ses **étapes réelles** (`performance`, `inspection`, `report`) ; écran plein écran (domaine audité, chrono, étapes réelles, contrôles réellement faits) |
 
+| P10 | Charte « or » partout : 265 valeurs codées en dur dans 32 fichiers, dégradés et halos dorés ; polices Orbitron / Chakra Petch (style science-fiction) ; **aucune police arabe** (rendu système sur le marché prioritaire) | Charte **monochrome luxe** (noir, ivoire, gris ; couleur réservée aux scores) pilotée par une seule variable `--accent-rgb` ; 256 valeurs remplacées ; Inter + IBM Plex Sans Arabic |
+| P11 | Hero : carrousel de 3 photos de banque d'images (circuits, câbles, globe) | Fond sobre (trame fine, lumière zénithale) ; barre d'audit centrée visible sans défiler |
+| P12 | Accueil : champ `type="url"` refusant `monsite.com` | Adresse complétée en `https://` |
+
 ### À corriger
 
 | Réf. | Constat | Fichier |
@@ -45,6 +49,8 @@ Un client premium ne juge pas sur une couleur, il juge sur des détails qui ne m
 | P7 | Idem dans le rapport Pro : « Core Web Vitals & Métriques », « Opportunités d'optimisation » | `components/report/ReportProFeatures.tsx:196, 233` |
 | P8 | Message d'erreur d'analyse renvoyé par l'API en français uniquement (« Limite quotidienne atteinte… ») | `backend/src/analyses/analyses.service.ts:84` |
 | P9 | Même risque de bouton grisé sans explication (CAPTCHA) dans le formulaire « Je veux corriger » et la fenêtre « Nouvel audit » | `components/report/LeadForm.tsx:99`, `components/audit/NewAuditModal.tsx:300` |
+| P13 | Section « fonctionnalités » de l'accueil : 4 photos Unsplash de banque d'images à la place de vraies captures du produit | `app/[locale]/page.tsx` (carrousel des fonctionnalités) — à remplacer par des captures réelles du rapport une fois la production fonctionnelle (P4) |
+| P14 | Badge de l'accueil « Analyse en 30 secondes » : durée non mesurée (deux audits PageSpeed + inspection ; délai max du job 60 s) | `messages/*.json` → `hero.badge` — à mesurer sur la production avant de garder un chiffre |
 
 ---
 
@@ -75,7 +81,7 @@ Ordre imposé par les dépendances : **fiabilité → vérité/langue → expér
 |---|---|---|
 | H3.1 | Écran d'audit plein écran avec étapes réelles | ✅ fait le 2026-11-17 (voir constats P2, P3) |
 | H3.2 | Rapport : ouverture par un **résumé exécutif** (score, 3 priorités, impact estimé, capture du site) avant le détail technique — tout existe déjà en base (`recommendations`, `screenshotUrl`, impact 1.6) | Revue sur un audit réel, 3 langues |
-| H3.3 | Hiérarchie visuelle : l'or réservé aux accents (score, état actif, CTA principal) ; fonds, typographie, espacements unifiés via `velifa-design-system.css` (aucune couleur en dur dans les pages) | Recherche `rgba(212,175,55` hors design system = 0 |
+| H3.3 | Charte monochrome luxe pilotée par `--accent-rgb` ; polices Inter + IBM Plex Sans Arabic ; aucune couleur d'or en dur | ✅ 2026-11-17 : recherche des valeurs d'or = 0 ; build OK |
 | H3.4 | Exemplarité : Lighthouse mobile du site VELIFA (accueil, rapport) | ≥ 90 performance et accessibilité, résultat consigné dans le Journal |
 | H3.5 | États vides, chargements et erreurs soignés sur tableau de bord, audits, réglages (squelettes, messages utiles) | Revue page par page |
 

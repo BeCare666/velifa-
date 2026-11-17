@@ -700,3 +700,21 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Preuves : 9 cas `normalizeSiteUrl` vérifiés ; `tsc` exit 0 ; `next build` exit 0 (87 pages) ; rendu local
   (`next start`) dans Chrome : barre visible sans défiler, Turnstile validé, `example.com` saisi → bouton actif.
 - Non vérifié visuellement : arabe (RTL) et mobile.
+
+### 2026-11-17 — 5.5 (lot H3) : refonte visuelle monochrome luxe, menus mobiles, espace client et admin
+- Demande du propriétaire : rendu « ultra pro, premium », plus de couleurs dorées, menus mobiles en panneau latéral,
+  espace client et admin au même niveau.
+- Constats (voir `docs/produit/app-haut-de-gamme.md`, P10–P14) : 265 valeurs d'or codées en dur dans 32 fichiers ;
+  polices Orbitron / Chakra Petch ; **aucune police arabe** ; carrousel de photos de banque d'images ; composants
+  dupliqués (3 cartes de statistiques, 3 affichages de score) ; couleurs blanches en dur (thème clair cassé).
+- Charte : noir / ivoire / gris, couleur réservée aux scores, accent unique `--accent-rgb` ; 256 valeurs remplacées ;
+  Inter + IBM Plex Sans Arabic.
+- Vitrine : fond sobre, en-tête translucide (page active, « Lancer un audit »), **panneau latéral mobile** (côté de
+  lecture, Échap, fond assombri, défilement bloqué).
+- Espace client / admin : `components/ui` (PageHeader, Panel, StatCard, ScoreBadge, ScoreRing, EmptyState, Skeleton,
+  Badge) + `lib/score.ts` ; tableau de bord, audits, vue générale admin refaits ; tiroirs mobiles RTL.
+- Bugs corrigés : liens de l'admin jamais actifs (chemin avec préfixe de langue) ; **l'admin affichait dans la
+  console du navigateur l'email, l'identifiant et la liste des emails administrateurs** (retiré) ; textes en dur.
+- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
+- Reste : paramètres, abonnement, support, 9 pages admin ; sections de l'accueil sous le hero ; vérification
+  visuelle mobile et arabe.

@@ -79,8 +79,8 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
                 onClick={() => switchLocale(l.code)}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors duration-100"
                 style={{
-                  color: l.code === locale ? '#D4AF37' : 'rgba(255,255,255,0.75)',
-                  background: l.code === locale ? 'rgba(212,175,55,0.08)' : 'transparent',
+                  color: l.code === locale ? 'var(--accent)' : 'rgba(255,255,255,0.75)',
+                  background: l.code === locale ? 'rgb(var(--accent-rgb)/0.08)' : 'transparent',
                   fontWeight: l.code === locale ? 600 : 400,
                 }}
                 onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
@@ -89,7 +89,7 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
                 <span className="text-base leading-none">{l.flag}</span>
                 <span>{l.name}</span>
                 {l.code === locale && (
-                  <span className="ml-auto text-xs" style={{ color: '#D4AF37' }}>✓</span>
+                  <span className="ml-auto text-xs" style={{ color: 'var(--accent)' }}>✓</span>
                 )}
               </button>
             ))}
@@ -138,8 +138,8 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
               onClick={() => switchLocale(l.code)}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors duration-100"
               style={{
-                color: l.code === locale ? '#D4AF37' : 'rgba(255,255,255,0.75)',
-                background: l.code === locale ? 'rgba(212,175,55,0.08)' : 'transparent',
+                color: l.code === locale ? 'var(--accent)' : 'rgba(255,255,255,0.75)',
+                background: l.code === locale ? 'rgb(var(--accent-rgb)/0.08)' : 'transparent',
                 fontWeight: l.code === locale ? 600 : 400,
               }}
               onMouseEnter={(e) => { if (l.code !== locale) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
@@ -148,7 +148,7 @@ export default function LanguageSwitcher({ variant = 'header' }: Props) {
               <span className="text-base leading-none">{l.flag}</span>
               <span>{l.name}</span>
               {l.code === locale && (
-                <span className="ml-auto text-xs" style={{ color: '#D4AF37' }}>✓</span>
+                <span className="ml-auto text-xs" style={{ color: 'var(--accent)' }}>✓</span>
               )}
             </button>
           ))}

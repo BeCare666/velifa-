@@ -102,7 +102,7 @@ export default function AdminProspectsPage() {
             Sans en-tête : url, nom, téléphone, pays. Séparateur « , » ou « ; ». 500 lignes max.
           </p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-            <label style={{ ...btn, color: '#D4AF37', borderColor: 'rgba(212,175,55,0.30)' }}>
+            <label style={{ ...btn, color: 'var(--accent)', borderColor: 'rgb(var(--accent-rgb)/0.30)' }}>
               <Upload style={{ width: 13, height: 13 }} /> {fileName || 'Choisir un fichier CSV'}
               <input type="file" accept=".csv,text/csv,text/plain" style={{ display: 'none' }}
                 onChange={(e) => onFile(e.target.files?.[0])} />
@@ -114,7 +114,7 @@ export default function AdminProspectsPage() {
               <option value="fr">Rapports en français</option>
             </select>
             <button type="button" disabled={!csv.trim() || importing} onClick={runImport}
-              style={{ ...btn, background: 'rgba(212,175,55,0.12)', borderColor: 'rgba(212,175,55,0.35)', color: '#D4AF37', opacity: !csv.trim() || importing ? 0.5 : 1 }}>
+              style={{ ...btn, background: 'rgb(var(--accent-rgb)/0.12)', borderColor: 'rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)', opacity: !csv.trim() || importing ? 0.5 : 1 }}>
               {importing ? 'Import…' : 'Importer et programmer les audits'}
             </button>
           </div>
@@ -196,7 +196,7 @@ export default function AdminProspectsPage() {
                   <td style={{ padding: '10px 16px', fontSize: 11, color: 'rgba(255,255,255,0.40)', whiteSpace: 'nowrap' }}>{fmtDate(p.createdAt)}</td>
                   <td style={{ padding: '10px 16px' }}>
                     {p.status === 'completed' && p.reportUrl && (
-                      <a href={p.reportUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#D4AF37' }} aria-label="Ouvrir le rapport">
+                      <a href={p.reportUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }} aria-label="Ouvrir le rapport">
                         <ExternalLink style={{ width: 14, height: 14 }} />
                       </a>
                     )}

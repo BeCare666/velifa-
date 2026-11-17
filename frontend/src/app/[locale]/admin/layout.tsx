@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div style={{minHeight:'100vh',background:'#080808',
       display:'flex',alignItems:'center',justifyContent:'center'}}>
       <div style={{width:32,height:32,borderRadius:'50%',
-        border:'2px solid #D4AF37',borderTopColor:'transparent',
+        border:'2px solid var(--accent)',borderTopColor:'transparent',
         animation:'spin 0.8s linear infinite'}}/>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
@@ -23,14 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       display:'flex',alignItems:'center',justifyContent:'center',
       flexDirection:'column',gap:16,color:'white'}}>
       <p>Connectez-vous pour accéder à l&apos;admin</p>
-      <a href="/sign-in" style={{color:'#D4AF37'}}>Se connecter</a>
+      <a href="/sign-in" style={{color:'var(--accent)'}}>Se connecter</a>
     </div>
   );
-
-  console.log('EMAIL CLERK:', JSON.stringify(user.primaryEmailAddress?.emailAddress));
-  console.log('USER ID CLERK:', JSON.stringify(user.id));
-  console.log('ADMINS:', JSON.stringify(ADMINS));
-  console.log('ADMIN_IDS:', JSON.stringify(ADMIN_USER_IDS));
 
   const email = user.primaryEmailAddress?.emailAddress?.toLowerCase() || '';
   const userId = user.id || '';
@@ -42,16 +37,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       flexDirection:'column',gap:16,color:'white'}}>
       <p style={{fontSize:24}}>⛔ Accès refusé</p>
       <p style={{color:'rgba(255,255,255,0.5)'}}>{email}</p>
-      <a href="/dashboard" style={{color:'#D4AF37'}}>
+      <a href="/dashboard" style={{color:'var(--accent)'}}>
         Retour au dashboard
       </a>
     </div>
   );
 
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'#0a0a0a'}}>
+    <div className="flex min-h-screen bg-bg">
       <AdminSidebar />
-      <main style={{flex:1,minWidth:0}}>{children}</main>
+      <main className="min-w-0 flex-1 overflow-x-hidden pt-14 md:pt-0">{children}</main>
     </div>
   );
 }

@@ -1,24 +1,19 @@
-import { Orbitron, Chakra_Petch, Sora } from 'next/font/google';
+import { Inter, IBM_Plex_Sans_Arabic } from 'next/font/google';
 
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800', '900'],
-  variable: '--velifa-font-brand',
-  display: 'swap',
-});
-
-const chakraPetch = Chakra_Petch({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--velifa-font-heading',
-  display: 'swap',
-});
-
-const sora = Sora({
+// Latin : Inter (sobre, très lisible, standard des produits professionnels)
+const inter = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
-  variable: '--velifa-font-body',
+  variable: '--font-inter',
   display: 'swap',
 });
 
-export const fontVariables = [orbitron.variable, chakraPetch.variable, sora.variable].join(' ');
+// Arabe : IBM Plex Sans Arabic (marché prioritaire ; avant : aucune police arabe, rendu système)
+const plexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-arabic',
+  display: 'swap',
+});
+
+export const fontVariables = [inter.variable, plexArabic.variable].join(' ');

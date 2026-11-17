@@ -10,7 +10,14 @@
     "faq": "FAQ",
     "contact": "Contact",
     "dashboard": "Mon espace",
-    "login": "Connexion"
+    "login": "Connexion",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "account": "Mon compte",
+    "startAudit": "Lancer un audit",
+    "menu": "Menu",
+    "language": "Langue",
+    "theme": "Thème"
   },
   "hero": {
     "badge": "Analyse en 30 secondes · Rapport complet · 100% gratuit",
@@ -295,7 +302,13 @@
       "threshold": "Seuil",
       "thresholdHelp": "Alerte email si le score passe sous ce seuil (1–100). Vide = pas d’alerte.",
       "scheduleBusinessOnly": "Audits programmés et alertes email : disponibles avec le plan Business."
-    }
+    },
+    "chartTitle": "Évolution du score de performance",
+    "chartEmpty": "Lancez plus d'audits pour voir l'évolution de votre score dans le temps.",
+    "planFree": "Gratuit",
+    "close": "Fermer",
+    "overview": "Vue d'ensemble",
+    "outOf": "/ 100"
   },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",

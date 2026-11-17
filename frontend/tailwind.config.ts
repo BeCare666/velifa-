@@ -19,17 +19,6 @@ const config: Config = {
         accent:          'var(--accent)',
         'accent-hover':  'var(--accent-hover)',
         'accent-soft':   'var(--accent-soft)',
-        gold: {
-          50:  'var(--velifa-gold-50)',
-          100: 'var(--velifa-gold-100)',
-          200: 'var(--velifa-gold-200)',
-          300: 'var(--velifa-gold-300)',
-          400: 'var(--velifa-gold-400)',
-          500: 'var(--velifa-gold-500)',
-          600: 'var(--velifa-gold-600)',
-          700: 'var(--velifa-gold-700)',
-          800: 'var(--velifa-gold-800)',
-        },
         score: {
           good:    'var(--velifa-score-good)',
           average: 'var(--velifa-score-average)',
@@ -37,14 +26,13 @@ const config: Config = {
         },
       },
       fontFamily: {
-        brand:   ['Orbitron', 'sans-serif'],
-        heading: ['Chakra Petch', 'sans-serif'],
-        body:    ['Sora', 'system-ui', 'sans-serif'],
-        sans:    ['Sora', 'system-ui', 'sans-serif'],
+        brand:   ['var(--velifa-font-brand)'],
+        heading: ['var(--velifa-font-heading)'],
+        body:    ['var(--velifa-font-body)'],
+        sans:    ['var(--velifa-font-body)'],
       },
       backgroundImage: {
-        'gradient-gold':      'var(--velifa-gradient-gold)',
-        'gradient-gold-soft': 'var(--velifa-gradient-gold-soft)',
+        'gradient-accent':    'var(--brand-gradient)',
       },
       borderRadius: {
         'velifa-sm': 'var(--velifa-radius-sm)',
@@ -56,11 +44,11 @@ const config: Config = {
         'velifa-sm': 'var(--shadow-sm)',
         'velifa-md': 'var(--shadow-md)',
         'velifa-lg': 'var(--shadow-lg)',
-        gold:        'var(--shadow-gold)',
+        accent:      'var(--shadow-accent)',
       },
       letterSpacing: {
-        eyebrow: '0.42em',
-        brand:   '0.14em',
+        eyebrow: '0.32em',
+        brand:   '0.32em',
       },
       transitionTimingFunction: {
         velifa: 'cubic-bezier(0.22, 1, 0.36, 1)',
@@ -71,8 +59,8 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'velifa-glow': {
-          '0%,100%': { boxShadow: '0 0 0 0 rgba(212,175,55,0.0)' },
-          '50%':     { boxShadow: '0 0 28px 0 rgba(212,175,55,0.35)' },
+          '0%,100%': { opacity: '1' },
+          '50%':     { opacity: '0.72' },
         },
       },
       animation: {

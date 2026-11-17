@@ -6,140 +6,52 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import {
   BarChart3, Globe, FileSearch, RefreshCw, ArrowRight,
-  Loader2, Zap, ChevronLeft, ChevronRight, Filter, Calendar,
+  Loader2, ChevronLeft, ChevronRight, Filter, Calendar,
   Gauge, Search, GitCompare,
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { api } from '@/lib/api';
 import type { MyAudit } from '@/types/analysis';
+import { PageHeader, Panel, StatCard, ScoreBadge, Skeleton, EmptyState, Badge } from '@/components/ui';
+import { displayHost, scoreBucket } from '@/lib/score';
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
 function useFormatDate() {
   const locale = useLocale();
   return (iso: string): string =>
-    new Date(iso).toLocaleDateString(locale, {
-      day: 'numeric', month: 'short', year: 'numeric',
-    });
+    new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
-
-function stripUrl(url: string): string {
-  try {
-    const u = new URL(url);
-    return u.host.replace(/^www\./, '') + (u.pathname !== '/' ? u.pathname : '');
-  } catch { return url; }
-}
-
-type ScoreBucket = 'good' | 'average' | 'poor' | 'unknown';
-function bucket(score: number | null): ScoreBucket {
-  if (score == null) return 'unknown';
-  if (score >= 90) return 'good';
-  if (score >= 50) return 'average';
-  return 'poor';
-}
-
-const SCORE_COLOR: Record<ScoreBucket, string> = {
-  good: '#0CCE6B', average: '#FFA400', poor: '#FF4E42', unknown: 'var(--text-subtle)',
-};
 
 type DateFilter  = '7d' | '30d' | 'all';
 type ScoreFilter = 'all' | 'good' | 'average' | 'poor';
 const PAGE_SIZE = 10;
 
-// ── Score pill ───────────────────────────────────────────────────────────────
-function ScorePill({ score }: { score: number | null }) {
-  const b = bucket(score);
+function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-      style={{
-        background: score != null
-          ? `${SCORE_COLOR[b]}18`
-          : 'var(--surface-raised)',
-        color: SCORE_COLOR[b],
-        border: `1px solid ${score != null ? `${SCORE_COLOR[b]}40` : 'var(--border)'}`,
-      }}
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+        active
+          ? 'border-[color:var(--border-strong)] bg-[color:var(--accent-soft)] text-text'
+          : 'border-transparent text-text-muted hover:text-text'
+      }`}
     >
-      {score ?? '—'}
-    </span>
+      {children}
+    </button>
   );
 }
 
-// ── Stat card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, gold = false }: {
-  label: string; value: React.ReactNode; icon: React.ElementType; gold?: boolean;
-}) {
+function FilterGroup({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children: React.ReactNode }) {
   return (
-    <div
-      className="flex flex-col gap-3 p-5 transition-all duration-200 hover:-translate-y-0.5"
-      style={{
-        background: gold
-          ? 'linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(26,26,26,0.95) 60%)'
-          : 'linear-gradient(135deg, rgba(36,36,36,0.9) 0%, rgba(18,18,18,0.95) 100%)',
-        border: gold ? '1px solid rgba(212,175,55,0.35)' : '1px solid var(--border)',
-        borderRadius: 'var(--velifa-radius-lg)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
-      }}
-    >
-      <Icon className="w-4 h-4" style={{ color: gold ? 'var(--accent)' : 'var(--text-subtle)' }} strokeWidth={1.75} />
-      <div>
-        <p className="text-[10px] font-semibold tracking-widest uppercase text-text-subtle mb-1">{label}</p>
-        <p className="font-heading font-bold text-3xl" style={{ color: gold ? 'var(--accent)' : 'var(--text)' }}>
-          {value}
-        </p>
-      </div>
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="me-1 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-text-subtle">
+        <Icon className="h-3.5 w-3.5" />{label}
+      </span>
+      {children}
     </div>
   );
 }
 
-// ── Row skeleton ─────────────────────────────────────────────────────────────
-function RowSkeleton() {
-  return (
-    <tr className="animate-pulse">
-      {[...Array(6)].map((_, i) => (
-        <td key={i} className="px-4 py-3.5">
-          <div className="h-4 rounded" style={{ background: 'var(--surface-raised)', width: i === 0 ? '60%' : '40%' }} />
-        </td>
-      ))}
-    </tr>
-  );
-}
-
-// ── Empty state ──────────────────────────────────────────────────────────────
-function EmptyState({ filtered, noResultsTitle, noResultsDesc, noAuditsTitle, noAuditsDesc, launchLabel }: {
-  filtered: boolean;
-  noResultsTitle: string;
-  noResultsDesc: string;
-  noAuditsTitle: string;
-  noAuditsDesc: string;
-  launchLabel: string;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-      <div
-        className="w-14 h-14 rounded-full flex items-center justify-center"
-        style={{ background: 'var(--surface-raised)' }}
-      >
-        <FileSearch className="w-6 h-6 text-text-subtle" strokeWidth={1.5} />
-      </div>
-      <div>
-        <h3 className="font-heading font-semibold text-text text-lg mb-1">
-          {filtered ? noResultsTitle : noAuditsTitle}
-        </h3>
-        <p className="text-text-muted text-sm max-w-xs">
-          {filtered ? noResultsDesc : noAuditsDesc}
-        </p>
-      </div>
-      {!filtered && (
-        <Link href="/" className="velifa-btn inline-flex items-center gap-2 mt-2">
-          <Zap className="w-4 h-4" />
-          {launchLabel}
-        </Link>
-      )}
-    </div>
-  );
-}
-
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default function AuditsPage() {
   const router = useRouter();
   const { isLoaded, isSignedIn, getToken } = useAuth();
@@ -148,26 +60,17 @@ export default function AuditsPage() {
   const locale = useLocale();
   const formatDate = useFormatDate();
 
-  const SCORE_LABEL: Record<ScoreBucket, string> = {
-    good: t('scoreGood'),
-    average: t('scoreAverage'),
-    poor: t('scorePoor'),
-    unknown: '—',
-  };
-
-  const [audits, setAudits]       = useState<MyAudit[] | null>(null);
-  const [error, setError]         = useState<string | null>(null);
+  const [audits, setAudits]        = useState<MyAudit[] | null>(null);
+  const [error, setError]          = useState<string | null>(null);
   const [relaunching, setRelaunch] = useState<string | null>(null);
-  const [dateFilter, setDate]     = useState<DateFilter>('all');
-  const [scoreFilter, setScore]   = useState<ScoreFilter>('all');
-  const [page, setPage]           = useState(1);
+  const [dateFilter, setDate]      = useState<DateFilter>('all');
+  const [scoreFilter, setScore]    = useState<ScoreFilter>('all');
+  const [page, setPage]            = useState(1);
 
-  // Auth guard
   useEffect(() => {
     if (isLoaded && !isSignedIn) router.push('/sign-in');
   }, [isLoaded, isSignedIn, router]);
 
-  // Fetch
   useEffect(() => {
     if (!isSignedIn) return;
     let cancelled = false;
@@ -184,7 +87,6 @@ export default function AuditsPage() {
     return () => { cancelled = true; };
   }, [isSignedIn, getToken]);
 
-  // Stats
   const stats = useMemo(() => {
     if (!audits?.length) return { total: 0, avg: null as number | null, best: null as number | null };
     const scored = audits.filter((a) => a.scorePerformance != null) as Array<MyAudit & { scorePerformance: number }>;
@@ -205,23 +107,19 @@ export default function AuditsPage() {
     return map;
   }, [audits]);
 
-  // Filtering
   const filtered = useMemo(() => {
     if (!audits) return [];
     let res = [...audits];
     const now = Date.now();
     if (dateFilter === '7d')  res = res.filter((a) => now - new Date(a.createdAt).getTime() < 7  * 86_400_000);
     if (dateFilter === '30d') res = res.filter((a) => now - new Date(a.createdAt).getTime() < 30 * 86_400_000);
-    if (scoreFilter === 'good')    res = res.filter((a) => bucket(a.scorePerformance) === 'good');
-    if (scoreFilter === 'average') res = res.filter((a) => bucket(a.scorePerformance) === 'average');
-    if (scoreFilter === 'poor')    res = res.filter((a) => bucket(a.scorePerformance) === 'poor');
+    if (scoreFilter !== 'all') res = res.filter((a) => scoreBucket(a.scorePerformance) === scoreFilter);
     return res;
   }, [audits, dateFilter, scoreFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // Reset page on filter change
   useEffect(() => { setPage(1); }, [dateFilter, scoreFilter]);
 
   async function relaunch(audit: MyAudit) {
@@ -233,7 +131,7 @@ export default function AuditsPage() {
       const res = await api.getMine(token!);
       setAudits(res.data);
     } catch {
-      // silent — user can retry
+      // silencieux — l'utilisateur peut réessayer
     } finally {
       setRelaunch(null);
     }
@@ -243,276 +141,141 @@ export default function AuditsPage() {
 
   if (!isLoaded || (isLoaded && !isSignedIn)) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-bg">
+        <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
       </div>
     );
   }
 
   return (
-    <>
-      <style jsx>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-      `}</style>
+    <div className="min-h-screen bg-bg">
+      <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+        <PageHeader title={t('title')} description={t('subtitle')} />
 
-      <div className="min-h-screen bg-bg">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 sm:py-16">
-
-          {/* Header */}
-          <div className="fade-up mb-10">
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-text tracking-tight">
-              {t('title')}
-            </h1>
-            <p className="text-text-muted mt-2 text-sm">
-              {t('subtitle')}
-            </p>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 fade-up" style={{ animationDelay: '60ms' }}>
-            <StatCard label={t('statTotal')}  value={stats.total}        icon={BarChart3} />
-            <StatCard label={t('statAvg')}    value={stats.avg ?? '—'}   icon={Gauge} />
-            <StatCard label={t('statBest')}   value={stats.best ?? '—'}  icon={Search} gold />
-          </div>
-
-          {/* Filters */}
-          <div
-            className="fade-up flex flex-wrap items-center gap-3 mb-6 p-4 rounded-[var(--velifa-radius-lg)]"
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              animationDelay: '100ms',
-            }}
-          >
-            <div className="flex items-center gap-2 text-text-subtle">
-              <Calendar className="w-4 h-4" />
-              <span className="text-xs font-semibold tracking-widest uppercase">{t('period')}</span>
-            </div>
-            {(['all', '7d', '30d'] as DateFilter[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => setDate(f)}
-                className="px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all"
-                style={dateFilter === f
-                  ? { background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.35)', color: 'var(--accent)' }
-                  : { background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-              >
-                {f === 'all' ? t('filterAll') : f === '7d' ? t('filter7d') : t('filter30d')}
-              </button>
-            ))}
-
-            <div className="w-px h-4 hidden sm:block" style={{ background: 'var(--border)' }} />
-
-            <div className="flex items-center gap-2 text-text-subtle">
-              <Filter className="w-4 h-4" />
-              <span className="text-xs font-semibold tracking-widest uppercase">{t('score')}</span>
-            </div>
-            {(['all', 'good', 'average', 'poor'] as ScoreFilter[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => setScore(f)}
-                className="px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all"
-                style={scoreFilter === f
-                  ? { background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.35)', color: 'var(--accent)' }
-                  : { background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-              >
-                {f === 'all' ? t('scoreAll') : f === 'good' ? t('scoreGood') : f === 'average' ? t('scoreAverage') : t('scorePoor')}
-              </button>
-            ))}
-          </div>
-
-          {/* Table */}
-          <div
-            className="fade-up rounded-[var(--velifa-radius-lg)] overflow-hidden"
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
-              animationDelay: '140ms',
-            }}
-          >
-            {error ? (
-              <div className="py-16 text-center">
-                <p className="text-sm font-medium" style={{ color: '#FF4E42' }}>{t('loadError')}</p>
-                <p className="text-text-muted text-xs mt-1">{error}</p>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                        {[t('colUrl'), t('colPerf'), t('colSeo'), t('colDate'), t('colStatus'), t('colActions')].map((h) => (
-                          <th
-                            key={h}
-                            className="px-4 py-3 text-start text-[10px] font-semibold tracking-widest uppercase text-text-subtle"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {isLoading
-                        ? [...Array(5)].map((_, i) => <RowSkeleton key={i} />)
-                        : paged.length === 0
-                          ? (
-                            <tr>
-                              <td colSpan={6}>
-                                <EmptyState
-                                  filtered={dateFilter !== 'all' || scoreFilter !== 'all'}
-                                  noResultsTitle={t('noResults')}
-                                  noResultsDesc={t('noResultsDesc')}
-                                  noAuditsTitle={t('noAudits')}
-                                  noAuditsDesc={t('noAuditsDesc')}
-                                  launchLabel={t('launchAudit')}
-                                />
-                              </td>
-                            </tr>
-                          )
-                          : paged.map((audit, i) => (
-                            <tr
-                              key={audit.id}
-                              className="group transition-colors"
-                              style={{
-                                borderBottom: i < paged.length - 1 ? '1px solid var(--border)' : 'none',
-                                animationDelay: `${i * 40}ms`,
-                              }}
-                              onMouseEnter={(e) => {
-                                (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.025)';
-                              }}
-                              onMouseLeave={(e) => {
-                                (e.currentTarget as HTMLTableRowElement).style.background = 'transparent';
-                              }}
-                            >
-                              {/* URL */}
-                              <td className="px-4 py-3.5 max-w-[200px]">
-                                <div className="flex items-center gap-2">
-                                  <Globe className="w-3.5 h-3.5 text-text-subtle flex-shrink-0" />
-                                  <span className="text-text font-medium truncate">{stripUrl(audit.url)}</span>
-                                </div>
-                              </td>
-                              {/* Perf */}
-                              <td className="px-4 py-3.5">
-                                <ScorePill score={audit.scorePerformance} />
-                              </td>
-                              {/* SEO */}
-                              <td className="px-4 py-3.5">
-                                <ScorePill score={(audit as any).scoreSeo ?? null} />
-                              </td>
-                              {/* Date */}
-                              <td className="px-4 py-3.5 text-text-muted whitespace-nowrap">
-                                {formatDate(audit.createdAt)}
-                              </td>
-                              {/* Statut */}
-                              <td className="px-4 py-3.5">
-                                <span
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-                                  style={{
-                                    background: 'rgba(12,206,107,0.12)',
-                                    color: '#0CCE6B',
-                                    border: '1px solid rgba(12,206,107,0.30)',
-                                  }}
-                                >
-                                  {t('completed')}
-                                </span>
-                              </td>
-                              {/* Actions */}
-                              <td className="px-4 py-3.5">
-                                <div className="flex items-center gap-2">
-                                  <Link
-                                    href={`/analyse/${audit.id}`}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all"
-                                    style={{
-                                      background: 'rgba(212,175,55,0.10)',
-                                      border: '1px solid rgba(212,175,55,0.28)',
-                                      color: 'var(--accent)',
-                                    }}
-                                  >
-                                    <FileSearch className="w-3 h-3" />
-                                    {t('report')}
-                                    <ArrowRight className="w-3 h-3" />
-                                  </Link>
-                                  {previousOf[audit.id] && (
-                                    <Link
-                                      href={`/${locale}/analyse/${audit.id}/compare/${previousOf[audit.id]}`}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all"
-                                      style={{
-                                        background: 'var(--surface-raised)',
-                                        border: '1px solid var(--border)',
-                                        color: 'var(--text-muted)',
-                                      }}
-                                    >
-                                      <GitCompare className="w-3 h-3" />
-                                      {tc('compare')}
-                                    </Link>
-                                  )}
-                                  <button
-                                    onClick={() => relaunch(audit)}
-                                    disabled={relaunching === audit.id}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all disabled:opacity-50"
-                                    style={{
-                                      background: 'var(--surface-raised)',
-                                      border: '1px solid var(--border)',
-                                      color: 'var(--text-muted)',
-                                    }}
-                                  >
-                                    {relaunching === audit.id
-                                      ? <Loader2 className="w-3 h-3 animate-spin" />
-                                      : <RefreshCw className="w-3 h-3" />
-                                    }
-                                    {t('relaunch')}
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                      }
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination */}
-                {!isLoading && totalPages > 1 && (
-                  <div
-                    className="flex items-center justify-between px-4 py-3"
-                    style={{ borderTop: '1px solid var(--border)' }}
-                  >
-                    <p className="text-xs text-text-muted">
-                      {filtered.length} {t('results')} · {t('page')} {page}/{totalPages}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all disabled:opacity-40"
-                        style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                        {t('prev')}
-                      </button>
-                      <button
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-[8px] text-xs font-medium transition-all disabled:opacity-40"
-                        style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-                      >
-                        {t('next')}
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
+        {/* ── Indicateurs ─────────────────────────────────────────────── */}
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <StatCard icon={BarChart3} label={t('statTotal')} value={stats.total} loading={isLoading} />
+          <StatCard icon={Gauge} label={t('statAvg')} value={stats.avg ?? '—'} loading={isLoading} />
+          <StatCard icon={Search} label={t('statBest')} value={stats.best ?? '—'} loading={isLoading} highlight />
         </div>
+
+        {/* ── Filtres ─────────────────────────────────────────────────── */}
+        <div className="mb-4 flex flex-col gap-3 rounded-velifa-lg border border-border bg-[color:var(--surface)] p-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <FilterGroup icon={Calendar} label={t('period')}>
+            {(['all', '7d', '30d'] as DateFilter[]).map((f) => (
+              <Chip key={f} active={dateFilter === f} onClick={() => setDate(f)}>
+                {f === 'all' ? t('filterAll') : f === '7d' ? t('filter7d') : t('filter30d')}
+              </Chip>
+            ))}
+          </FilterGroup>
+          <span className="hidden h-5 w-px bg-[color:var(--border)] sm:block" />
+          <FilterGroup icon={Filter} label={t('score')}>
+            {(['all', 'good', 'average', 'poor'] as ScoreFilter[]).map((f) => (
+              <Chip key={f} active={scoreFilter === f} onClick={() => setScore(f)}>
+                {f === 'all' ? t('scoreAll') : f === 'good' ? t('scoreGood') : f === 'average' ? t('scoreAverage') : t('scorePoor')}
+              </Chip>
+            ))}
+          </FilterGroup>
+        </div>
+
+        {/* ── Tableau ─────────────────────────────────────────────────── */}
+        <Panel padded={false}>
+          {error ? (
+            <div className="py-16 text-center">
+              <p className="text-sm font-semibold" style={{ color: 'var(--velifa-score-poor)' }}>{t('loadError')}</p>
+              <p className="mt-1 text-xs text-text-muted">{error}</p>
+            </div>
+          ) : !isLoading && paged.length === 0 ? (
+            <div className="p-5">
+              {dateFilter !== 'all' || scoreFilter !== 'all' ? (
+                <EmptyState icon={FileSearch} title={t('noResults')} description={t('noResultsDesc')} />
+              ) : (
+                <EmptyState
+                  icon={FileSearch}
+                  title={t('noAudits')}
+                  description={t('noAuditsDesc')}
+                  action={<Link href="/" className="velifa-btn">{t('launchAudit')}<ArrowRight className="h-4 w-4 rtl:rotate-180" /></Link>}
+                />
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      {[t('colUrl'), t('colPerf'), t('colSeo'), t('colDate'), t('colStatus'), t('colActions')].map((h) => (
+                        <th key={h} className="px-5 py-3 text-start text-[11px] font-medium uppercase tracking-[0.12em] text-text-subtle">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[color:var(--border)]">
+                    {isLoading
+                      ? [...Array(5)].map((_, i) => (
+                          <tr key={i}>
+                            {[...Array(6)].map((__, j) => (
+                              <td key={j} className="px-5 py-4"><Skeleton className={`h-4 ${j === 0 ? 'w-3/5' : 'w-2/5'}`} /></td>
+                            ))}
+                          </tr>
+                        ))
+                      : paged.map((audit) => (
+                          <tr key={audit.id} className="transition-colors hover:bg-[color:var(--accent-soft)]">
+                            <td className="max-w-[240px] px-5 py-3.5">
+                              <span className="flex items-center gap-2">
+                                <Globe className="h-3.5 w-3.5 flex-shrink-0 text-text-subtle" />
+                                <span dir="ltr" className="truncate font-medium text-text">{displayHost(audit.url)}</span>
+                              </span>
+                            </td>
+                            <td className="px-5 py-3.5"><ScoreBadge score={audit.scorePerformance} /></td>
+                            <td className="px-5 py-3.5"><ScoreBadge score={audit.scoreSeo} /></td>
+                            <td className="whitespace-nowrap px-5 py-3.5 text-text-muted">{formatDate(audit.createdAt)}</td>
+                            {/* /analyses/mine ne renvoie que les audits terminés */}
+                            <td className="px-5 py-3.5"><Badge tone="good">{t('completed')}</Badge></td>
+                            <td className="px-5 py-3.5">
+                              <div className="flex items-center gap-1.5">
+                                <Link href={`/analyse/${audit.id}`} className="velifa-btn !px-3 !py-1.5 text-xs">
+                                  <FileSearch className="h-3.5 w-3.5" />
+                                  {t('report')}
+                                </Link>
+                                {previousOf[audit.id] && (
+                                  <Link href={`/${locale}/analyse/${audit.id}/compare/${previousOf[audit.id]}`} className="velifa-btn velifa-btn--ghost !px-3 !py-1.5 text-xs">
+                                    <GitCompare className="h-3.5 w-3.5" />
+                                    {tc('compare')}
+                                  </Link>
+                                )}
+                                <button
+                                  onClick={() => relaunch(audit)}
+                                  disabled={relaunching === audit.id}
+                                  className="velifa-btn velifa-btn--ghost !px-3 !py-1.5 text-xs disabled:opacity-50"
+                                >
+                                  {relaunching === audit.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                                  {t('relaunch')}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {!isLoading && totalPages > 1 && (
+                <div className="flex items-center justify-between gap-3 border-t border-border px-5 py-3">
+                  <p className="text-xs text-text-muted tabular-nums">{filtered.length} {t('results')} · {t('page')} {page}/{totalPages}</p>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="velifa-btn velifa-btn--ghost !px-3 !py-1.5 text-xs disabled:opacity-40">
+                      <ChevronLeft className="h-3.5 w-3.5 rtl:rotate-180" />{t('prev')}
+                    </button>
+                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="velifa-btn velifa-btn--ghost !px-3 !py-1.5 text-xs disabled:opacity-40">
+                      {t('next')}<ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </Panel>
       </div>
-    </>
+    </div>
   );
 }

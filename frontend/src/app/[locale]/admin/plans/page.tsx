@@ -119,7 +119,7 @@ export default function AdminPlansPage() {
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', marginBottom: 24 }}>
           Le prix affiché doit correspondre au prix de la variante Lemon Squeezy choisie (c’est elle qui est facturée).
           Les produits se créent dans le tableau de bord Lemon Squeezy (l’API ne permet que de les lire).
-          <button type="button" onClick={loadVariants} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#D4AF37', cursor: 'pointer', fontSize: 12 }}>
+          <button type="button" onClick={loadVariants} style={{ marginLeft: 8, background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12 }}>
             <RefreshCw style={{ width: 11, height: 11, display: 'inline' }} /> Recharger les variantes
           </button>
         </p>
@@ -128,7 +128,7 @@ export default function AdminPlansPage() {
         <div style={{ display: 'grid', gap: 16 }}>
           {codes.map((code) => forms[code] && (
             <div key={code} style={box}>
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: '#D4AF37', margin: '0 0 14px' }}>{LABEL[code] ?? code}</h2>
+              <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)', margin: '0 0 14px' }}>{LABEL[code] ?? code}</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                 {code !== 'free' && (<>
                   <div><label style={lbl}>Prix mensuel (USD)</label><input style={inp} type="number" min={0} step="0.01" value={forms[code].priceMonthly} onChange={(e) => set(code, 'priceMonthly', e.target.value)} /></div>
@@ -144,7 +144,7 @@ export default function AdminPlansPage() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
                 <button type="button" onClick={() => save(code)}
-                  style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.35)', color: '#D4AF37' }}>
+                  style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}>
                   <Save style={{ width: 13, height: 13 }} /> Enregistrer
                 </button>
                 {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? '#ef4444' : 'rgba(255,255,255,0.55)' }}>{status[code]}</span>}

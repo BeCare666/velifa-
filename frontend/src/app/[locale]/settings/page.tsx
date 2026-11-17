@@ -135,9 +135,9 @@ export default function SettingsPage() {
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0"
                   style={{
-                    background: 'rgba(212,175,55,0.15)',
+                    background: 'rgb(var(--accent-rgb)/0.15)',
                     color: 'var(--accent)',
-                    border: '2px solid rgba(212,175,55,0.30)',
+                    border: '2px solid rgb(var(--accent-rgb)/0.30)',
                   }}
                 >
                   {initial}

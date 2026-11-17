@@ -58,7 +58,7 @@ export default function ApiKeysSection() {
       <p className="text-sm text-text-muted">{t('intro')}</p>
 
       {newKey && (
-        <div className="p-3 rounded-[8px] space-y-2" style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.35)' }}>
+        <div className="p-3 rounded-[8px] space-y-2" style={{ background: 'rgb(var(--accent-rgb)/0.08)', border: '1px solid rgb(var(--accent-rgb)/0.35)' }}>
           <p className="text-xs flex items-center gap-1.5 text-text"><AlertTriangle className="w-3.5 h-3.5 text-accent" /> {t('showOnce')}</p>
           <div className="flex items-center gap-2">
             <code dir="ltr" className="text-xs break-all flex-1">{newKey}</code>

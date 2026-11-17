@@ -121,7 +121,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#D4AF37' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
               {(s.email ?? s.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
@@ -129,7 +129,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
                 {s.email ?? s.clerkUserId}
               </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
-                <span style={{ fontSize: 10, fontWeight: 600, color: s.plan === 'business' ? '#a8a8a8' : '#D4AF37', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgba(212,175,55,0.12)', borderRadius: 99, padding: '2px 8px' }}>
+                <span style={{ fontSize: 10, fontWeight: 600, color: s.plan === 'business' ? '#a8a8a8' : 'var(--accent)', background: s.plan === 'business' ? 'rgba(168,168,168,0.10)' : 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '2px 8px' }}>
                   {s.plan === 'business' ? 'Business' : 'Pro'}
                 </span>
                 {s.suspended && (
@@ -147,7 +147,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
         <div style={{ display: 'flex', gap: 4, padding: '10px 22px 0', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ padding: '8px 14px', fontSize: 12, fontWeight: 600, borderRadius: '8px 8px 0 0', cursor: 'pointer', background: tab === t.key ? 'rgba(212,175,55,0.10)' : 'transparent', border: 'none', borderBottom: tab === t.key ? '2px solid #D4AF37' : '2px solid transparent', color: tab === t.key ? '#D4AF37' : 'rgba(255,255,255,0.45)' }}>
+              style={{ padding: '8px 14px', fontSize: 12, fontWeight: 600, borderRadius: '8px 8px 0 0', cursor: 'pointer', background: tab === t.key ? 'rgb(var(--accent-rgb)/0.10)' : 'transparent', border: 'none', borderBottom: tab === t.key ? '2px solid var(--accent)' : '2px solid transparent', color: tab === t.key ? 'var(--accent)' : 'rgba(255,255,255,0.45)' }}>
               {t.label}
             </button>
           ))}
@@ -327,7 +327,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
 
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <Link href={`/admin/audits?user=${s.clerkUserId}`}
-                  style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(212,175,55,0.10)', border: '1px solid rgba(212,175,55,0.25)', color: '#D4AF37', textDecoration: 'none' }}>
+                  style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.25)', color: 'var(--accent)', textDecoration: 'none' }}>
                   <ExternalLink style={{ width: 13, height: 13 }} /> Voir tous ses audits
                 </Link>
                 {s.email && (

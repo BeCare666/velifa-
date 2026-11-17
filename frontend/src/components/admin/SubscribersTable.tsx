@@ -14,7 +14,7 @@ function scoreColor(score: number) {
 
 function PlanBadge({ plan }: { plan: string }) {
   if (plan === 'business') return <span style={{ fontSize: 10, fontWeight: 600, color: '#a8a8a8', background: 'rgba(168,168,168,0.10)', borderRadius: 99, padding: '3px 8px' }}>Business</span>;
-  return <span style={{ fontSize: 10, fontWeight: 600, color: '#D4AF37', background: 'rgba(212,175,55,0.12)', borderRadius: 99, padding: '3px 8px' }}>Pro</span>;
+  return <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', background: 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '3px 8px' }}>Pro</span>;
 }
 
 type SortKey = 'avgScore' | 'totalProblems' | null;
@@ -75,7 +75,7 @@ export default function SubscribersTable() {
       <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
         {([['all', 'Tous'], ['pro', 'Pro'], ['business', 'Business'], ['suspended', 'Suspendus']] as const).map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)}
-            style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: filter === key ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${filter === key ? 'rgba(212,175,55,0.30)' : 'rgba(255,255,255,0.09)'}`, color: filter === key ? '#D4AF37' : 'rgba(255,255,255,0.55)' }}>
+            style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: filter === key ? 'rgb(var(--accent-rgb)/0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${filter === key ? 'rgb(var(--accent-rgb)/0.30)' : 'rgba(255,255,255,0.09)'}`, color: filter === key ? 'var(--accent)' : 'rgba(255,255,255,0.55)' }}>
             {label}
           </button>
         ))}
@@ -124,7 +124,7 @@ export default function SubscribersTable() {
 
                 <td style={{ padding: '11px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'rgba(212,175,55,0.12)', border: '1px solid rgba(212,175,55,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#D4AF37' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--accent)' }}>
                       {(u.email ?? u.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
                     </div>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -164,7 +164,7 @@ export default function SubscribersTable() {
 
                 <td style={{ padding: '11px 16px' }}>
                   <button onClick={() => setSelected(u)}
-                    style={{ height: 28, padding: '0 12px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'rgba(212,175,55,0.10)', border: '1px solid rgba(212,175,55,0.25)', color: '#D4AF37' }}>
+                    style={{ height: 28, padding: '0 12px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.25)', color: 'var(--accent)' }}>
                     Détails
                   </button>
                 </td>

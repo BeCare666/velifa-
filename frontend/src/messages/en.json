@@ -10,7 +10,14 @@
     "faq": "FAQ",
     "contact": "Contact",
     "dashboard": "My Dashboard",
-    "login": "Sign in"
+    "login": "Sign in",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "account": "My account",
+    "startAudit": "Run an audit",
+    "menu": "Menu",
+    "language": "Language",
+    "theme": "Theme"
   },
   "hero": {
     "badge": "Analysis in 30 seconds · Full report · 100% free",
@@ -295,7 +302,13 @@
       "threshold": "Threshold",
       "thresholdHelp": "Email alert when the score drops below this threshold (1–100). Empty = no alert.",
       "scheduleBusinessOnly": "Scheduled audits and email alerts: available with the Business plan."
-    }
+    },
+    "chartTitle": "Performance score over time",
+    "chartEmpty": "Run more audits to see how your score evolves over time.",
+    "planFree": "Free",
+    "close": "Close",
+    "overview": "Overview",
+    "outOf": "/ 100"
   },
   "errors": {
     "generic": "An error occurred. Please try again.",

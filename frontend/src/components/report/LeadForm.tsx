@@ -64,7 +64,7 @@ export default function LeadForm({ analysisId }: { analysisId: string }) {
   const input = 'w-full rounded-velifa-md border border-border bg-transparent px-3 py-2 text-sm text-text placeholder:text-text-subtle focus:outline-none focus:border-accent';
 
   return (
-    <div className="velifa-card" style={{ borderColor: 'rgba(212,175,55,0.35)' }}>
+    <div className="velifa-card" style={{ borderColor: 'rgb(var(--accent-rgb)/0.35)' }}>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
           <h2 className="font-heading font-semibold text-text flex items-center gap-2">

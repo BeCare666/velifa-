@@ -22,7 +22,7 @@ function CheckoutButton({
   plan: 'pro' | 'business';
   billing: 'monthly' | 'yearly';
   label: string;
-  variant: 'gold' | 'ghost';
+  variant: 'primary' | 'ghost';
   userEmail: string | null;
   platinum?: boolean;
   /** true = l'utilisateur a déjà un abonnement actif → upgrade direct sans checkout */
@@ -158,7 +158,7 @@ export default function TarifsPage() {
       description: t('pro.desc'),
       cta: t('ctaPro'),
       ctaHref: null,
-      ctaVariant: 'gold' as const,
+      ctaVariant: 'primary' as const,
       badge: t('pro.badge'),
       featured: true,
       features: (t.raw('pro.features') as string[]),
@@ -205,7 +205,7 @@ export default function TarifsPage() {
             <div className="inline-flex rounded-full border border-border p-1 text-sm" role="group" aria-label={t('billingLabel')}>
               {(['monthly', 'yearly'] as const).map((b) => (
                 <button key={b} type="button" onClick={() => setBilling(b)} aria-pressed={billing === b}
-                  className={`px-4 py-1.5 rounded-full transition ${billing === b ? 'bg-accent text-velifa-black font-semibold' : 'text-text-muted'}`}>
+                  className={`px-4 py-1.5 rounded-full transition ${billing === b ? 'bg-accent text-[color:var(--text-on-accent)] font-semibold' : 'text-text-muted'}`}>
                   {b === 'monthly' ? t('billingMonthly') : t('billingYearly')}
                 </button>
               ))}
@@ -218,8 +218,8 @@ export default function TarifsPage() {
             <span
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
               style={{
-                background: 'linear-gradient(135deg, rgba(212,175,55,0.14) 0%, rgba(168,123,30,0.10) 100%)',
-                border: '1px solid rgba(212,175,55,0.40)',
+                background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.14) 0%, rgb(var(--accent-rgb)/0.10) 100%)',
+                border: '1px solid rgb(var(--accent-rgb)/0.40)',
                 color: 'var(--accent)',
               }}
             >
@@ -239,7 +239,7 @@ export default function TarifsPage() {
                   background: 'linear-gradient(160deg, rgba(48,48,48,0.95) 0%, rgba(18,18,18,0.99) 60%)',
                 }
               : plan.featured
-                ? { borderWidth: '2px', boxShadow: 'var(--shadow-gold)' }
+                ? { borderWidth: '2px', boxShadow: 'var(--shadow-accent)' }
                 : { boxShadow: '0 4px 20px rgba(0,0,0,0.45)' };
             return (
             <div
@@ -265,8 +265,8 @@ export default function TarifsPage() {
                     </span>
                   ) : (
                     <span
-                      className="inline-block px-4 py-1 rounded-full text-xs font-bold text-velifa-black tracking-wide"
-                      style={{ background: 'var(--velifa-gradient-gold)' }}
+                      className="inline-block px-4 py-1 rounded-full text-xs font-bold text-[color:var(--text-on-accent)] tracking-wide"
+                      style={{ background: 'var(--brand-gradient)' }}
                     >
                       {plan.badge}
                     </span>
@@ -277,7 +277,7 @@ export default function TarifsPage() {
               {/* Plan name */}
               <div className="text-center mb-6 pt-2">
                 <h2
-                  className={`font-heading font-bold text-lg mb-1 ${plan.featured ? 'velifa-gold-text' : 'text-text'}`}
+                  className={`font-heading font-bold text-lg mb-1 ${plan.featured ? 'velifa-accent-text' : 'text-text'}`}
                   style={isBizCard ? { color: '#E8E8E8' } : undefined}
                 >
                   {plan.name}
@@ -332,8 +332,8 @@ export default function TarifsPage() {
                           color: '#E8E8E8',
                         }
                       : {
-                          background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(168,123,30,0.18) 100%)',
-                          border: '1px solid rgba(212,175,55,0.45)',
+                          background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.12) 0%, rgb(var(--accent-rgb)/0.18) 100%)',
+                          border: '1px solid rgb(var(--accent-rgb)/0.45)',
                           color: 'var(--accent)',
                         }
                     }
