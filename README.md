@@ -104,11 +104,13 @@ curl -X POST http://localhost:3001/api/v1/analyses \
 ### Backend → Render.com
 
 1. Créer un compte sur https://render.com
-2. "New Web Service" → connecter votre repo GitHub
-3. Root Directory: `backend`
-4. Build: `npm install && npm run prisma:generate && npm run build`
-5. Start: `node dist/main`
-6. Renseigner toutes les variables d'env dans le dashboard Render
+2. "New" → "Blueprint" → connecter votre repo GitHub : Render lit `render.yaml` (commandes et variables déjà définies)
+3. Si le service est créé à la main ("New Web Service"), reprendre les valeurs de `render.yaml` :
+   - Root Directory : **vide** (racine du dépôt, les commandes font elles-mêmes `cd backend`)
+   - Build : `cd backend && npm install && npm run prisma:generate && npm run build`
+   - Start : `cd backend && node dist/main`
+   - Health Check Path : `/api/v1/health`
+4. Renseigner toutes les variables d'env dans le dashboard Render (liste dans `render.yaml`)
 
 ### Frontend → Vercel
 
