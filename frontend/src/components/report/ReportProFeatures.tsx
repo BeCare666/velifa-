@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import {
-  Sparkles, Lock, Download, Server, Code2, Globe2,
+  Sparkles, Lock, Server, Code2, Globe2,
   Megaphone, Share2, Tag, Wifi, LayoutGrid,
   Layers, Pencil, BarChart2, CheckCircle2,
   AlertCircle, Minus, Gem, Microscope, Clock, ShoppingCart,
@@ -43,8 +43,8 @@ const CATEGORY_TEXT: Record<TechCategory, string> = {
 };
 
 function ConfidenceDot({ level }: { level: 'high' | 'medium' | 'low' }) {
-  if (level === 'high')   return <CheckCircle2 className="w-3 h-3 flex-shrink-0" style={{ color: '#0CCE6B' }} />;
-  if (level === 'medium') return <AlertCircle  className="w-3 h-3 flex-shrink-0" style={{ color: '#FFA400' }} />;
+  if (level === 'high')   return <CheckCircle2 className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--velifa-score-good)' }} />;
+  if (level === 'medium') return <AlertCircle  className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--velifa-score-average)' }} />;
   return                         <Minus         className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--text-subtle)' }} />;
 }
 
@@ -131,12 +131,13 @@ function formatMetricValue(audit: any): string {
 
 function getMetricColor(score: number | null): string {
   if (score == null) return 'var(--text-subtle)';
-  if (score >= 0.9) return '#0CCE6B';
-  if (score >= 0.5) return '#FFA400';
+  if (score >= 0.9) return 'var(--velifa-score-good)';
+  if (score >= 0.5) return 'var(--velifa-score-average)';
   return 'var(--velifa-score-poor)';
 }
 
 function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
+  const t = useTranslations('reportPro');
   const lh = reportJson?.lighthouseResult ?? reportJson;
   const audits = lh?.audits;
   if (!audits) return null;
@@ -170,20 +171,20 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, rgba(48,48,48,0.90) 0%, var(--surface) 100%)',
+        background: 'var(--surface)',
         border: `1px solid ${SILVER_BORDER}`,
         borderRadius: 'var(--velifa-radius-lg)',
         padding: '1.5rem',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.50)',
+        boxShadow: 'var(--shadow-lg)',
       }}
     >
       <div className="flex items-center gap-2 mb-5">
         <Microscope className="w-4 h-4 flex-shrink-0" style={{ color: SILVER }} strokeWidth={1.75} />
         <h2 className="font-heading font-semibold text-base" style={{ color: SILVER }}>
-          Analyse approfondie
+          {t('deepTitle')}
         </h2>
         <span
-          className="ml-auto text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full"
+          className="ms-auto text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full"
           style={{ background: SILVER_BG, color: SILVER }}
         >
           💎 Business
@@ -193,7 +194,7 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
       {/* Core Web Vitals détaillés */}
       <div className="mb-5">
         <p className="text-[10px] font-bold tracking-widest uppercase text-text-subtle mb-3">
-          Core Web Vitals &amp; Métriques
+          {t('deepMetrics')}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {metrics.map(({ key, abbr, label, value, score }) => (
@@ -230,7 +231,7 @@ function DeepAnalysisSection({ reportJson }: { reportJson: any }) {
       {opportunities.length > 0 && (
         <div>
           <p className="text-[10px] font-bold tracking-widest uppercase text-text-subtle mb-3">
-            Opportunités d&apos;optimisation
+            {t('deepOpportunities')}
           </p>
           <div className="space-y-2">
             {opportunities.map(({ title, score, savings }) => (
@@ -274,9 +275,9 @@ export default function ReportProFeatures({
       <div
         className="rounded-[var(--velifa-radius-lg)] border p-6 flex flex-col sm:flex-row sm:items-center gap-5"
         style={{
-          background: 'linear-gradient(135deg, var(--surface) 0%, rgba(30,24,10,0.98) 100%)',
+          background: 'var(--surface-raised)',
           border: '1px solid rgb(var(--accent-rgb)/0.25)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         <div
@@ -358,7 +359,7 @@ export default function ReportProFeatures({
           border: '1px solid var(--border)',
           borderRadius: 'var(--velifa-radius-lg)',
           padding: '1.5rem',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         <div className="flex items-center gap-2 mb-5">
@@ -368,7 +369,7 @@ export default function ReportProFeatures({
           </h2>
           {hasTech && (
             <span
-              className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
+              className="ms-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
               style={{ background: 'rgb(var(--accent-rgb)/0.12)', color: 'var(--accent)' }}
             >
               {t('found', { count: technologies!.length })}
@@ -443,31 +444,6 @@ export default function ReportProFeatures({
       {plan === 'business' && (
         <DeepAnalysisSection reportJson={reportJson} />
       )}
-
-      {/* ── Export PDF (placeholder) ───────────────────────────── */}
-      <div
-        className="flex items-center justify-between gap-4 p-4 rounded-[var(--velifa-radius-lg)]"
-        style={{
-          background: 'rgb(var(--accent-rgb)/0.05)',
-          border: '1px dashed rgb(var(--accent-rgb)/0.30)',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <Download className="w-4 h-4 text-accent" strokeWidth={1.75} />
-          <div>
-            <p className="text-sm font-medium text-text">{t('pdf')}</p>
-            <p className="text-xs text-text-muted">{t('pdfDesc')}</p>
-          </div>
-        </div>
-        <button
-          disabled
-          className="velifa-btn text-xs opacity-60 cursor-not-allowed flex items-center gap-2"
-          title={t('soon')}
-        >
-          <Download className="w-3.5 h-3.5" />
-          {t('soon')}
-        </button>
-      </div>
 
     </div>
   );

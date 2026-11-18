@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Check, Zap, Loader2, CheckCircle2, Sparkles, Gem } from 'lucide-react';
 import { api, type PublicPlan } from '@/lib/api';
 import { useSubscription } from '@/context/SubscriptionContext';
@@ -29,6 +29,8 @@ function CheckoutButton({
   isUpgrade?: boolean;
 }) {
   const router = useRouter();
+  const locale = useLocale();
+  const tErr = useTranslations('errors');
   const { isSignedIn, getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,14 +39,14 @@ function CheckoutButton({
     setError(null);
 
     if (!isSignedIn) {
-      router.push(`/sign-in?redirect_url=/tarifs`);
+      router.push(`/sign-in?redirect_url=${encodeURIComponent(`/${locale}/tarifs`)}`);
       return;
     }
 
     setLoading(true);
     try {
       const token = await getToken();
-      if (!token) throw new Error('Token introuvable');
+      if (!token) throw new Error(tErr('unauthorized'));
 
       const res = await api.createCheckout(
         { plan, email: userEmail ?? undefined, billing },
@@ -53,23 +55,23 @@ function CheckoutButton({
 
       // ── Upgrade direct (Pro → Business) : pas de checkout, déjà mis à jour ──
       if (res.data?.upgraded) {
-        window.location.href = '/dashboard?upgraded=true';
+        window.location.href = `/${locale}/dashboard?upgraded=true`;
         return;
       }
 
       // ── Nouveau checkout ──────────────────────────────────────────────────
       const url = res.data?.checkoutUrl;
-      if (!url) throw new Error('URL de paiement introuvable');
+      if (!url) throw new Error(tErr('generic'));
       window.location.href = url;
     } catch (err: any) {
-      setError(err.message ?? 'Une erreur est survenue');
+      setError(err.message ?? tErr('generic'));
       setLoading(false);
     }
   }
 
   const platinumStyle: React.CSSProperties = platinum
     ? {
-        background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.18) 0%, rgba(140,140,140,0.10) 100%)',
+        background: 'var(--surface-raised)',
         border: '1px solid rgb(var(--accent-rgb)/0.55)',
         color: 'var(--text)',
         boxShadow: '0 4px 16px rgb(var(--accent-rgb)/0.10)',
@@ -117,6 +119,7 @@ export default function TarifsPage() {
   const { plan: currentPlan, isActive, refresh: refreshPlan } = useSubscription();
   const { isSignedIn } = useAuth();
   const t = useTranslations('pricing');
+  const locale = useLocale();
 
   // Prix saisis dans le backoffice (GET /plans) — USD
   const [prices, setPrices] = useState<PublicPlan[] | null>(null);
@@ -144,7 +147,7 @@ export default function TarifsPage() {
       period,
       description: t('free.desc'),
       cta: t('ctaFree'),
-      ctaHref: '/' as const,
+      ctaHref: `/${locale}#audit`,
       ctaVariant: 'ghost' as const,
       badge: null,
       featured: false,
@@ -235,12 +238,12 @@ export default function TarifsPage() {
               ? {
                   borderWidth: '2px',
                   borderColor: 'rgb(var(--accent-rgb)/0.55)',
-                  boxShadow: '0 0 0 1px rgb(var(--accent-rgb)/0.12), 0 16px 48px rgba(0,0,0,0.55), 0 8px 24px rgb(var(--accent-rgb)/0.08)',
-                  background: 'linear-gradient(160deg, rgba(48,48,48,0.95) 0%, var(--surface) 60%)',
+                  boxShadow: 'var(--shadow-lg)',
+                  background: 'var(--surface-raised)',
                 }
               : plan.featured
                 ? { borderWidth: '2px', boxShadow: 'var(--shadow-accent)' }
-                : { boxShadow: '0 4px 20px rgba(0,0,0,0.45)' };
+                : { boxShadow: 'var(--shadow-sm)' };
             return (
             <div
               key={plan.name}
@@ -254,7 +257,7 @@ export default function TarifsPage() {
                     <span
                       className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-xs font-bold tracking-wide"
                       style={{
-                        background: 'linear-gradient(135deg, #3a3a3a 0%, #1a1a1a 100%)',
+                        background: 'var(--surface)',
                         border: '1px solid rgb(var(--accent-rgb)/0.55)',
                         color: 'var(--text)',
                         boxShadow: '0 2px 12px rgb(var(--accent-rgb)/0.15)',
@@ -309,7 +312,7 @@ export default function TarifsPage() {
                   <li key={f} className="flex items-start gap-3">
                     <Check
                       className="w-4 h-4 flex-shrink-0 mt-0.5"
-                      style={{ color: isBizCard ? 'var(--text)' : '#0CCE6B' }}
+                      style={{ color: isBizCard ? 'var(--text)' : 'var(--velifa-score-good)' }}
                     />
                     <span className="text-sm text-text">{f}</span>
                   </li>

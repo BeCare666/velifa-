@@ -43,7 +43,9 @@
     "noSpam": "Aucun spam.",
     "captchaPending": "Vérification anti-robot…",
     "captchaFailed": "La vérification anti-robot n'a pas pu se charger.",
-    "captchaRetry": "Réessayer"
+    "captchaRetry": "Réessayer",
+    "newAuditTitle": "Nouvel audit",
+    "newAuditSubtitle": "Google Lighthouse sur mobile et ordinateur, puis les contrôles VELIFA."
   },
   "trust": {
     "noData": "Aucune donnée revendue",
@@ -763,7 +765,10 @@
       "lcp": "Largest Contentful Paint",
       "cls": "Cumulative Layout Shift",
       "tbt": "Total Blocking Time",
-      "fcp": "First Contentful Paint"
+      "fcp": "First Contentful Paint",
+      "mobile": "Mobile",
+      "desktop": "Ordinateur",
+      "unavailable": "Non mesuré"
     },
     "scores": {
       "title": "Scores Lighthouse",
@@ -948,7 +953,9 @@
         "pdf_failed": "La génération du PDF a échoué. Réessayez.",
         "generic": "Téléchargement impossible. Réessayez."
       }
-    }
+    },
+    "onThisPage": "Dans ce rapport",
+    "analyzedOn": "Analysé le {date}"
   },
   "emailModal": {
     "title": "Recevoir votre rapport",
@@ -984,7 +991,10 @@
     "thirdParties": "Services tiers (Lighthouse)",
     "pdf": "Exporter en PDF",
     "pdfDesc": "Rapport complet prêt à partager",
-    "soon": "Bientôt"
+    "soon": "Bientôt",
+    "deepTitle": "Analyse approfondie",
+    "deepMetrics": "Core Web Vitals et métriques",
+    "deepOpportunities": "Opportunités d'optimisation"
   },
   "comparePage": {
     "title": "Avant / après",

@@ -794,3 +794,23 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   Politique de confidentialité. Restent à compléter par le propriétaire : société, statut, adresse, immatriculation,
   téléphone, directeur de publication, lien WhatsApp des pages légales.
 - Preuves : `next build` exit 0 (87/87 pages), types vérifiés par le build.
+
+### 2026-11-18 — 5.5 (suite) : rapport, comparaison, tarifs, fenêtres et pages légales
+- Rapport (`analyse/[id]`) : synthèse en tête (anneau de score, plateforme, date d'analyse, capture encadrée, 4 scores
+  Lighthouse), navigation interne par ancres, sections homogènes. Mesures ordinateur (`lcpDesktop`, `clsDesktop`,
+  `tbtDesktop`, déjà calculées par le worker mais jamais affichées) ajoutées à côté du mobile. Mesure absente :
+  `getCwvStatus(null)` renvoyait « mauvais » → affichage neutre « Non mesuré ». `<main>` imbriqué dans celui du layout
+  → `<div>`. Nouvelles clés `reportPage.*` AR/EN/FR.
+- H1.3 ✅ : `CaptchaStatus` (en cours / échec + Réessayer) dans `LeadForm` et `NewAuditModal`.
+- H2.1 ✅ : faux bouton PDF « Bientôt » retiré de la section Pro (le vrai bouton est dans l'en-tête du rapport).
+- `NewAuditModal` : textes français en dur et « résultats en ~30 secondes » → traductions `hero.*` ; adresse sans
+  `https://` acceptée (`normalizeSiteUrl`, comme l'accueil) ; redirections avec la langue ; bloc « rapport en cache »
+  jamais déclenché (`setCachedInfo` jamais alimenté) retiré.
+- Fonds sombres codés en dur (dont un reste brun de l'ancienne charte or) → variables du thème dans `NewAuditModal`,
+  `EmailReportModal`, `ReportProFeatures` et la carte Business des Tarifs (blocs noirs en thème clair).
+- Tarifs : retour après connexion, mise à niveau Business et bouton Gratuit avec la langue (bouton Gratuit → barre
+  d'audit) ; erreurs de paiement traduites. Comparaison : en-tête et anneaux de score alignés sur le rapport.
+- Pages légales : lien de retour avec la langue, retrait RTL (`ms-4`).
+- Non modifié, à décider par le propriétaire : `/design` (page interne de démonstration de la charte, non liée mais
+  accessible en ligne).
+- Preuves : `next build` exit 0 (87/87 pages), types vérifiés par le build.

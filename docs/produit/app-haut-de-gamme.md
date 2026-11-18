@@ -64,14 +64,14 @@ Ordre imposé par les dépendances : **fiabilité → vérité/langue → expér
 |---|---|---|
 | H1.1 | Redis de production (P4) | `/api/v1/health` → 200 sur Render ; un audit réel de bout en bout depuis le site Vercel |
 | H1.2 | Domaine Vercel autorisé dans Cloudflare Turnstile (P1) | Visiteur anonyme : widget validé, audit lancé sans compte |
-| H1.3 | Message d'échec CAPTCHA aussi dans `LeadForm` et `NewAuditModal` (P9) | Build + revue des 3 langues |
+| H1.3 | Message d'échec CAPTCHA aussi dans `LeadForm` et `NewAuditModal` (P9) | ✅ 2026-11-18 : `components/audit/CaptchaStatus` (textes `hero.*` AR/EN/FR) dans les deux formulaires ; build OK |
 | H1.4 | Messages d'erreur API traduits (P8) : code d'erreur renvoyé, texte choisi côté frontend | Tests unitaires backend + revue frontend |
 
 ### Lot 2 — Vérité et langue
 
 | ID | Chantier | Critère d'acceptation |
 |---|---|---|
-| H2.1 | Retirer le faux bouton PDF « Bientôt » (P5) | Une seule entrée PDF dans le rapport |
+| H2.1 | Retirer le faux bouton PDF « Bientôt » (P5) | ✅ 2026-11-18 : encart désactivé retiré de `ReportProFeatures` ; seule entrée = `PdfDownloadButton` (en-tête du rapport) ; build OK |
 | H2.2 | Extraire tous les textes en dur (P6, P7, et recherche systématique) | Recherche des caractères accentués hors commentaires = 0 dans `src/app` et `src/components` ; revue AR RTL |
 | H2.3 | Vérification automatique des clés de traduction (mêmes clés dans `ar/en/fr.json`) | Test qui échoue si une clé manque dans une langue |
 

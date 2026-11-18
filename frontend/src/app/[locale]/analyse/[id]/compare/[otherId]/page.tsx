@@ -1,16 +1,19 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { ArrowRight, Zap, Globe, TrendingUp, TrendingDown, Minus, HelpCircle, Info } from 'lucide-react';
+import { ArrowRight, Globe, TrendingUp, TrendingDown, Minus, HelpCircle, Info } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatMs } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { BrandMark } from '@/components/layout/Header';
+import { ScoreRing } from '@/components/ui';
+import { displayHost } from '@/lib/score';
 import type { AnalysisComparison, ListDiff, MetricDiff, Trend } from '@/types/analysis';
 
 export const revalidate = 0;
 
 const TREND_STYLE: Record<Trend, { color: string; bg: string; Icon: any }> = {
-  better:  { color: 'var(--velifa-score-good)',    bg: 'rgba(12,206,107,0.12)', Icon: TrendingUp },
-  worse:   { color: 'var(--velifa-score-poor)',    bg: 'rgba(255,78,66,0.12)',  Icon: TrendingDown },
+  better:  { color: 'var(--velifa-score-good)',    bg: 'var(--velifa-score-good-bg)', Icon: TrendingUp },
+  worse:   { color: 'var(--velifa-score-poor)',    bg: 'var(--velifa-score-poor-bg)', Icon: TrendingDown },
   stable:  { color: 'var(--text-muted)',           bg: 'var(--surface-raised)', Icon: Minus },
   unknown: { color: 'var(--text-subtle)',          bg: 'var(--surface-raised)', Icon: HelpCircle },
 };
@@ -113,16 +116,15 @@ export default async function ComparePage({ params }: { params: Promise<{ id: st
   const perf = c?.scores.find((s) => s.key === 'performance');
 
   return (
-    <main className="min-h-screen bg-bg">
-      <header className="border-b border-border sticky top-0 z-10 bg-bg/95 backdrop-blur">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <Zap className="w-5 h-5 text-accent flex-shrink-0" />
-            <Link href={`/${locale}`} className="velifa-wordmark text-sm">VELIFA</Link>
+    <div className="min-h-screen bg-bg">
+      <header className="sticky top-0 z-20 border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link href={`/${locale}`} aria-label="VELIFA" className="flex-shrink-0"><BrandMark /></Link>
             {c && (<>
-              <span className="text-muted text-xs">·</span>
-              <Globe className="w-4 h-4 text-text-subtle flex-shrink-0" />
-              <span dir="ltr" className="text-sm font-medium text-text truncate">{c.urlSite}</span>
+              <span className="h-5 w-px bg-[color:var(--border-strong)]" />
+              <Globe className="h-3.5 w-3.5 flex-shrink-0 text-text-subtle" />
+              <span dir="ltr" className="truncate text-sm font-medium text-text">{displayHost(c.urlSite)}</span>
             </>)}
           </div>
           <ThemeToggle />
@@ -131,25 +133,26 @@ export default async function ComparePage({ params }: { params: Promise<{ id: st
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
         <div>
-          <h1 className="text-2xl font-heading font-bold text-text">{t('title')}</h1>
+          <h1 className="font-heading text-3xl font-semibold tracking-tight text-text">{t('title')}</h1>
           <p className="text-sm text-text-muted mt-1">{t('subtitle')}</p>
         </div>
 
         {!c ? (
-          <div className="velifa-card text-sm text-text-muted">{t('error', { message: error })}</div>
+          <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 text-sm text-text-muted sm:p-7">{t('error', { message: error })}</div>
         ) : (
           <>
             {/* ── Performance avant → après ─────────────────────────────── */}
-            <div className="velifa-card">
+            <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
                 {([['before', c.before, perf?.before], ['after', c.after, perf?.after]] as const).map(([k, a, score], i) => (
                   <div key={k} className="flex items-center gap-6 md:gap-10">
                     {i === 1 && <ArrowRight className="w-6 h-6 text-text-subtle rtl:rotate-180 hidden md:block" />}
-                    <div className="text-center">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-text-subtle">{t(k)}</div>
-                      <div className="text-5xl font-heading font-bold text-text my-2">{score ?? '—'}</div>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-subtle">{t(k)}</div>
+                      <ScoreRing score={score ?? null} size={112} stroke={7} />
+                      <div className="mt-3" />
                       <div className="text-xs text-text-muted">{t('auditOf', { date: fmtDate(a.createdAt) })}</div>
-                      <Link href={`/${locale}/analyse/${a.id}`} className="text-xs text-accent hover:underline">{t('openReport')}</Link>
+                      <Link href={`/${locale}/analyse/${a.id}`} className="mt-1 text-xs font-medium text-text underline underline-offset-4">{t('openReport')}</Link>
                     </div>
                   </div>
                 ))}
@@ -166,36 +169,36 @@ export default async function ComparePage({ params }: { params: Promise<{ id: st
               </p>
             </div>
 
-            <div className="velifa-card">
+            <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
               <h2 className="font-heading font-semibold text-text mb-4">{t('labTitle')}</h2>
               <MetricTable rows={c.lab} kind="metric" />
             </div>
 
             {c.field && (
-              <div className="velifa-card">
+              <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
                 <h2 className="font-heading font-semibold text-text mb-1">{t('fieldTitle')}</h2>
                 <p className="text-xs text-text-muted mb-4">{t('fieldNote')}</p>
                 <MetricTable rows={c.field} kind="metric" />
               </div>
             )}
 
-            <div className="velifa-card">
+            <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
               <h2 className="font-heading font-semibold text-text mb-4">{t('recsTitle')}</h2>
               <DiffLists diff={c.recommendations} label={recTitle} />
             </div>
 
-            <div className="velifa-card">
+            <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
               <h2 className="font-heading font-semibold text-text mb-4">{t('issuesTitle')}</h2>
               <DiffLists diff={c.siteIssues} label={issueText} />
             </div>
 
-            <div className="velifa-card">
+            <div className="rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:p-7">
               <h2 className="font-heading font-semibold text-text mb-4">{t('scoresTitle')}</h2>
               <MetricTable rows={c.scores} kind="score" />
             </div>
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Wrench, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useCaptcha } from '@/hooks/useCaptcha';
+import CaptchaStatus from '@/components/audit/CaptchaStatus';
 
 // Golfe d'abord (marché prioritaire) ; '' = numéro saisi avec son indicatif.
 const COUNTRY_CODES = ['+966', '+971', '+974', '+965', '+973', '+968', '+20', '+212', '+33', '+1', ''];
@@ -93,6 +94,7 @@ export default function LeadForm({ analysisId }: { analysisId: string }) {
           </div>
           <textarea className={input} rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t('message')} maxLength={1000} aria-label={t('message')} />
           {captcha.widget}
+          <CaptchaStatus pending={captcha.pending} failed={captcha.failed} onRetry={captcha.reset} />
           {error && <p className="text-sm score-poor">{error}</p>}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
             <p className="text-[11px] text-text-subtle">{t('privacy')}</p>

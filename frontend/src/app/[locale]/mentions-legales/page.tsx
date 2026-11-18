@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function MentionsLegalesPage() {
   const t = await getTranslations('legal');
+  const locale = await getLocale();
 
   const sections = [
     {
@@ -105,7 +106,7 @@ export default async function MentionsLegalesPage() {
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-6 pb-16 text-center">
-        <Link href="/" className="text-text-subtle text-xs hover:text-accent transition-colors">
+        <Link href={`/${locale}`} className="text-text-subtle text-xs hover:text-text transition-colors">
           {t('backHome')}
         </Link>
       </div>

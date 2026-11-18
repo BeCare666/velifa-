@@ -43,7 +43,9 @@
     "noSpam": "No spam.",
     "captchaPending": "Bot check in progress…",
     "captchaFailed": "The bot check could not load.",
-    "captchaRetry": "Try again"
+    "captchaRetry": "Try again",
+    "newAuditTitle": "New audit",
+    "newAuditSubtitle": "Google Lighthouse on mobile and desktop, then VELIFA checks."
   },
   "trust": {
     "noData": "No data resold",
@@ -760,7 +762,10 @@
       "lcp": "Largest Contentful Paint",
       "cls": "Cumulative Layout Shift",
       "tbt": "Total Blocking Time",
-      "fcp": "First Contentful Paint"
+      "fcp": "First Contentful Paint",
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "unavailable": "Not measured"
     },
     "scores": {
       "title": "Lighthouse scores",
@@ -945,7 +950,9 @@
         "pdf_failed": "PDF generation failed. Please try again.",
         "generic": "Download failed. Please try again."
       }
-    }
+    },
+    "onThisPage": "In this report",
+    "analyzedOn": "Analysed on {date}"
   },
   "emailModal": {
     "title": "Get your report",
@@ -981,7 +988,10 @@
     "thirdParties": "Third-party services (Lighthouse)",
     "pdf": "Export to PDF",
     "pdfDesc": "Full report ready to share",
-    "soon": "Soon"
+    "soon": "Soon",
+    "deepTitle": "In-depth analysis",
+    "deepMetrics": "Core Web Vitals and metrics",
+    "deepOpportunities": "Optimisation opportunities"
   },
   "comparePage": {
     "title": "Before / after",

@@ -135,9 +135,9 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
         <div
           className="relative w-full max-w-md rounded-[16px] overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #111111 100%)',
+            background: 'var(--surface)',
             border: '1px solid rgb(var(--accent-rgb)/0.25)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.80), 0 0 0 1px rgb(var(--accent-rgb)/0.04)',
+            boxShadow: 'var(--shadow-lg)',
             animation: 'modalIn 0.3s cubic-bezier(0.22,1,0.36,1)',
           }}
         >
@@ -166,12 +166,12 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
               <div className="flex flex-col items-center gap-4 py-4 text-center">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(12,206,107,0.15)', border: '1px solid rgba(12,206,107,0.35)' }}
+                  style={{ background: 'var(--velifa-score-good-bg)', border: '1px solid transparent' }}
                 >
-                  <CheckCircle2 className="w-6 h-6" style={{ color: '#0CCE6B' }} />
+                  <CheckCircle2 className="w-6 h-6" style={{ color: 'var(--velifa-score-good)' }} />
                 </div>
                 <div>
-                  <p className="font-heading font-bold text-base" style={{ color: '#0CCE6B' }}>
+                  <p className="font-heading font-bold text-base" style={{ color: 'var(--velifa-score-good)' }}>
                     {sentMessage || t('sentGeneric')}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'rgb(var(--accent-rgb)/0.55)' }}>
@@ -218,11 +218,11 @@ export default function EmailReportModal({ analysisId, siteUrl, score, reportUrl
                       className="w-full px-4 py-3 rounded-[10px] text-sm outline-none transition-all disabled:opacity-50"
                       style={{
                         background: 'rgb(var(--accent-rgb)/0.05)',
-                        border: error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgb(var(--accent-rgb)/0.12)',
+                        border: error ? '1px solid var(--velifa-score-poor)' : '1px solid rgb(var(--accent-rgb)/0.12)',
                         color: 'rgb(var(--accent-rgb)/0.90)',
                       }}
                       onFocus={(e) => { e.currentTarget.style.border = '1px solid rgb(var(--accent-rgb)/0.50)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgb(var(--accent-rgb)/0.08)'; }}
-                      onBlur={(e) => { e.currentTarget.style.border = error ? '1px solid rgba(255,78,66,0.60)' : '1px solid rgb(var(--accent-rgb)/0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      onBlur={(e) => { e.currentTarget.style.border = error ? '1px solid var(--velifa-score-poor)' : '1px solid rgb(var(--accent-rgb)/0.12)'; e.currentTarget.style.boxShadow = 'none'; }}
                     />
                   </div>
 

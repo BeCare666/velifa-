@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function ConfidentialitePage() {
   const t = await getTranslations('privacy');
+  const locale = await getLocale();
 
   const sections = [
     {
@@ -59,11 +60,11 @@ export default async function ConfidentialitePage() {
           <ul className="space-y-3 list-disc list-inside">
             <li>
               <strong>Velifa</strong> — {t('s5Item1')}
-              <span className="text-text-subtle text-xs block mt-1 ml-4">{t('s5Item1Policy')} <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover underline">https://policies.google.com/privacy</a></span>
+              <span className="text-text-subtle text-xs block mt-1 ms-4">{t('s5Item1Policy')} <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover underline">https://policies.google.com/privacy</a></span>
             </li>
             <li>
               <strong>Brevo</strong> — {t('s5Item2')}
-              <span className="text-text-subtle text-xs block mt-1 ml-4">{t('s5Item2Policy')} <a href="https://www.brevo.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover underline">https://www.brevo.com/legal/privacy/</a></span>
+              <span className="text-text-subtle text-xs block mt-1 ms-4">{t('s5Item2Policy')} <a href="https://www.brevo.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover underline">https://www.brevo.com/legal/privacy/</a></span>
             </li>
             <li>
               <strong>[{t('s5Item3')}]</strong> — {t('s5Item3Desc')}
@@ -173,7 +174,7 @@ export default async function ConfidentialitePage() {
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-6 pb-16 text-center">
-        <Link href="/" className="text-text-subtle text-xs hover:text-accent transition-colors">
+        <Link href={`/${locale}`} className="text-text-subtle text-xs hover:text-text transition-colors">
           {t('backHome')}
         </Link>
       </div>

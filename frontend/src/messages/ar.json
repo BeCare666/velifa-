@@ -43,7 +43,9 @@
     "noSpam": "لا بريد مزعج.",
     "captchaPending": "جارٍ التحقق من أنك لست روبوتًا…",
     "captchaFailed": "تعذّر تحميل التحقق من أنك لست روبوتًا.",
-    "captchaRetry": "إعادة المحاولة"
+    "captchaRetry": "إعادة المحاولة",
+    "newAuditTitle": "تدقيق جديد",
+    "newAuditSubtitle": "Google Lighthouse على الجوال والكمبيوتر، ثم فحوصات VELIFA."
   },
   "trust": {
     "noData": "لا يُعاد بيع أي بيانات",
@@ -763,7 +765,10 @@
       "lcp": "Largest Contentful Paint",
       "cls": "Cumulative Layout Shift",
       "tbt": "Total Blocking Time",
-      "fcp": "First Contentful Paint"
+      "fcp": "First Contentful Paint",
+      "mobile": "الجوال",
+      "desktop": "الكمبيوتر",
+      "unavailable": "غير مقاس"
     },
     "scores": {
       "title": "نتائج Lighthouse",
@@ -948,7 +953,9 @@
         "pdf_failed": "فشل إنشاء ملف PDF. حاول مرة أخرى.",
         "generic": "تعذّر التنزيل. حاول مرة أخرى."
       }
-    }
+    },
+    "onThisPage": "في هذا التقرير",
+    "analyzedOn": "تم التحليل في {date}"
   },
   "emailModal": {
     "title": "استلم تقريرك",
@@ -984,7 +991,10 @@
     "thirdParties": "خدمات خارجية (Lighthouse)",
     "pdf": "تصدير PDF",
     "pdfDesc": "تقرير كامل جاهز للمشاركة",
-    "soon": "قريباً"
+    "soon": "قريباً",
+    "deepTitle": "تحليل معمّق",
+    "deepMetrics": "مؤشرات Core Web Vitals والمقاييس",
+    "deepOpportunities": "فرص التحسين"
   },
   "comparePage": {
     "title": "قبل / بعد",
