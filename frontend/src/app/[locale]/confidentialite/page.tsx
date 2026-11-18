@@ -12,7 +12,7 @@ export default async function ConfidentialitePage() {
           {t('s1Intro')}<br />
           <strong>[{t('s1CompanyPlaceholder')}]</strong><br />
           [{t('s1AddressPlaceholder')}]<br />
-          {t('s1Email')} <strong>[adresse@email.com — à compléter]</strong>
+          {t('s1Email')} <strong><a href="mailto:support@velifa.com" className="underline underline-offset-4" dir="ltr">support@velifa.com</a></strong>
         </p>
       ),
     },
@@ -129,7 +129,7 @@ export default async function ConfidentialitePage() {
       content: (
         <p>
           {t('s12Content')}<br />
-          <strong>{t('s12Email')}</strong> [adresse@email.com — à compléter]<br />
+          <strong>{t('s12Email')}</strong> <a href="mailto:support@velifa.com" className="underline underline-offset-4" dir="ltr">support@velifa.com</a><br />
           <strong>{t('s12Whatsapp')}</strong> [https://wa.me/22900000000 — à remplacer]
         </p>
       ),

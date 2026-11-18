@@ -789,6 +789,8 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Corrigé : grilles avec cellules vides (accueil : 3e rangée à moitié vide) ; liens sans la langue et appels vers
   `/` au lieu de la barre d'audit ; pied de page : tous les liens internes ouverts dans un nouvel onglet, logo
   différent de l'en-tête, faux boutons Twitter/LinkedIn désactivés ; aperçu de rapport avec couleurs en dur.
-- À confirmer par le propriétaire : `contact@velifa.io` (page Contact) et `support@velifa.com` (Support, Abonnement)
-  coexistent ; non modifiés.
+- Adresse de contact : `support@velifa.com` confirmée par le propriétaire (2026-11-18) → page Contact
+  (`contact@velifa.io` retiré) et 4 emplacements `[adresse@email.com — à compléter]` des Mentions légales et de la
+  Politique de confidentialité. Restent à compléter par le propriétaire : société, statut, adresse, immatriculation,
+  téléphone, directeur de publication, lien WhatsApp des pages légales.
 - Preuves : `next build` exit 0 (87/87 pages), types vérifiés par le build.

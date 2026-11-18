@@ -13,7 +13,7 @@ export default async function MentionsLegalesPage() {
           <p className="mb-3"><strong>{t('s1LegalStatus')}</strong> [Statut juridique — à compléter]</p>
           <p className="mb-3"><strong>{t('s1Address')}</strong> [Adresse complète — à compléter]</p>
           <p className="mb-3"><strong>{t('s1RegNumber')}</strong> [Numéro d&apos;immatriculation — à compléter]</p>
-          <p className="mb-3"><strong>{t('s1Email')}</strong> [adresse@email.com — à compléter]</p>
+          <p className="mb-3"><strong>{t('s1Email')}</strong> <a href="mailto:support@velifa.com" className="underline underline-offset-4" dir="ltr">support@velifa.com</a></p>
           <p><strong>{t('s1Phone')}</strong> [Numéro de téléphone — à compléter]</p>
         </>
       ),
@@ -61,7 +61,7 @@ export default async function MentionsLegalesPage() {
       content: (
         <p>
           {t('s8Content')}<br />
-          <strong>{t('s8Email')}</strong> [adresse@email.com — à compléter]<br />
+          <strong>{t('s8Email')}</strong> <a href="mailto:support@velifa.com" className="underline underline-offset-4" dir="ltr">support@velifa.com</a><br />
           <strong>{t('s8Whatsapp')}</strong> [https://wa.me/22900000000 — à remplacer]
         </p>
       ),

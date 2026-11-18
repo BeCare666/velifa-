@@ -7,10 +7,10 @@ export default async function ContactPage() {
   const t = await getTranslations('contact');
   const locale = await getLocale();
 
-  // Coordonnées inchangées (déjà publiées sur le site)
+  // Email : support@velifa.com (adresse confirmée par le propriétaire) ; WhatsApp : numéro déjà publié
   const contacts = [
     { icon: MessageCircle, label: 'WhatsApp', description: t('whatsappDesc'), detail: '+229 01 62 02 64 18', href: 'https://wa.me/2290162026418', external: true },
-    { icon: Mail,          label: 'Email',    description: t('emailDesc'),    detail: 'contact@velifa.io',   href: 'mailto:contact@velifa.io', external: false },
+    { icon: Mail,          label: 'Email',    description: t('emailDesc'),    detail: 'support@velifa.com',  href: 'mailto:support@velifa.com', external: false },
   ];
 
   return (
