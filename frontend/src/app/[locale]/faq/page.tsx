@@ -2,36 +2,38 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, MessageCircle } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { MarketingHero } from '@/components/marketing';
 
 function AccordionItem({ question, answer }: { question: string; answer: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="velifa-card overflow-hidden">
+    <div className="border-b border-border">
       <button
+        type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-4 py-5 px-6 text-start group"
+        className="group flex w-full items-center justify-between gap-6 py-6 text-start"
         aria-expanded={open}
       >
-        <span className="font-heading font-semibold text-text text-sm md:text-base leading-relaxed group-hover:text-accent transition-colors">
+        <span className="font-heading text-base font-medium leading-relaxed text-text md:text-lg">
           {question}
         </span>
-        <ChevronDown
-          className={`w-5 h-5 flex-shrink-0 text-accent transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        />
+        <span className={`grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-border text-text-muted transition-all duration-200 group-hover:text-text ${open ? 'rotate-180 border-[color:var(--border-strong)]' : ''}`}>
+          <ChevronDown className="h-4 w-4" />
+        </span>
       </button>
-      {open && (
-        <div className="px-6 pb-6">
-          <div className="velifa-divider mb-5" />
-          <div className="text-text-muted text-sm leading-relaxed">{answer}</div>
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <div className="max-w-3xl pb-6 text-sm leading-relaxed text-text-muted md:text-[15px]">{answer}</div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
 export default function FAQPage() {
   const t = useTranslations('faq');
+  const locale = useLocale();
 
   const faqs = [
     { question: t('q1'), answer: t('a1') },
@@ -49,7 +51,7 @@ export default function FAQPage() {
           {t('a9_free')} <strong>{t('a9_freePlan')}</strong> {t('a9_mid')}{' '}
           <strong>{t('a9_proPlan')}</strong> {t('a9_proDesc')}{' '}
           {t('a9_business')} <strong>{t('a9_businessPlan')}</strong> {t('a9_businessDesc')}{' '}
-          <Link href="/tarifs" className="text-accent hover:text-accent-hover underline">
+          <Link href={`/${locale}/tarifs`} className="font-medium text-text underline underline-offset-4">
             {t('a9_link')}
           </Link>
         </span>
@@ -59,41 +61,30 @@ export default function FAQPage() {
 
   return (
     <main className="min-h-screen bg-bg">
-      <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-        <p className="velifa-eyebrow mb-5">{t('eyebrow')}</p>
-        <h1 className="font-heading text-4xl md:text-5xl font-bold text-text mb-5">
-          {t('title')}
-        </h1>
-        <p className="text-text-muted text-base md:text-lg leading-relaxed">
-          {t('subtitle')}
-        </p>
-      </section>
+      <MarketingHero eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} />
 
-      <section className="max-w-3xl mx-auto px-6 pb-16">
-        <div className="space-y-3">
+      <section className="mx-auto max-w-4xl px-5 py-16 sm:px-6 sm:py-20">
+        <div className="border-t border-border">
           {faqs.map((faq, i) => (
             <AccordionItem key={i} question={faq.question} answer={faq.answer} />
           ))}
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 pb-20">
-        <div className="velifa-card text-center py-10 px-6">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
-            style={{ background: 'var(--accent-soft)' }}>
-            <MessageCircle className="w-6 h-6 text-accent" />
+      <section className="mx-auto max-w-4xl px-5 pb-20 sm:px-6">
+        <div className="flex flex-col items-start gap-5 rounded-velifa-xl border border-[color:var(--border-strong)] bg-[color:var(--surface-raised)] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-center gap-4">
+            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg)] text-text">
+              <MessageCircle className="h-5 w-5" strokeWidth={1.75} />
+            </span>
+            <div>
+              <h2 className="font-heading text-lg font-semibold text-text">{t('ctaTitle')}</h2>
+              <p className="mt-0.5 text-sm text-text-muted">{t('ctaDesc')}</p>
+            </div>
           </div>
-          <h2 className="font-heading text-xl font-bold text-text mb-3">{t('ctaTitle')}</h2>
-          <p className="text-text-muted text-sm mb-6 leading-relaxed">{t('ctaDesc')}</p>
-          <a
-            href="https://wa.me/2290162026418"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="velifa-btn inline-flex items-center gap-2"
-          >
-            <MessageCircle className="w-4 h-4" />
+          <Link href={`/${locale}/contact`} className="velifa-btn inline-flex flex-shrink-0 items-center gap-2">
             {t('ctaButton')}
-          </a>
+          </Link>
         </div>
       </section>
 

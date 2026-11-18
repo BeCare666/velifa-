@@ -772,3 +772,23 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
     Performance : libellés backend sans accents affichés accentués ; Demandes : cartes sur mobile.
 - Preuves : `jest src/admin` 16/16 (nouveau `admin-system.spec.ts` : Redis OK, en panne, sans réponse, clés non
   exposées) ; `tsc` backend exit 0 ; `next build` exit 0 (87/87 pages).
+
+### 2026-11-18 — 5.5 (suite) : accueil et pages vitrine
+- Textes publics alignés sur le code (FR/EN/AR, 46 clés) :
+  - « Analyse en 30 secondes », « moins de 30 s », « moins d'une minute », « réponse en quelques heures » retirés
+    (jamais mesurés, doc P14) ;
+  - email de rapport présenté comme automatique « après chaque audit » → sur demande (adresse fournie ; compte :
+    préférence « rapports », `shouldSendReportEmail`), contenu réel = scores + lien ;
+  - « Accompagnement WhatsApp » → demande d'aide depuis le rapport (formulaire « Je veux corriger ») ;
+  - Fonctionnalités et FAQ : PDF, API, multi-sites et audits programmés annoncés « bientôt » / « en cours de
+    développement » alors que livrés (2.3, 2.6) → présentés avec leur plan ;
+  - « scores calculés par Velifa » → mesurés par Google Lighthouse ; Core Web Vitals officiels = LCP, CLS, INP
+    (TBT = indicateur de laboratoire) ; limites gratuites 1 / 24 h sans compte, 3 / 24 h avec compte.
+- Blocs vitrine partagés `components/marketing` (en-tête quadrillé, titre de section, grille à filets, étapes reliées,
+  bandeau d'appel) appliqués à l'accueil, Fonctionnalités (+ contrôles propres au Golfe), À propos, FAQ, Contact.
+- Corrigé : grilles avec cellules vides (accueil : 3e rangée à moitié vide) ; liens sans la langue et appels vers
+  `/` au lieu de la barre d'audit ; pied de page : tous les liens internes ouverts dans un nouvel onglet, logo
+  différent de l'en-tête, faux boutons Twitter/LinkedIn désactivés ; aperçu de rapport avec couleurs en dur.
+- À confirmer par le propriétaire : `contact@velifa.io` (page Contact) et `support@velifa.com` (Support, Abonnement)
+  coexistent ; non modifiés.
+- Preuves : `next build` exit 0 (87/87 pages), types vérifiés par le build.

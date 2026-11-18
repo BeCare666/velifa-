@@ -1,85 +1,58 @@
 import Link from 'next/link';
-import { MessageCircle, Mail, ArrowRight } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { MessageCircle, Mail, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { MarketingHero } from '@/components/marketing';
 
 export default async function ContactPage() {
   const t = await getTranslations('contact');
+  const locale = await getLocale();
 
+  // Coordonnées inchangées (déjà publiées sur le site)
   const contacts = [
-    {
-      icon: MessageCircle,
-      label: 'WhatsApp',
-      description: t('whatsappDesc'),
-      href: 'https://wa.me/2290162026418',
-      external: true,
-    },
-    {
-      icon: Mail,
-      label: 'Email',
-      description: t('emailDesc'),
-      href: 'mailto:contact@velifa.io',
-      external: false,
-    },
+    { icon: MessageCircle, label: 'WhatsApp', description: t('whatsappDesc'), detail: '+229 01 62 02 64 18', href: 'https://wa.me/2290162026418', external: true },
+    { icon: Mail,          label: 'Email',    description: t('emailDesc'),    detail: 'contact@velifa.io',   href: 'mailto:contact@velifa.io', external: false },
   ];
 
   return (
     <main className="min-h-screen bg-bg">
-      <section className="max-w-2xl mx-auto px-6 pt-16 pb-12 text-center">
-        <p className="velifa-eyebrow mb-5">{t('eyebrow')}</p>
-        <h1 className="font-heading text-4xl md:text-5xl font-bold text-text mb-5">
-          {t('title')}
-        </h1>
-        <p className="text-text-muted text-base md:text-lg leading-relaxed">
-          {t('subtitle')}
-        </p>
-      </section>
+      <MarketingHero eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} />
 
-      <section className="max-w-2xl mx-auto px-6 pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {contacts.map((contact) => {
-            const Icon = contact.icon;
-            return (
-              <a
-                key={contact.label}
-                href={contact.href}
-                target={contact.external ? '_blank' : undefined}
-                rel={contact.external ? 'noopener noreferrer' : undefined}
-                className="velifa-card flex flex-col items-center text-center p-8 hover:border-accent transition-colors group"
-              >
-                <div className="w-14 h-14 rounded-velifa-lg flex items-center justify-center mb-5 transition-colors"
-                  style={{ background: 'var(--accent-soft)' }}>
-                  <Icon className="w-7 h-7 text-accent" />
-                </div>
-                <h2 className="font-heading font-semibold text-text text-lg mb-2 group-hover:text-accent transition-colors">
-                  {contact.label}
-                </h2>
-                <p className="text-text-muted text-sm leading-relaxed mb-4">
-                  {contact.description}
-                </p>
-              </a>
-            );
-          })}
+      <section className="mx-auto max-w-4xl px-5 py-16 sm:px-6 sm:py-20">
+        <div className="grid gap-px overflow-hidden rounded-velifa-xl border border-border bg-[color:var(--border)] sm:grid-cols-2">
+          {contacts.map(({ icon: Icon, label, description, detail, href, external }) => (
+            <a
+              key={label}
+              href={href}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}
+              className="group flex flex-col bg-[color:var(--bg)] p-7 transition-colors hover:bg-[color:var(--bg-subtle)] sm:p-8"
+            >
+              <div className="mb-8 flex items-center justify-between">
+                <span className="grid h-11 w-11 place-items-center rounded-[12px] border border-border bg-[color:var(--surface)] text-text">
+                  <Icon className="h-5 w-5" strokeWidth={1.75} />
+                </span>
+                <ArrowUpRight className="h-5 w-5 text-text-subtle transition-all group-hover:-translate-y-0.5 group-hover:text-text rtl:-scale-x-100" />
+              </div>
+              <h2 className="font-heading text-xl font-semibold text-text">{label}</h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{description}</p>
+              <p className="mt-5 font-mono text-sm text-text" dir="ltr">{detail}</p>
+            </a>
+          ))}
         </div>
-      </section>
 
-      <section className="max-w-2xl mx-auto px-6 pb-20">
-        <div className="velifa-card text-center py-8 px-6">
-          <p className="text-text-muted text-sm mb-5">{t('auditCta')}</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/" className="velifa-btn">
+        <div className="mt-6 flex flex-col items-start gap-4 rounded-velifa-lg border border-border p-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-text-muted">{t('auditCta')}</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/${locale}#audit`} className="velifa-btn inline-flex items-center gap-2">
               {t('launchAudit')}
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
             </Link>
-            <Link href="/faq" className="velifa-btn velifa-btn--ghost">
-              {t('seeFaq')}
-            </Link>
+            <Link href={`/${locale}/faq`} className="velifa-btn velifa-btn--ghost">{t('seeFaq')}</Link>
           </div>
         </div>
       </section>
 
-      <div className="max-w-2xl mx-auto px-6 pb-16 text-center">
-        <p className="text-text-subtle text-xs">{t('footerNote')}</p>
-      </div>
+      <p className="mx-auto max-w-4xl px-6 pb-16 text-center text-xs text-text-subtle">{t('footerNote')}</p>
     </main>
   );
 }

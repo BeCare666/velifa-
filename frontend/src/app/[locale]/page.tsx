@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useCaptcha } from '@/hooks/useCaptcha';
 import { normalizeSiteUrl } from '@/lib/site-url';
+import { SectionHeading, FeatureGrid, Steps, CtaBand } from '@/components/marketing';
 
 // ── Formulaire d'audit ───────────────────────────────────────────────────────
 function AuditForm() {
@@ -241,124 +242,68 @@ function RevealSection({ children, className = '', delay = 0 }: { children: Reac
 
 // ── Hero SVG Mockup ───────────────────────────────────────────────────────────
 function ReportMockup() {
+  const bars = [
+    { label: 'Performance', score: 92 },
+    { label: 'Accessibilité', score: 78 },
+    { label: 'SEO', score: 95 },
+    { label: 'Bonnes pratiques', score: 88 },
+  ];
+  const color = (n: number) => (n >= 90 ? 'var(--velifa-score-good)' : n >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)');
   return (
-    <div className="relative mx-auto" style={{ maxWidth: '520px' }}>
-      {/* Glow effect */}
-      <div className="absolute inset-0 rounded-velifa-xl opacity-40"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgb(var(--accent-rgb)/0.15) 0%, transparent 70%)',
-          filter: 'blur(20px)',
-        }} />
-
-      {/* Card frame */}
-      <div className="relative rounded-velifa-xl overflow-hidden"
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgb(var(--accent-rgb)/0.1)',
-        }}>
-
-        {/* Browser bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-border"
-          style={{ background: 'var(--velifa-ink-900)' }}>
-          {['#FF5F57','#FFBD2E','#28C840'].map((c, i) => (
-            <div key={i} className="w-3 h-3 rounded-full" style={{ background: c }} />
-          ))}
-          <div className="flex-1 mx-4 h-5 rounded-md text-center text-xs flex items-center px-3"
-            style={{ background: 'var(--velifa-ink-800)', color: 'var(--text-subtle)' }}>
-            velifa.io/analyse/rapport
+    <div className="relative mx-auto max-w-[560px]" aria-hidden>
+      <div className="absolute -inset-8 rounded-[40px] opacity-70 blur-3xl" style={{ background: 'radial-gradient(closest-side, rgb(var(--accent-rgb)/0.10), transparent)' }} />
+      <div className="relative overflow-hidden rounded-velifa-xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-start shadow-velifa-lg">
+        <div className="flex items-center gap-3 border-b border-border bg-[color:var(--bg-subtle)] px-4 py-3">
+          <div className="flex gap-1.5">{[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-[color:var(--border-strong)]" />)}</div>
+          <div className="flex h-6 flex-1 items-center justify-center rounded-md border border-border bg-[color:var(--surface)] font-mono text-[11px] text-text-subtle" dir="ltr">
+            exemple-boutique.com
           </div>
         </div>
-
-        {/* Report content */}
-        <div className="p-6 space-y-5">
-          {/* Header row */}
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="w-24 h-3 rounded mb-2" style={{ background: 'var(--accent)', opacity: 0.9 }} />
-              <div className="w-16 h-2 rounded" style={{ background: 'var(--border)' }} />
-            </div>
-            {/* Score ring mini */}
-            <div className="relative w-16 h-16">
-              <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
-                <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" strokeWidth="6" />
-                <circle cx="32" cy="32" r="26" fill="none"
-                  stroke="var(--velifa-score-good)" strokeWidth="6"
-                  strokeDasharray="163.4" strokeDashoffset="16.3"
-                  strokeLinecap="round" />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center font-heading font-bold text-lg"
-                style={{ color: 'var(--velifa-score-good)' }}>90</span>
-            </div>
+        <div className="grid gap-6 p-6 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center">
+          <div className="relative mx-auto h-24 w-24">
+            <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+              <circle cx="32" cy="32" r="27" fill="none" stroke="var(--border)" strokeWidth="5" />
+              <circle cx="32" cy="32" r="27" fill="none" stroke="var(--velifa-score-good)" strokeWidth="5" strokeLinecap="round" strokeDasharray="169.6" strokeDashoffset="13.6" />
+            </svg>
+            <span className="absolute inset-0 grid place-items-center font-heading text-2xl font-semibold tabular-nums text-text">92</span>
           </div>
-
-          {/* Score bars */}
-          {[
-            { label: 'Performance', score: 92, color: 'var(--velifa-score-good)' },
-            { label: 'Accessibilité', score: 78, color: 'var(--velifa-score-average)' },
-            { label: 'SEO', score: 95, color: 'var(--velifa-score-good)' },
-            { label: 'Bonnes pratiques', score: 88, color: 'var(--velifa-score-good)' },
-          ].map(({ label, score, color }) => (
-            <div key={label} className="space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span style={{ color: 'var(--text-subtle)' }}>{label}</span>
-                <span className="font-bold" style={{ color }}>{score}</span>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                <div className="h-full rounded-full" style={{ width: `${score}%`, background: color }} />
-              </div>
-            </div>
-          ))}
-
-          {/* Divider */}
-          <div className="border-t border-border" style={{ borderStyle: 'dashed' }} />
-
-          {/* CWV row */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'LCP', value: '1.2s', good: true },
-              { label: 'CLS', value: '0.00', good: true },
-              { label: 'TBT', value: '180ms', good: true },
-            ].map(({ label, value, good }) => (
-              <div key={label} className="rounded-lg p-3 text-center"
-                style={{ background: 'var(--velifa-score-good-bg)', border: '1px solid rgba(12,206,107,0.2)' }}>
-                <div className="text-xs mb-1" style={{ color: 'var(--text-subtle)' }}>{label}</div>
-                <div className="font-heading font-bold text-sm" style={{ color: 'var(--velifa-score-good)' }}>{value}</div>
+          <div className="space-y-3">
+            {bars.map(({ label, score }) => (
+              <div key={label}>
+                <div className="mb-1 flex justify-between text-xs">
+                  <span className="text-text-muted">{label}</span>
+                  <span className="font-semibold tabular-nums" style={{ color: color(score) }}>{score}</span>
+                </div>
+                <div className="h-1 overflow-hidden rounded-full bg-[color:var(--border)]">
+                  <div className="h-full rounded-full" style={{ width: `${score}%`, background: color(score) }} />
+                </div>
               </div>
             ))}
           </div>
-
-          {/* Screenshot placeholder */}
-          <div className="rounded-lg overflow-hidden h-20" style={{ background: 'var(--velifa-ink-900)', border: '1px solid var(--border)' }}>
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-8 h-8 rounded mx-auto mb-1 opacity-40" style={{ background: 'var(--accent)' }} />
-                <div className="w-16 h-1.5 rounded mx-auto" style={{ background: 'var(--border)' }} />
-              </div>
+        </div>
+        <div className="grid grid-cols-3 border-t border-border">
+          {[['LCP', '1,2 s'], ['CLS', '0,01'], ['TBT', '180 ms']].map(([k, v], i) => (
+            <div key={k} className={`px-4 py-3.5 text-center ${i < 2 ? 'border-e border-border' : ''}`}>
+              <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-text-subtle">{k}</p>
+              <p className="mt-1 font-heading text-sm font-semibold tabular-nums" style={{ color: 'var(--velifa-score-good)' }} dir="ltr">{v}</p>
             </div>
-          </div>
+          ))}
         </div>
       </div>
-
-      {/* Floating accent lines */}
-      <div className="absolute -top-4 -right-4 w-24 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--accent))' }} />
-      <div className="absolute -top-4 -right-4 h-24 w-px" style={{ background: 'linear-gradient(180deg, transparent, var(--accent))' }} />
-      <div className="absolute -bottom-4 -left-4 w-24 h-px" style={{ background: 'linear-gradient(90deg, var(--accent), transparent)' }} />
-      <div className="absolute -bottom-4 -left-4 h-24 w-px" style={{ background: 'linear-gradient(180deg, var(--accent), transparent)' }} />
     </div>
   );
 }
 
 // ── Capacités (uniquement des fonctions livrées, textes traduits) ───────────────
 const CAPABILITIES = [
-  { key: 'lighthouse', icon: Gauge,        span: 'lg:col-span-2' },
+  { key: 'lighthouse', icon: Gauge,        span: '' },
   { key: 'field',      icon: Users,        span: '' },
   { key: 'platforms',  icon: Store,        span: '' },
   { key: 'arabic',     icon: Languages,    span: '' },
   { key: 'privacy',    icon: ShieldCheck,  span: '' },
   { key: 'priorities', icon: ListChecks,   span: '' },
   { key: 'compare',    icon: GitCompare,   span: '' },
-  { key: 'pdf',        icon: FileText,     span: 'lg:col-span-2' },
+  { key: 'pdf',        icon: FileText,     span: '' },
 ] as const;
 
 function CapabilitiesGrid() {
@@ -411,6 +356,7 @@ function HeroBackground() {
 
 export default function HomePage() {
   const tHero  = useTranslations('hero');
+  const locale = useLocale();
   const tTrust = useTranslations('trust');
   const tFeat  = useTranslations('features');
   const tKF    = useTranslations('keyFeatures');
@@ -491,7 +437,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-text-subtle">
             {[
               { icon: Shield, text: tTrust('noData') },
-              { icon: Clock,  text: tTrust('fast') },
+              { icon: Gauge,  text: tTrust('fast') },
               { icon: Zap,    text: tTrust('powered') },
               { icon: Globe,  text: tTrust('compatible') },
             ].map(({ icon: Icon, text }) => (
@@ -522,6 +468,22 @@ export default function HomePage() {
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* FONCTIONNALITÉS CLÉS */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      <section className="mx-auto max-w-7xl px-5 pb-20 sm:px-6 sm:pb-28">
+        <RevealSection>
+          <SectionHeading eyebrow={tFeat('eyebrow')} title={tKF('sectionTitle')} subtitle={tKF('sectionSubtitle')} />
+        </RevealSection>
+        <RevealSection delay={100}>
+          <FeatureGrid columns={4} items={keyFeatures.map((f) => ({ icon: f.icon, title: f.title, description: f.desc }))} />
+        </RevealSection>
+        <div className="mt-10 text-center">
+          <Link href={`/${locale}/fonctionnalites`} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
+            {tKF('seeAll')}
+            <ArrowUpRight className="h-4 w-4 rtl:-scale-x-100" />
+          </Link>
+        </div>
+      </section>
+
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <RevealSection>
@@ -563,6 +525,23 @@ export default function HomePage() {
 
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* COMMENT ÇA MARCHE */}
+      {/* ══════════════════════════════════════════════════════════════════ */}
+      <section className="border-y border-border bg-bg-subtle">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
+          <RevealSection>
+            <SectionHeading eyebrow={tHiW('eyebrow')} title={tHiW('stepsTitle')} />
+          </RevealSection>
+          <RevealSection delay={100}>
+            <Steps steps={steps.map((st) => ({ number: st.number, title: st.title, description: st.desc }))} />
+          </RevealSection>
+          <div className="mt-12 text-center">
+            <a href="#audit" className="velifa-btn inline-flex items-center gap-2">
+              {tHiW('ctaButton')} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════════════════════════════════════════════════════════════ */}
       <section className="bg-bg-subtle border-y border-border">
         <div className="max-w-7xl mx-auto px-6 py-20">
@@ -653,7 +632,7 @@ export default function HomePage() {
 
         <RevealSection delay={200}>
           <div className="text-center">
-            <Link href="/tarifs" className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
+            <Link href={`/${locale}/tarifs`} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
               {tPP('seeAllPlans')}
               <ArrowUpRight className="w-4 h-4" />
             </Link>
@@ -664,22 +643,14 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════════════════ */}
       {/* CTA FINAL */}
       {/* ══════════════════════════════════════════════════════════════════ */}
-      <section className="border-t border-border">
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <RevealSection>
-            <h2 className="font-heading text-3xl md:text-[40px] font-semibold tracking-tight text-text mb-5">
-              {tCta('title')}
-            </h2>
-            <p className="text-text-muted mb-10 text-base">
-              {tCta('subtitle')}
-            </p>
-            <a href="#audit" className="velifa-btn inline-flex items-center gap-2">
-              {tCta('button')}
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </RevealSection>
-        </div>
-      </section>
+      <div className="border-t border-border pt-20 sm:pt-24">
+        <CtaBand
+          title={tCta('title')}
+          subtitle={tCta('subtitle')}
+          primary={{ href: '#audit', label: tCta('button') }}
+          secondary={{ href: `/${locale}/tarifs`, label: tPP('seeAllPlans') }}
+        />
+      </div>
 
     </main>
   );

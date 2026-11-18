@@ -1,9 +1,10 @@
-import Link from 'next/link';
-import { Globe, Search, Gauge, ArrowRight, Sparkles, Eye, Target } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { Globe, Search, Gauge, Sparkles, Eye, Target } from 'lucide-react';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { MarketingHero, SectionHeading, FeatureGrid, CtaBand } from '@/components/marketing';
 
 export default async function AProposPage() {
   const t = await getTranslations('about');
+  const locale = await getLocale();
 
   const whyPoints = [
     { icon: Globe,  title: t('why1Title'), description: t('why1Desc') },
@@ -19,99 +20,56 @@ export default async function AProposPage() {
 
   return (
     <main className="min-h-screen bg-bg">
-      <section className="max-w-5xl mx-auto px-6 pt-16 pb-20 text-center">
-        <p className="velifa-eyebrow mb-5">{t('eyebrow')}</p>
-        <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-text mb-6 leading-tight">
-          {t('title')}
-        </h1>
-        <p className="text-text-muted text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-          {t('subtitle')}
-        </p>
-      </section>
+      <MarketingHero eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} />
 
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="velifa-card py-10 px-8 md:py-14 md:px-16 text-center">
-          <p className="velifa-eyebrow mb-6">{t('missionEyebrow')}</p>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-text mb-6">
-            {t('missionTitle')}
-          </h2>
-          <p className="text-text-muted leading-relaxed text-base md:text-lg max-w-2xl mx-auto">
+      {/* Mission : citation éditoriale */}
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
+          <div>
+            <p className="velifa-eyebrow mb-4">{t('missionEyebrow')}</p>
+            <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight text-text md:text-[40px]">
+              {t('missionTitle')}
+            </h2>
+          </div>
+          <blockquote className="border-s-2 border-[color:var(--border-strong)] ps-6 text-lg leading-relaxed text-text-muted md:text-xl">
             {t('missionDesc')}
-          </p>
+          </blockquote>
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="text-center mb-12">
-          <p className="velifa-eyebrow mb-4">{t('whyEyebrow')}</p>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-text">
-            {t('whyTitle')}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {whyPoints.map((point) => {
-            const Icon = point.icon;
-            return (
-              <div key={point.title} className="velifa-card">
-                <div className="w-12 h-12 rounded-velifa-md flex items-center justify-center mb-5"
-                  style={{ background: 'var(--accent-soft)' }}>
-                  <Icon className="w-6 h-6 text-accent" />
+      <section className="mx-auto max-w-6xl px-5 pb-24 sm:px-6">
+        <SectionHeading eyebrow={t('whyEyebrow')} title={t('whyTitle')} />
+        <FeatureGrid items={whyPoints} columns={3} />
+      </section>
+
+      <section className="border-y border-border bg-bg-subtle">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+          <SectionHeading eyebrow={t('valuesEyebrow')} title={t('valuesTitle')} />
+          <div className="grid gap-10 md:grid-cols-3 md:gap-8">
+            {values.map(({ icon: Icon, title, description }, i) => (
+              <div key={title} className="border-t border-[color:var(--border-strong)] pt-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <Icon className="h-5 w-5 text-text" strokeWidth={1.75} />
+                  <span className="font-heading text-sm tabular-nums text-text-subtle">0{i + 1}</span>
                 </div>
-                <h3 className="font-heading font-semibold text-text mb-3">{point.title}</h3>
-                <p className="text-text-muted text-sm leading-relaxed">{point.description}</p>
+                <h3 className="mb-2 font-heading text-lg font-semibold text-text">{title}</h3>
+                <p className="text-sm leading-relaxed text-text-muted">{description}</p>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="text-center mb-12">
-          <p className="velifa-eyebrow mb-4">{t('valuesEyebrow')}</p>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-text">
-            {t('valuesTitle')}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {values.map((value) => {
-            const Icon = value.icon;
-            return (
-              <div key={value.title} className="velifa-card text-center">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
-                  style={{ background: 'var(--accent-soft)', border: '2px solid var(--accent)' }}>
-                  <Icon className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="font-heading font-semibold text-text mb-3">{value.title}</h3>
-                <p className="text-text-muted text-sm leading-relaxed">{value.description}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="velifa-card text-center py-12 px-6">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-text mb-4">
-            {t('ctaTitle')}
-          </h2>
-          <p className="text-text-muted mb-8 max-w-md mx-auto text-sm leading-relaxed">
-            {t('ctaSubtitle')}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/" className="velifa-btn">
-              {t('ctaButton')}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/tarifs" className="velifa-btn velifa-btn--ghost">
-              {t('ctaSecondary')}
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-6 pb-16 text-center">
-        <p className="text-text-subtle text-xs">{t('footerNote')}</p>
+      <div className="pt-20">
+        <CtaBand
+          title={t('ctaTitle')}
+          subtitle={t('ctaSubtitle')}
+          primary={{ href: `/${locale}#audit`, label: t('ctaButton') }}
+          secondary={{ href: `/${locale}/tarifs`, label: t('ctaSecondary') }}
+        />
       </div>
+
+      <p className="mx-auto max-w-5xl px-6 pb-16 text-center text-xs text-text-subtle">{t('footerNote')}</p>
     </main>
   );
 }

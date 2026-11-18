@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "VELIFA — Audit de Performance Web",
-    "description": "Analysez la performance de votre site e-commerce en 30 secondes. Score, Core Web Vitals, rapport détaillé."
+    "description": "Audit de performance pour boutiques en ligne : 4 scores Google Lighthouse, Core Web Vitals, plateforme détectée et priorités traduites."
   },
   "nav": {
     "home": "Accueil",
@@ -20,7 +20,7 @@
     "theme": "Thème"
   },
   "hero": {
-    "badge": "Analyse en 30 secondes · Rapport complet · 100% gratuit",
+    "badge": "Google Lighthouse · Mobile et ordinateur · Gratuit, sans compte",
     "title": "Auditez et optimisez la",
     "titleHighlight": "performance de votre site",
     "subtitle": "Obtenez votre score de performance complet, Core Web Vitals, et un plan d'action prioritaire. Aucune connaissance technique requise.",
@@ -47,8 +47,8 @@
   },
   "trust": {
     "noData": "Aucune donnée revendue",
-    "fast": "Résultat en moins de 30s",
-    "powered": "Propulsé par Velifa",
+    "fast": "Mobile et ordinateur",
+    "powered": "Mesures Google Lighthouse",
     "compatible": "Compatible tout site public"
   },
   "features": {
@@ -77,7 +77,7 @@
   },
   "keyFeatures": {
     "sectionTitle": "Un audit complet, pas à pas",
-    "sectionSubtitle": "Velifa vous donne toutes les métriques nécessaires pour comprendre et améliorer la performance de votre site.",
+    "sectionSubtitle": "Les mesures officielles de Google, expliquées clairement et classées par priorité.",
     "seeAll": "Voir toutes les fonctionnalités",
     "detailedScore": {
       "title": "Score détaillé",
@@ -85,15 +85,15 @@
     },
     "emailReport": {
       "title": "Rapport par email",
-      "desc": "Recevez votre rapport complet directement par email"
+      "desc": "Recevez sur demande vos scores et le lien du rapport complet par email."
     },
     "whatsapp": {
-      "title": "Accompagnement WhatsApp",
-      "desc": "Support personnalisé pour comprendre et améliorer vos résultats"
+      "title": "Aide à la correction",
+      "desc": "Depuis le rapport, demandez de l'aide : nous vous recontactons par WhatsApp ou par email."
     },
     "dataProtected": {
       "title": "Données protégées",
-      "desc": "Vos données ne sont jamais revendues ni partagées avec des tiers"
+      "desc": "Vos données ne sont jamais revendues. Elles servent uniquement à produire le rapport."
     }
   },
   "howItWorks": {
@@ -108,13 +108,13 @@
     },
     "step2": {
       "num": "02",
-      "title": "Analyse Velifa",
-      "desc": "Velifa lance les tests avec Google Lighthouse et collecte toutes les métriques de performance."
+      "title": "Analyse VELIFA",
+      "desc": "VELIFA lance Google Lighthouse sur mobile et sur ordinateur, puis ajoute ses contrôles : plateforme, version arabe, traceurs."
     },
     "step3": {
       "num": "03",
-      "title": "Rapport par email",
-      "desc": "Recevez un rapport complet avec vos scores, captures d'écran visuelles et recommandations d'amélioration."
+      "title": "Votre rapport",
+      "desc": "Scores, Core Web Vitals, capture d'écran et recommandations classées par priorité, à consulter en ligne ou à recevoir par email."
     }
   },
   "pricingPreview": {
@@ -143,7 +143,7 @@
   },
   "cta": {
     "title": "Prêt à booster votre site ?",
-    "subtitle": "Obtenez votre rapport gratuit en moins d'une minute",
+    "subtitle": "Lancez un audit gratuit, sans créer de compte.",
     "button": "Analyser mon site maintenant"
   },
   "footer": {
@@ -172,7 +172,7 @@
     "currentPlanLabel": "Plan actuel ✓",
     "activeSubscription": "Votre abonnement actif",
     "securePayment": "Paiement sécurisé via Lemon Squeezy. Résiliable à tout moment. Sans engagement.",
-    "footerNote": "Velifa effectue les audits de performance. Les scores sont calculés selon une méthodologie reconnue.",
+    "footerNote": "Les scores sont mesurés par Google Lighthouse ; VELIFA ajoute ses propres contrôles et recommandations.",
     "ctaFree": "Lancer un audit",
     "ctaPro": "Choisir Pro",
     "ctaBusiness": "Choisir Business",
@@ -244,7 +244,7 @@
     "recentAudits": "Audits récents",
     "yourAudits": "Vos audits",
     "noAudits": "Aucun audit pour l'instant",
-    "noAuditsDesc": "Lancez votre premier audit pour suivre la performance de vos sites en 30 secondes.",
+    "noAuditsDesc": "Lancez votre premier audit pour suivre la performance de vos sites.",
     "startFirst": "Lancer mon premier audit",
     "startFirstAction": "Lancer mon premier audit",
     "score": "Score",
@@ -344,33 +344,33 @@
     "q1": "Qu'est-ce que Velifa ?",
     "a1": "Un outil d'audit de performance web qui analyse votre site et vous donne des scores et recommandations détaillés.",
     "q2": "L'audit est-il gratuit ?",
-    "a2": "Oui, l'audit ponctuel d'une URL est gratuit. Les plans Pro et Business ajoutent le suivi dans le temps et d'autres fonctionnalités.",
+    "a2": "Oui : 1 audit par 24 h sans compte, 3 par 24 h avec un compte gratuit. Les plans Pro et Business ajoutent les audits illimités, l'historique et d'autres fonctionnalités.",
     "q3": "Comment fonctionne l'analyse ?",
     "a3": "Vous entrez l'URL de votre site, Velifa lance une analyse complète (mobile et desktop) et vous renvoie les scores, les Core Web Vitals et une capture d'écran.",
     "q4": "Que mesure Velifa ?",
-    "a4": "Performance, Accessibilité, SEO, Bonnes pratiques, ainsi que les Core Web Vitals (LCP, CLS, TBT, FCP).",
+    "a4": "Performance, Accessibilité, SEO et Bonnes pratiques (Google Lighthouse), les mesures LCP, CLS, TBT et FCP, ainsi que les données de vrais visiteurs (Chrome UX Report) quand Google en dispose.",
     "q5": "Vais-je recevoir mon rapport par email ?",
-    "a5": "Oui, un rapport est envoyé à l'adresse email fournie lors de l'analyse, avec les scores détaillés et les recommandations principales.",
+    "a5": "Oui, sur demande : depuis le rapport, indiquez une adresse email pour recevoir les scores principaux et le lien du rapport complet. Avec un compte, l'envoi automatique se règle dans vos paramètres.",
     "q6": "Mes données sont-elles en sécurité ?",
-    "a6": "Velifa ne collecte que les informations strictement nécessaires à l'analyse et à l'envoi du rapport. Aucun usage secondaire n'est fait de vos données.",
+    "a6": "VELIFA ne collecte que les informations nécessaires à l'analyse et à l'envoi du rapport. Vos données ne sont jamais revendues.",
     "q7": "Combien de temps prend un audit ?",
-    "a7": "La plupart des audits sont terminés en moins d'une minute. Le temps exact dépend de la taille et de la complexité du site analysé.",
+    "a7": "Le temps dépend du site analysé : VELIFA lance Google Lighthouse sur mobile puis sur ordinateur, et l'écran d'analyse affiche chaque étape en direct.",
     "q8": "Puis-je analyser n'importe quel site ?",
     "a8": "Oui, tout site accessible publiquement sur internet peut être analysé. Il n'est pas nécessaire d'être le propriétaire du site.",
     "q9": "Quelle est la différence entre les plans ?",
     "a9_free": "Le",
     "a9_freePlan": "Gratuit",
-    "a9_mid": "permet un audit ponctuel par URL. Le",
+    "a9_mid": "permet 1 audit par 24 h sans compte (3 avec un compte). Le",
     "a9_proPlan": "Pro",
-    "a9_proDesc": "ajoute un compte personnel avec historique des audits et suivi de l'évolution des scores.",
+    "a9_proDesc": "ajoute les audits illimités, l'historique complet et le suivi de l'évolution des scores.",
     "a9_business": "Le",
     "a9_businessPlan": "Business",
-    "a9_businessDesc": "ajoute l'analyse approfondie et le support prioritaire. Multi-sites, audits programmés, export PDF et API sont en cours de développement.",
+    "a9_businessDesc": "ajoute le suivi multi-sites avec audits programmés et alertes email, le rapport PDF à la marque de votre agence et l'API REST.",
     "a9_link": "Voir les tarifs",
     "ctaTitle": "Une autre question ?",
-    "ctaDesc": "N'hésitez pas à nous contacter — nous répondons généralement en quelques heures.",
+    "ctaDesc": "Écrivez-nous : nous vous répondons dès que possible.",
     "ctaButton": "Nous contacter",
-    "footerNote": "Velifa effectue les audits de performance. Les scores sont calculés selon une méthodologie reconnue."
+    "footerNote": "Les scores sont mesurés par Google Lighthouse ; VELIFA ajoute ses propres contrôles et recommandations."
   },
   "contact": {
     "eyebrow": "Contact",
@@ -381,43 +381,43 @@
     "auditCta": "Vous pouvez aussi lancer un audit gratuit de votre site.",
     "launchAudit": "Lancer un audit gratuit",
     "seeFaq": "Voir la FAQ",
-    "footerNote": "Velifa effectue les audits de performance."
+    "footerNote": "Les scores sont mesurés par Google Lighthouse ; VELIFA ajoute ses propres contrôles et recommandations."
   },
   "featurePage": {
     "eyebrow": "Fonctionnalités",
     "title": "Tout ce qu'il faut pour des sites plus rapides",
     "subtitle": "Velifa vous donne toutes les clés pour comprendre, mesurer et améliorer les performances de vos sites web.",
     "f1Title": "Audit de performance complet",
-    "f1Desc": "4 scores clés — Performance, Accessibilité, SEO, Bonnes pratiques — calculés par Velifa.",
+    "f1Desc": "4 scores — Performance, Accessibilité, SEO, Bonnes pratiques — mesurés par Google Lighthouse, sur mobile et sur ordinateur.",
     "f2Title": "Core Web Vitals",
     "f2Desc": "LCP, CLS, TBT, FCP mesurés et expliqués avec code couleur (bon/moyen/faible).",
     "f3Title": "Capture d'écran",
     "f3Desc": "Aperçu visuel de la page analysée pour mieux comprendre les résultats.",
     "f4Title": "Rapport par email",
-    "f4Desc": "Résultats détaillés envoyés directement dans votre boîte mail après chaque audit.",
+    "f4Desc": "Scores principaux et lien du rapport complet envoyés à l'adresse de votre choix.",
     "f5Title": "Suivi dans le temps",
     "f5Desc": "Historique de tous vos audits et évolution des scores pour mesurer vos progrès.",
     "f6Title": "Audits programmés",
-    "f6Desc": "Analyses automatiques récurrentes pour suivre vos performances en continu.",
+    "f6Desc": "Analyses quotidiennes ou hebdomadaires de vos sites suivis, avec alerte email sous votre seuil (plan Business).",
     "f7Title": "Multi-sites",
-    "f7Desc": "Gérez plusieurs projets et sites web depuis un seul tableau de bord.",
-    "f8Title": "Export PDF (bientôt)",
-    "f8Desc": "Générez des rapports PDF complets pour partager vos résultats avec vos équipes ou clients.",
-    "f9Title": "Accès API (bientôt)",
-    "f9Desc": "Intégrez Velifa dans vos workflows avec un accès API complet et documentation.",
+    "f7Desc": "Suivez plusieurs sites depuis un seul tableau de bord (plan Business).",
+    "f8Title": "Rapport PDF à votre marque",
+    "f8Desc": "Rapport PDF arabe ou anglais au logo et aux couleurs de votre agence, à partager avec vos clients (plan Business).",
+    "f9Title": "API REST",
+    "f9Desc": "Lancez et lisez des audits depuis vos outils avec une clé API (plan Business).",
     "howEyebrow": "Comment ça marche",
     "howTitle": "En 3 étapes, votre rapport",
     "step1Title": "Entrez l'URL",
     "step1Desc": "Saisissez l'adresse du site que vous souhaitez analyser. Aucune inscription requise pour le plan gratuit.",
-    "step2Title": "Velifa analyse",
-    "step2Desc": "En quelques secondes, Velifa collecte les données et génère votre rapport complet.",
-    "step3Title": "Recevez et optimisez",
-    "step3Desc": "Votre rapport arrive par email. Appliquez les recommandations pour améliorer vos scores et votre expérience utilisateur.",
+    "step2Title": "VELIFA analyse",
+    "step2Desc": "VELIFA lance Google Lighthouse sur mobile et sur ordinateur et suit chaque étape en direct.",
+    "step3Title": "Consultez et optimisez",
+    "step3Desc": "Consultez le rapport en ligne ou recevez-le par email, puis appliquez les recommandations par ordre de priorité.",
     "ctaTitle": "Prêt à analyser votre site ?",
-    "ctaSubtitle": "Lancez votre premier audit gratuit en quelques secondes. Aucun compte requis.",
+    "ctaSubtitle": "Lancez votre premier audit gratuit. Aucun compte requis.",
     "ctaButton": "Lancer un audit gratuit",
     "ctaSecondary": "Voir les tarifs",
-    "footerNote": "Velifa effectue les audits de performance. Les scores sont calculés selon une méthodologie reconnue."
+    "footerNote": "Les scores sont mesurés par Google Lighthouse ; VELIFA ajoute ses propres contrôles et recommandations."
   },
   "about": {
     "eyebrow": "À propos",
@@ -433,20 +433,20 @@
     "why2Title": "La vitesse influence le référencement",
     "why2Desc": "Google intègre la performance des pages dans ses critères de classement. Un site rapide a un avantage significatif en termes de visibilité.",
     "why3Title": "Les Core Web Vitals sont des critères officiels",
-    "why3Desc": "Google utilise LCP, CLS et TBT pour évaluer l'expérience utilisateur. Ces métriques jouent un rôle direct dans le classement de vos pages.",
+    "why3Desc": "Google utilise LCP, CLS et INP pour évaluer l'expérience de page sur de vraies visites. VELIFA les affiche quand Google en dispose, avec le TBT mesuré en laboratoire.",
     "valuesEyebrow": "Notre approche",
     "valuesTitle": "Ce qui guide Velifa",
     "val1Title": "Simplicité",
     "val1Desc": "Pas besoin d'être expert pour comprendre ses scores. Velifa traduit les données techniques en informations claires et actionnables.",
     "val2Title": "Transparence",
-    "val2Desc": "Les audits sont réalisés via une technologie reconnue. Les résultats sont reproductibles et vérifiables.",
+    "val2Desc": "Les mesures viennent de Google Lighthouse et de Chrome UX Report. Les résultats sont reproductibles et vérifiables.",
     "val3Title": "Résultats concrets",
     "val3Desc": "Chaque recommandation est actionnable. Velifa vous aide à passer de l'analyse à l'amélioration réelle de vos performances.",
     "ctaTitle": "Prêt à améliorer votre site ?",
-    "ctaSubtitle": "Lancez votre premier audit gratuit en quelques secondes. Aucun compte requis.",
+    "ctaSubtitle": "Lancez votre premier audit gratuit. Aucun compte requis.",
     "ctaButton": "Lancer un audit gratuit",
     "ctaSecondary": "Voir les tarifs",
-    "footerNote": "Velifa effectue les audits de performance. Les scores sont calculés selon une méthodologie reconnue."
+    "footerNote": "Les scores sont mesurés par Google Lighthouse ; VELIFA ajoute ses propres contrôles et recommandations."
   },
   "audits": {
     "title": "Mes Audits",

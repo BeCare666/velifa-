@@ -1,98 +1,75 @@
 'use client';
 
 import Link from 'next/link';
-import { Zap } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { ArrowRight } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { BrandMark } from './Header';
 
 export default function Footer() {
   const t = useTranslations('footer');
+  const tNav = useTranslations('nav');
+  const locale = useLocale();
+  const href = (path: string) => `/${locale}${path}`;
 
   const columns = [
     {
       title: t('product'),
       links: [
-        { label: t('features'), href: '/fonctionnalites' as const },
-        { label: t('pricing'),  href: '/tarifs' as const },
-        { label: t('faq'),      href: '/faq' as const },
+        { label: t('features'), path: '/fonctionnalites' },
+        { label: t('pricing'),  path: '/tarifs' },
+        { label: t('faq'),      path: '/faq' },
       ],
     },
     {
       title: t('company'),
       links: [
-        { label: t('about'),   href: '/a-propos' as const },
-        { label: t('contact'), href: '/contact' as const },
+        { label: t('about'),   path: '/a-propos' },
+        { label: t('contact'), path: '/contact' },
       ],
     },
     {
       title: t('legal'),
       links: [
-        { label: t('legalNotice'), href: '/mentions-legales' as const },
-        { label: t('privacy'),     href: '/confidentialite' as const },
+        { label: t('legalNotice'), path: '/mentions-legales' },
+        { label: t('privacy'),     path: '/confidentialite' },
       ],
     },
   ];
 
   return (
-    <footer className="bg-bg-subtle border-t border-border">
-      <div className="max-w-7xl mx-auto px-6 pt-14 pb-8">
-        {/* Main content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-border">
-
-          {/* Brand column */}
-          <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Zap className="w-5 h-5 text-accent" />
-              <span className="velifa-wordmark text-sm">VELIFA</span>
+    <footer className="border-t border-border bg-bg-subtle">
+      <div className="mx-auto max-w-7xl px-5 pb-8 pt-16 sm:px-6">
+        <div className="grid grid-cols-2 gap-10 border-b border-border pb-12 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
+          <div className="col-span-2 md:col-span-1">
+            <Link href={href('')} aria-label="VELIFA" className="inline-flex">
+              <BrandMark />
             </Link>
-            <p className="text-text-subtle text-xs leading-relaxed">
-              {t('tagline')}
-            </p>
-            {/* Social placeholders */}
-            <div className="flex items-center gap-3 mt-5">
-              {['Twitter', 'LinkedIn'].map((social) => (
-                <button
-                  key={social}
-                  disabled
-                  className="text-xs text-text-subtle opacity-50 cursor-not-allowed"
-                  title={`${social} — à venir`}
-                >
-                  {social}
-                </button>
-              ))}
-            </div>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-text-muted">{t('tagline')}</p>
+            <Link href={`${href('')}#audit`} className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-text hover:underline underline-offset-4">
+              {tNav('startAudit')}
+              <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+            </Link>
           </div>
 
-          {/* Link columns */}
           {columns.map((col) => (
-            <div key={col.title}>
-              <h3 className="font-heading font-semibold text-text text-sm mb-4">
-                {col.title}
-              </h3>
+            <nav key={col.title} aria-label={col.title}>
+              <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-subtle">{col.title}</h3>
               <ul className="space-y-3">
-                {col.links.map(({ label, href }) => (
-                  <li key={label}>
-                    <Link
-                      target="_blank"
-                      href={href}
-                      className="text-sm text-text-muted hover:text-accent transition-colors"
-                    >
+                {col.links.map(({ label, path }) => (
+                  <li key={path}>
+                    <Link href={href(path)} className="text-sm text-text-muted transition-colors hover:text-text">
                       {label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-text-subtle text-xs">
-            {t('copyright')}
-          </p>
-          <p className="text-text-subtle text-xs">
-            {t('madeWith')}
-          </p>
+        <div className="flex flex-col items-center justify-between gap-3 pt-8 text-xs text-text-subtle md:flex-row">
+          <p>{t('copyright')}</p>
+          <p>{t('madeWith')}</p>
         </div>
       </div>
     </footer>
