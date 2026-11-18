@@ -754,3 +754,21 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   langue ; `window.confirm()` natif → `ConfirmDialog` ; squelette 6 colonnes pour 7 ; clé React manquante
   (fragment) dans la liste des sites ; statuts d'audit bruts (`completed`) → libellés français.
 - Preuves : `tsc` exit 0 ; `next build` exit 0.
+
+### 2026-11-18 — 5.5 (suite) : autres pages admin
+- Revenus, Audits, Performance, Prospects, Système, Demandes, Notifications, Paramètres admin, Plans : styles en
+  dur → kit `components/ui` (tableaux défilants sur mobile, filtres segmentés, squelettes, états vides, erreurs).
+- Corrigé (vérifié dans le code) :
+  - Revenus : le graphique lisait `priceProEur` / `priceBusinessEur`, absents de `GET /admin/revenue` (qui renvoie
+    `priceProUsd` / `priceBusinessUsd`) → barres vides ; « Depuis » affichait `updated_at` → « Compte mis à jour le ».
+  - Système : Redis et Clerk affichés « OK » en dur, Brevo déduit de la clé Clerk → `getSystem` interroge Redis
+    (ping, délai 3 s) et la file (`getJobCounts`), et indique la présence de `BREVO_API_KEY` / `CLERK_SECRET_KEY`
+    sans en renvoyer la valeur. « Vider le cache Redis — efface toutes les clés » était faux (seul l'historique
+    terminé/échoué de la file est nettoyé) → libellé exact.
+  - Paramètres admin : adresse Gmail personnelle affichée en dur comme destinataire du test → « premier email de
+    ADMIN_EMAILS » (comportement réel de `sendTestEmail`).
+  - Plans : chargement sans gestion d'erreur (plantage `list.map`) ; Notifications : erreur affichée comme « Aucune
+    notification » ; Audits : filtre « En cours » (`processing`) ajouté, liens rapport/utilisateur avec la langue ;
+    Performance : libellés backend sans accents affichés accentués ; Demandes : cartes sur mobile.
+- Preuves : `jest src/admin` 16/16 (nouveau `admin-system.spec.ts` : Redis OK, en panne, sans réponse, clés non
+  exposées) ; `tsc` backend exit 0 ; `next build` exit 0 (87/87 pages).

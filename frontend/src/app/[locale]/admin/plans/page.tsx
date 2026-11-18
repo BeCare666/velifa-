@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { PageHeader, Panel, Skeleton, ErrorNote } from '@/components/ui';
 
 /** Messages des erreurs renvoyées par PUT /admin/plans/:code. */
 const ERRORS: Record<string, string> = {
@@ -15,9 +16,8 @@ const ERRORS: Record<string, string> = {
 
 const LABEL: Record<string, string> = { free: 'Gratuit', pro: 'Pro', business: 'Business (agence)' };
 
-const box = { background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: 20 } as const;
-const inp = { width: '100%', height: 34, padding: '0 10px', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, color: 'rgb(var(--accent-rgb)/0.85)', fontSize: 13, boxSizing: 'border-box' } as const;
-const lbl = { display: 'block', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.40)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 } as const;
+const inp = 'h-10 w-full rounded-velifa-md border border-border bg-[color:var(--surface)] px-3 text-sm text-text tabular-nums focus:border-[color:var(--border-strong)] focus:outline-none';
+const lbl = 'mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle';
 
 type Form = {
   priceMonthly: string; priceYearly: string; lemonVariantMonthly: string; lemonVariantYearly: string;
@@ -41,14 +41,22 @@ export default function AdminPlansPage() {
   const [codes, setCodes]       = useState<string[]>([]);
   const [variants, setVariants] = useState<any[] | null>(null);
   const [variantsError, setVariantsError] = useState('');
-  const [status, setStatus]     = useState<Record<string, string>>({});
+  const [status, setStatus]     = useState<Record<string, { ok: boolean; text: string }>>({});
+  const [saving, setSaving]     = useState<string | null>(null);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState('');
 
   const load = useCallback(async () => {
-    const token = await getToken().catch(() => null);
-    const res = await api.admin.getPlanPricing(token);
-    const list = res?.data ?? res;
-    setCodes(list.map((p: any) => p.code));
-    setForms(Object.fromEntries(list.map((p: any) => [p.code, toForm(p)])));
+    setLoading(true); setError('');
+    try {
+      const token = await getToken().catch(() => null);
+      const res = await api.admin.getPlanPricing(token);
+      const list = res?.data ?? res;
+      if (!Array.isArray(list)) throw new Error('Réponse inattendue du serveur');
+      setCodes(list.map((p: any) => p.code));
+      setForms(Object.fromEntries(list.map((p: any) => [p.code, toForm(p)])));
+    } catch (e: any) { setError(e.message ?? 'Chargement impossible'); }
+    finally { setLoading(false); }
   }, [getToken]);
 
   const loadVariants = useCallback(async () => {
@@ -72,7 +80,8 @@ export default function AdminPlansPage() {
 
   async function save(code: string) {
     const f = forms[code];
-    setStatus((s) => ({ ...s, [code]: 'Enregistrement…' }));
+    setSaving(code);
+    setStatus((s) => { const n = { ...s }; delete n[code]; return n; });
     try {
       const token = await getToken().catch(() => null);
       const res = await api.admin.updatePlanPricing(token, code, {
@@ -85,17 +94,17 @@ export default function AdminPlansPage() {
         widgetDailyLimit: Number(f.widgetDailyLimit),
       });
       setForms((all) => ({ ...all, [code]: toForm(res?.data ?? res) }));
-      setStatus((s) => ({ ...s, [code]: 'Enregistré ✓ (appliqué sous 1 minute)' }));
+      setStatus((s) => ({ ...s, [code]: { ok: true, text: 'Enregistré — appliqué sous 1 minute' } }));
     } catch (e: any) {
       const msg = Array.isArray(e.message) ? e.message.join(', ') : ERRORS[e.message] ?? e.message;
-      setStatus((s) => ({ ...s, [code]: `⚠️ ${msg}` }));
-    }
+      setStatus((s) => ({ ...s, [code]: { ok: false, text: msg } }));
+    } finally { setSaving(null); }
   }
 
   const variantField = (code: string, key: 'lemonVariantMonthly' | 'lemonVariantYearly', interval: 'month' | 'year') => {
     const options = (variants ?? []).filter((v) => !v.interval || v.interval === interval);
     return options.length > 0 ? (
-      <select style={inp} value={forms[code][key]} onChange={(e) => set(code, key, e.target.value)}>
+      <select className={inp} value={forms[code][key]} onChange={(e) => set(code, key, e.target.value)}>
         <option value="">— aucune —</option>
         {options.map((v) => (
           <option key={v.id} value={v.id}>
@@ -104,54 +113,76 @@ export default function AdminPlansPage() {
         ))}
       </select>
     ) : (
-      <input style={inp} dir="ltr" placeholder="ID de variante" value={forms[code][key]} onChange={(e) => set(code, key, e.target.value)} />
+      <input className={inp} dir="ltr" placeholder="ID de variante" value={forms[code][key]} onChange={(e) => set(code, key, e.target.value)} />
     );
   };
 
+  const field = (code: string, key: keyof Form, label: string, step: string) => (
+    <div>
+      <label htmlFor={`${code}-${key}`} className={lbl}>{label}</label>
+      <input id={`${code}-${key}`} className={inp} type="number" min={0} step={step} dir="ltr"
+        value={forms[code][key]} onChange={(e) => set(code, key, e.target.value)} />
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Plans et prix</h1>
-        <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.40)', marginTop: 4, marginBottom: 8, lineHeight: 1.6 }}>
-          Prix en USD affichés sur la page Tarifs, variantes Lemon Squeezy utilisées au paiement, et limites appliquées par le serveur.
-          Les fonctions réservées au plan Business (audits programmés, PDF, widget, API) ne se modifient pas ici.
-        </p>
-        <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.40)', marginBottom: 24 }}>
-          Le prix affiché doit correspondre au prix de la variante Lemon Squeezy choisie (c’est elle qui est facturée).
-          Les produits se créent dans le tableau de bord Lemon Squeezy (l’API ne permet que de les lire).
-          <button type="button" onClick={loadVariants} style={{ marginLeft: 8, background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12 }}>
-            <RefreshCw style={{ width: 11, height: 11, display: 'inline' }} /> Recharger les variantes
-          </button>
-        </p>
-        {variantsError && <p style={{ fontSize: 12, color: 'var(--velifa-score-average)', marginBottom: 16 }}>{variantsError}</p>}
+      <div className="mx-auto max-w-[1100px]">
+        <PageHeader
+          eyebrow="Administration"
+          title="Plans et prix"
+          description="Prix en USD affichés sur la page Tarifs, variantes Lemon Squeezy utilisées au paiement, et limites appliquées par le serveur. Les fonctions réservées au plan Business (audits programmés, PDF, widget, API) ne se modifient pas ici."
+        />
 
-        <div style={{ display: 'grid', gap: 16 }}>
-          {codes.map((code) => forms[code] && (
-            <div key={code} style={box}>
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent)', margin: '0 0 14px' }}>{LABEL[code] ?? code}</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-                {code !== 'free' && (<>
-                  <div><label style={lbl}>Prix mensuel (USD)</label><input style={inp} type="number" min={0} step="0.01" value={forms[code].priceMonthly} onChange={(e) => set(code, 'priceMonthly', e.target.value)} /></div>
-                  <div><label style={lbl}>Prix annuel (USD, vide = aucun)</label><input style={inp} type="number" min={0} step="0.01" value={forms[code].priceYearly} onChange={(e) => set(code, 'priceYearly', e.target.value)} /></div>
-                  <div><label style={lbl}>Variante mensuelle</label>{variantField(code, 'lemonVariantMonthly', 'month')}</div>
-                  <div><label style={lbl}>Variante annuelle</label>{variantField(code, 'lemonVariantYearly', 'year')}</div>
-                </>)}
-                <div><label style={lbl}>Sites suivis</label><input style={inp} type="number" min={0} step={1} value={forms[code].siteLimit} onChange={(e) => set(code, 'siteLimit', e.target.value)} /></div>
-                {code === 'business' && (<>
-                  <div><label style={lbl}>Audits API / jour</label><input style={inp} type="number" min={0} step={1} value={forms[code].apiDailyLimit} onChange={(e) => set(code, 'apiDailyLimit', e.target.value)} /></div>
-                  <div><label style={lbl}>Audits widget / jour / agence</label><input style={inp} type="number" min={0} step={1} value={forms[code].widgetDailyLimit} onChange={(e) => set(code, 'widgetDailyLimit', e.target.value)} /></div>
-                </>)}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
-                <button type="button" onClick={() => save(code)}
-                  style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}>
-                  <Save style={{ width: 13, height: 13 }} /> Enregistrer
-                </button>
-                {status[code] && <span style={{ fontSize: 12, color: status[code].startsWith('⚠️') ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.55)' }}>{status[code]}</span>}
-              </div>
-            </div>
-          ))}
+        <div className="mb-6 flex flex-col gap-3 rounded-velifa-lg border border-border bg-[color:var(--surface)] p-4 text-xs leading-relaxed text-text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Le prix affiché doit correspondre au prix de la variante Lemon Squeezy choisie (c’est elle qui est facturée).
+            Les produits se créent dans le tableau de bord Lemon Squeezy (l’API ne permet que de les lire).
+          </p>
+          <button type="button" onClick={loadVariants} className="inline-flex h-9 flex-shrink-0 items-center gap-2 self-start rounded-velifa-md border border-border px-3 font-medium text-text transition-colors hover:border-[color:var(--border-strong)] sm:self-auto">
+            <RefreshCw className="h-3.5 w-3.5" /> Recharger les variantes
+          </button>
         </div>
+        {variantsError && (
+          <p className="mb-5 rounded-velifa-md px-4 py-3 text-xs" style={{ color: 'var(--velifa-score-average)', background: 'var(--velifa-score-average-bg)' }}>{variantsError}</p>
+        )}
+
+        {error && <ErrorNote>{error}</ErrorNote>}
+
+        {loading ? (
+          <div className="space-y-5">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-48 rounded-velifa-lg" />)}</div>
+        ) : (
+          <div className="space-y-5">
+            {codes.map((code) => forms[code] && (
+              <Panel key={code} title={<span className="text-base">{LABEL[code] ?? code}</span>}>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {code !== 'free' && (<>
+                    {field(code, 'priceMonthly', 'Prix mensuel (USD)', '0.01')}
+                    {field(code, 'priceYearly', 'Prix annuel (USD, vide = aucun)', '0.01')}
+                    <div><label className={lbl}>Variante mensuelle</label>{variantField(code, 'lemonVariantMonthly', 'month')}</div>
+                    <div><label className={lbl}>Variante annuelle</label>{variantField(code, 'lemonVariantYearly', 'year')}</div>
+                  </>)}
+                  {field(code, 'siteLimit', 'Sites suivis', '1')}
+                  {code === 'business' && (<>
+                    {field(code, 'apiDailyLimit', 'Audits API / jour', '1')}
+                    {field(code, 'widgetDailyLimit', 'Audits widget / jour / agence', '1')}
+                  </>)}
+                </div>
+                <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-4">
+                  <button type="button" onClick={() => save(code)} disabled={saving === code} className="velifa-btn inline-flex items-center gap-2 disabled:opacity-60">
+                    {saving === code ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    {saving === code ? 'Enregistrement…' : 'Enregistrer'}
+                  </button>
+                  {status[code] && (
+                    <span className="text-xs" style={{ color: status[code].ok ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
+                      {status[code].text}
+                    </span>
+                  )}
+                </div>
+              </Panel>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

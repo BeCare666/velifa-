@@ -2,35 +2,27 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { DollarSign, TrendingUp, Users, RefreshCw, Sparkles } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, RefreshCw, CreditCard } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '@/lib/api';
+import { PageHeader, Panel, StatCard, Skeleton, EmptyState, IconButton, ErrorNote } from '@/components/ui';
 
 const fmt = (n: number) => new Intl.NumberFormat('fr-FR').format(n);
+const usd = (n: number) => `$${fmt(n)}`;
 const fmtDate = (v: any) =>
   v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
-function KpiCard({ label, value, sub, icon: Icon }: {
-  label: string; value: string; sub?: string; icon: React.ElementType;
-}) {
+const ChartTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  const p = payload[0]?.payload;
   return (
-    <div style={{
-      background: 'rgb(var(--accent-rgb)/0.025)',
-      border: '1px solid rgb(var(--accent-rgb)/0.07)',
-      borderRadius: 12, padding: '18px 20px',
-      transition: 'border-color 150ms',
-    }}
-      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgb(var(--accent-rgb)/0.14)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgb(var(--accent-rgb)/0.07)'; }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <Icon style={{ width: 14, height: 14, color: 'rgb(var(--accent-rgb)/0.40)', flexShrink: 0 }} strokeWidth={1.75} />
-        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.30)' }}>{label}</span>
-      </div>
-      <p style={{ fontSize: 24, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.90)', margin: 0 }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', marginTop: 6 }}>{sub}</p>}
+    <div className="rounded-[8px] border border-border bg-[color:var(--surface-raised)] px-3 py-2 text-xs shadow-velifa-md">
+      <p className="mb-1 font-semibold text-text">{label}</p>
+      <p className="text-text-muted">Revenu : <strong className="tabular-nums text-text">{usd(p?.montant ?? 0)}</strong></p>
+      <p className="text-text-muted">Abonnés : <strong className="tabular-nums text-text">{p?.nb ?? 0}</strong></p>
     </div>
   );
-}
+};
 
 export default function AdminRevenuePage() {
   const { getToken } = useAuth();
@@ -48,135 +40,127 @@ export default function AdminRevenuePage() {
     finally { setLoading(false); }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
-  const chartData = data ? [
-    { name: 'Pro', montant: data.proCount * data.priceProEur, nb: data.proCount },
-    { name: 'Business', montant: data.businessCount * data.priceBusinessEur, nb: data.businessCount },
-  ] : [];
+  const proCount = data?.proCount ?? 0;
+  const bizCount = data?.businessCount ?? 0;
+  const pricePro = data?.priceProUsd ?? 0;
+  const priceBiz = data?.priceBusinessUsd ?? 0;
+  const mrr = data?.estimatedMonthly ?? 0;
+  const proShare = mrr > 0 ? Math.round((proCount * pricePro / mrr) * 100) : 0;
+
+  // Montants calculés à partir des champs réellement renvoyés par GET /admin/revenue (USD)
+  const chartData = [
+    { name: 'Pro', montant: proCount * pricePro, nb: proCount },
+    { name: 'Business', montant: bizCount * priceBiz, nb: bizCount },
+  ];
+  const subs: any[] = data?.subscriptions ?? [];
 
   return (
     <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-      <div style={{ maxWidth: 1600, margin: '0 auto' }}>
+      <div className="mx-auto max-w-[1600px]">
+        <PageHeader
+          eyebrow="Administration"
+          title="Revenus"
+          description="Revenu mensuel estimé à partir des abonnements actifs et des prix du back-office."
+          actions={<IconButton icon={RefreshCw} label="Rafraîchir" onClick={load} spinning={loading} />}
+        />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
-          <div>
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Revenus</h1>
-            <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>MRR estimé basé sur les abonnements actifs</p>
-          </div>
-          <button onClick={load} style={{ height: 36, width: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', cursor: 'pointer' }}>
-            <RefreshCw style={{ width: 14, height: 14 }} />
-          </button>
-        </div>
-
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 24 }}>
-            ⚠️ {error}
-          </div>
-        )}
+        {error && <ErrorNote>{error}</ErrorNote>}
 
         {loading ? (
-          <>
-            <div style={{ height: 130, borderRadius: 16, background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', marginBottom: 16, animation: 'pulse 1.5s ease-in-out infinite' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 24px', height: 100, animation: 'pulse 1.5s ease-in-out infinite' }} />
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Hero MRR banner */}
-            <div style={{
-              position: 'relative', overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.14), rgb(var(--accent-rgb)/0.03) 60%)',
-              border: '1px solid rgb(var(--accent-rgb)/0.25)', borderRadius: 16,
-              padding: '26px 32px', marginBottom: 16,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
-            }}>
-              <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgb(var(--accent-rgb)/0.08)', filter: 'blur(10px)' }} />
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                  <Sparkles style={{ width: 14, height: 14, color: 'var(--accent)' }} strokeWidth={1.75} />
-                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.80)' }}>Revenu mensuel récurrent</span>
-                </div>
-                <p style={{ fontSize: 42, fontWeight: 800, color: 'var(--accent)', margin: 0, letterSpacing: '-0.01em' }}>
-                  ${fmt(data?.estimatedMonthly ?? 0)} <span style={{ fontSize: 22, fontWeight: 600 }}>/ mois (estimation)</span>
-                </p>
-              </div>
-              <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
+          <div className="space-y-4">
+            <Skeleton className="h-40 w-full rounded-velifa-xl" />
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-velifa-lg" />)}</div>
+          </div>
+        ) : data && (
+          <div className="space-y-5">
+            {/* Revenu mensuel récurrent */}
+            <section className="relative overflow-hidden rounded-velifa-xl border border-[color:var(--border-strong)] bg-[color:var(--surface-raised)] p-6 sm:p-8">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-24 end-[-5%] h-64 w-64 rounded-full blur-3xl"
+                style={{ background: 'radial-gradient(circle, rgb(var(--accent-rgb)/0.10), transparent 70%)' }}
+              />
+              <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: '0 0 6px' }}>Pro</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--accent)', margin: 0 }}>${fmt((data?.proCount ?? 0) * (data?.priceProUsd ?? 0))}</p>
-                  <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', margin: '4px 0 0' }}>{data?.proCount} × ${data?.priceProUsd}</p>
+                  <p className="velifa-eyebrow mb-3">Revenu mensuel récurrent (estimation)</p>
+                  <p className="font-heading text-5xl font-semibold tracking-tight text-text tabular-nums sm:text-6xl" dir="ltr">
+                    {usd(mrr)}<span className="ms-2 text-xl font-medium text-text-muted">/ mois</span>
+                  </p>
                 </div>
-                <div>
-                  <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: '0 0 6px' }}>Business</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', margin: 0 }}>${fmt((data?.businessCount ?? 0) * (data?.priceBusinessUsd ?? 0))}</p>
-                  <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.30)', margin: '4px 0 0' }}>{data?.businessCount} × ${data?.priceBusinessUsd}</p>
+                <div className="grid min-w-[280px] grid-cols-2 gap-6">
+                  {[
+                    { label: 'Pro', amount: proCount * pricePro, detail: `${proCount} × $${pricePro}` },
+                    { label: 'Business', amount: bizCount * priceBiz, detail: `${bizCount} × $${priceBiz}` },
+                  ].map((p) => (
+                    <div key={p.label}>
+                      <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-text-subtle">{p.label}</p>
+                      <p className="text-xl font-semibold tabular-nums text-text" dir="ltr">{usd(p.amount)}</p>
+                      <p className="mt-0.5 text-xs text-text-muted tabular-nums" dir="ltr">{p.detail}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            {/* KPI grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
-              <KpiCard label="Abonnés Pro"      value={fmt(data?.proCount ?? 0)}      icon={TrendingUp} sub={`$${data?.priceProUsd}/mois par abonné`} />
-              <KpiCard label="Abonnés Business" value={fmt(data?.businessCount ?? 0)} icon={Users}      sub={`$${data?.priceBusinessUsd}/mois par abonné`} />
-              <KpiCard label="Total abonnés"    value={fmt((data?.proCount ?? 0) + (data?.businessCount ?? 0))} icon={Users} />
-              <KpiCard label="Revenu annuel projeté" value={`$${fmt((data?.estimatedMonthly ?? 0) * 12)}`} icon={DollarSign} />
-            </div>
-          </>
-        )}
-
-        {!loading && data && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-            <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 20px 12px' }}>
-              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', marginBottom: 20 }}>
-                Revenu par plan
-              </p>
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={chartData} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
-                  <CartesianGrid stroke="rgb(var(--accent-rgb)/0.04)" strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: 'var(--surface-raised)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, fontSize: 12 }}
-                    formatter={(v: any) => [`$${v}`, 'Revenu']} />
-                  <Bar dataKey="montant" fill="var(--accent)" radius={[4, 4, 0, 0]} name="Revenu ($)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
-                <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)' }}>
-                  Abonnements actifs ({data.subscriptions?.length ?? 0})
-                </p>
-              </div>
-              <div style={{ maxHeight: 340, overflowY: 'auto' }}>
-                {(data.subscriptions ?? []).length === 0 ? (
-                  <p style={{ padding: '24px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun abonnement actif</p>
-                ) : (data.subscriptions ?? []).map((s: any, i: number) => (
-                  <div key={s.clerkUserId} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.10)', border: `1px solid ${s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.20)' : 'rgb(var(--accent-rgb)/0.20)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)', flexShrink: 0 }}>
-                      {(s.clerkUserId ?? 'U').slice(-2).toUpperCase()}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.55)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.clerkUserId}</p>
-                      <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', marginTop: 2 }}>Depuis {fmtDate(s.since)}</p>
-                    </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '3px 8px', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.12)', color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)' }}>
-                        {s.plan}
-                      </span>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.70)', marginTop: 4 }}>
-                        {s.plan === 'business' ? `$${data.priceBusinessUsd}` : `$${data.priceProUsd}`}/mois
-                      </p>
-                    </div>
+              {mrr > 0 && (
+                <div className="relative mt-8">
+                  <div className="flex h-1.5 overflow-hidden rounded-full bg-[color:var(--border)]">
+                    <span className="bg-[color:var(--text)]" style={{ width: `${proShare}%` }} />
+                    <span className="bg-[color:var(--text-subtle)]" style={{ width: `${100 - proShare}%` }} />
                   </div>
-                ))}
-              </div>
+                  <p className="mt-2 text-xs text-text-muted tabular-nums">Pro {proShare} % · Business {100 - proShare} %</p>
+                </div>
+              )}
+            </section>
+
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+              <StatCard icon={TrendingUp} label="Abonnés Pro" value={fmt(proCount)} sub={`$${pricePro} / mois par abonné`} />
+              <StatCard icon={Users} label="Abonnés Business" value={fmt(bizCount)} sub={`$${priceBiz} / mois par abonné`} />
+              <StatCard icon={CreditCard} label="Total abonnés" value={fmt(proCount + bizCount)} />
+              <StatCard icon={DollarSign} label="Revenu annuel projeté" value={usd(mrr * 12)} sub="Estimation × 12 mois" />
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+              <Panel title="Revenu par plan">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={chartData} margin={{ left: -12, right: 8, top: 8, bottom: 0 }}>
+                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fill: 'var(--text-subtle)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: 'var(--text-subtle)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+                    <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--accent-soft)' }} />
+                    <Bar dataKey="montant" fill="var(--text)" radius={[6, 6, 0, 0]} maxBarSize={72} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Panel>
+
+              <Panel title={`Abonnements actifs (${subs.length})`} padded={false}>
+                {subs.length === 0 ? (
+                  <div className="p-5"><EmptyState icon={CreditCard} title="Aucun abonnement actif" /></div>
+                ) : (
+                  <ul className="max-h-[300px] divide-y divide-[color:var(--border)] overflow-y-auto">
+                    {subs.map((s: any) => (
+                      <li key={s.clerkUserId} className="flex items-center gap-3 px-5 py-3">
+                        <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg-subtle)] text-[10px] font-semibold text-text-muted">
+                          {(s.clerkUserId ?? 'U').slice(-2).toUpperCase()}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-mono text-[11px] text-text" dir="ltr">{s.clerkUserId}</p>
+                          <p className="mt-0.5 text-[11px] text-text-subtle">Compte mis à jour le {fmtDate(s.since)}</p>
+                        </div>
+                        <div className="flex-shrink-0 text-end">
+                          <span className="inline-flex rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] font-semibold text-text ring-1 ring-inset ring-[color:var(--border-strong)]">
+                            {s.plan === 'business' ? 'Business' : 'Pro'}
+                          </span>
+                          <p className="mt-1 text-[11px] font-semibold tabular-nums text-text-muted" dir="ltr">
+                            ${s.plan === 'business' ? priceBiz : pricePro}/mois
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Panel>
             </div>
           </div>
         )}

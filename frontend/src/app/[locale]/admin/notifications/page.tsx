@@ -2,100 +2,99 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, CheckCheck, Loader2, RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
+import { PageHeader, Panel, Skeleton, EmptyState, ErrorNote, IconButton } from '@/components/ui';
+
+const TYPES: Record<string, { label: string; color: string; bg: string }> = {
+  suspension: { label: 'Suspension',    color: 'var(--velifa-score-poor)',    bg: 'var(--velifa-score-poor-bg)' },
+  critical:   { label: 'Critique',      color: 'var(--velifa-score-poor)',    bg: 'var(--velifa-score-poor-bg)' },
+  warning:    { label: 'Avertissement', color: 'var(--velifa-score-average)', bg: 'var(--velifa-score-average-bg)' },
+  info:       { label: 'Info',          color: 'var(--velifa-score-good)',    bg: 'var(--velifa-score-good-bg)' },
+  lead:       { label: 'Demande',       color: 'var(--text)',                 bg: 'var(--surface-raised)' },
+};
+
+const fmtDate = (v: any) =>
+  v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
 
 export default function AdminNotificationsPage() {
   const { getToken } = useAuth();
   const [notifs, setNotifs] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [markingRead, setMarkingRead] = useState(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    setLoading(true); setError('');
     try {
       const token = await getToken().catch(() => null);
       const res = await api.admin.getNotifications(token);
       setNotifs(res?.data ?? res);
-    } catch { /* noop */ }
+    } catch (e: any) { setError(e.message ?? 'Chargement impossible'); }
     finally { setLoading(false); }
   }, [getToken]);
 
   useEffect(() => { load(); }, [load]);
 
+  async function markAll() {
+    setMarkingRead(true);
+    try {
+      const token = await getToken();
+      if (token) await api.admin.markAllRead(token);
+      await load();
+    } catch (e: any) { setError(e.message ?? 'Action impossible'); }
+    finally { setMarkingRead(false); }
+  }
+
+  const list: any[] = notifs?.notifications ?? [];
+  const unread = notifs?.unread ?? 0;
+
   return (
     <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-      <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-
-        <div style={{ marginBottom: 28 }}>
-          <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Notifications</h1>
-          <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
-            Notifications administrateur
-          </p>
-        </div>
-
-        {loading ? (
-          <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '24px 20px', color: 'rgb(var(--accent-rgb)/0.30)', fontSize: 13 }}>
-            Chargement...
-          </div>
-        ) : (
-          <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Bell style={{ width: 14, height: 14, color: 'rgb(var(--accent-rgb)/0.40)' }} strokeWidth={1.75} />
-                <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: 0 }}>Notifications admin</p>
-                {(notifs?.unread ?? 0) > 0 && (
-                  <span style={{ fontSize: 9, fontWeight: 700, minWidth: 16, height: 16, borderRadius: 8, background: 'var(--velifa-score-poor)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
-                    {notifs.unread}
-                  </span>
-                )}
-              </div>
-              {(notifs?.unread ?? 0) > 0 && (
-                <button
-                  disabled={markingRead}
-                  onClick={async () => {
-                    setMarkingRead(true);
-                    try {
-                      const token = await getToken();
-                      if (token) await api.admin.markAllRead(token);
-                      await load();
-                    } catch { /* noop */ }
-                    finally { setMarkingRead(false); }
-                  }}
-                  style={{ fontSize: 11, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', borderRadius: 6, padding: '4px 10px', color: 'rgb(var(--accent-rgb)/0.50)' }}>
+      <div className="mx-auto max-w-4xl">
+        <PageHeader
+          eyebrow="Administration"
+          title="Notifications"
+          description={loading ? 'Chargement…' : unread > 0 ? `${unread} non lue${unread > 1 ? 's' : ''} sur ${list.length}` : 'Tout est lu'}
+          actions={
+            <>
+              <IconButton icon={RefreshCw} label="Rafraîchir" onClick={load} spinning={loading} />
+              {unread > 0 && (
+                <button type="button" disabled={markingRead} onClick={markAll} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2 disabled:opacity-50">
+                  {markingRead ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCheck className="h-4 w-4" />}
                   Tout marquer comme lu
                 </button>
               )}
-            </div>
-            {(notifs?.notifications ?? []).length === 0 ? (
-              <div style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', gap: 8, color: 'rgb(var(--accent-rgb)/0.28)', fontSize: 13 }}>
-                <BellOff style={{ width: 14, height: 14 }} /> Aucune notification
-              </div>
-            ) : (
-              <div>
-                {(notifs.notifications ?? []).map((n: any) => {
-                  const typeColors: Record<string, { color: string; bg: string }> = {
-                    suspension: { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.08)' },
-                    info:       { color: 'var(--velifa-score-good)', bg: 'rgba(34,197,94,0.08)' },
-                    warning:    { color: 'var(--velifa-score-average)', bg: 'rgba(245,158,11,0.08)' },
-                    critical:   { color: 'var(--velifa-score-poor)', bg: 'rgba(239,68,68,0.08)' },
-                    lead:       { color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.10)' },
-                  };
-                  const { color, bg } = typeColors[n.type] ?? typeColors.info;
-                  return (
-                    <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: n.read ? 'transparent' : 'rgb(var(--accent-rgb)/0.02)' }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: n.read ? 'rgb(var(--accent-rgb)/0.15)' : color, flexShrink: 0 }} />
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 4, background: bg, color, flexShrink: 0 }}>{n.type}</span>
-                      <p style={{ flex: 1, fontSize: 12, color: n.read ? 'rgb(var(--accent-rgb)/0.40)' : 'rgb(var(--accent-rgb)/0.75)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.message}</p>
-                      <span style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.25)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                        {n.createdAt ? new Date(n.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
-                      </span>
+            </>
+          }
+        />
+
+        {error && <ErrorNote>{error}</ErrorNote>}
+
+        {loading ? (
+          <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-velifa-md" />)}</div>
+        ) : !error && list.length === 0 ? (
+          <EmptyState icon={BellOff} title="Aucune notification" />
+        ) : list.length > 0 && (
+          <Panel padded={false} title={<span className="inline-flex items-center gap-2"><Bell className="h-4 w-4 text-text-muted" strokeWidth={1.75} />Notifications administrateur</span>}>
+            <ul className="divide-y divide-[color:var(--border)]">
+              {list.map((n: any) => {
+                const t = TYPES[n.type] ?? { label: n.type, color: 'var(--text-muted)', bg: 'var(--surface-raised)' };
+                return (
+                  <li key={n.id} className={`flex gap-3 px-5 py-4 ${n.read ? '' : 'bg-[color:var(--bg-subtle)]'}`}>
+                    <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full" style={{ background: n.read ? 'var(--border-strong)' : t.color }} aria-label={n.read ? 'Lue' : 'Non lue'} />
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ color: t.color, background: t.bg }}>{t.label}</span>
+                        <span className="text-[11px] text-text-subtle">{fmtDate(n.createdAt)}</span>
+                      </div>
+                      <p className={`break-words text-sm leading-relaxed ${n.read ? 'text-text-muted' : 'text-text'}`} dir="auto">{n.message}</p>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </Panel>
         )}
       </div>
     </div>

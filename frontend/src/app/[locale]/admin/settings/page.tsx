@@ -2,48 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Loader2, Shield, Server, Database, Cpu, Clock, Mail, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Shield, Server, Mail, CheckCircle2 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { PageHeader, Panel, Skeleton, ErrorNote, Badge } from '@/components/ui';
 
-function InfoRow({ label, value, mono = false, ok }: { label: string; value: React.ReactNode; mono?: boolean; ok?: boolean }) {
+function InfoRow({ label, value, mono = false }: { label: string; value: React.ReactNode; mono?: boolean }) {
   return (
-    <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
-      <span className="text-sm" style={{ color: 'rgb(var(--accent-rgb)/0.45)' }}>{label}</span>
-      <span className={`text-sm font-medium ${mono ? 'font-mono' : ''}`}
-        style={{ color: ok === true ? 'var(--velifa-score-good)' : ok === false ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.80)' }}>
-        {ok === true ? '✓ ' : ok === false ? '✗ ' : ''}{value}
-      </span>
+    <div className="flex items-center justify-between gap-4 border-b border-border py-3 last:border-b-0 first:pt-0 last:pb-0">
+      <span className="text-sm text-text-muted">{label}</span>
+      <span className={`truncate text-sm font-medium text-text ${mono ? 'font-mono text-xs' : ''}`} dir={mono ? 'ltr' : undefined}>{value}</span>
     </div>
   );
 }
 
-function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
-  return (
-    <div className="rounded-[12px] overflow-hidden" style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-      <div className="flex items-center gap-2 px-5 py-4" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
-        <Icon className="w-4 h-4" style={{ color: 'var(--velifa-score-poor)' }} strokeWidth={1.75} />
-        <h2 className="text-sm font-semibold" style={{ color: 'rgb(var(--accent-rgb)/0.80)' }}>{title}</h2>
-      </div>
-      <div className="px-5 pb-2">{children}</div>
-    </div>
-  );
-}
+const title = (Icon: React.ElementType, text: string) => (
+  <span className="inline-flex items-center gap-2"><Icon className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{text}</span>
+);
 
 export default function AdminSettingsPage() {
   const { getToken } = useAuth();
   const [sysData, setSysData]   = useState<any>(null);
   const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState('');
   const [emailSending, setEmailSending] = useState(false);
-  const [emailResult, setEmailResult]   = useState<string | null>(null);
+  const [emailResult, setEmailResult]   = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         const token = await getToken();
-        if (!token) return;
+        if (!token) { setError('Session expirée, reconnectez-vous'); return; }
         const res = await api.admin.getSystem(token);
-        setSysData(res.data ?? res);
-      } finally { setLoading(false); }
+        setSysData(res?.data ?? res);
+      } catch (e: any) { setError(e.message ?? 'Chargement impossible'); }
+      finally { setLoading(false); }
     })();
   }, [getToken]);
 
@@ -53,84 +45,79 @@ export default function AdminSettingsPage() {
     try {
       const token = await getToken();
       if (!token) return;
-      // Email de test envoyé au premier email de ADMIN_EMAILS (route admin dédiée)
+      // Envoyé au premier email de ADMIN_EMAILS (route admin dédiée)
       const res = await api.admin.testEmail(token);
       const result = res?.data ?? res;
-      setEmailResult(result?.sent ? '✓ Email de test envoyé' : `✗ Échec : ${result?.reason ?? 'inconnu'}`);
+      setEmailResult(result?.sent ? { ok: true, text: 'Email de test envoyé' } : { ok: false, text: `Échec : ${result?.reason ?? 'inconnu'}` });
     } catch {
-      setEmailResult('✗ Échec de l\'envoi');
+      setEmailResult({ ok: false, text: 'Échec de l\'envoi' });
     } finally { setEmailSending(false); }
   }
 
   const uptimeH = sysData ? Math.floor(sysData.uptimeSeconds / 3600) : 0;
   const uptimeM = sysData ? Math.floor((sysData.uptimeSeconds % 3600) / 60) : 0;
+  const admins: string[] = sysData?.adminEmails ?? [];
 
   return (
-    <div className="min-h-screen p-6 sm:p-8" style={{ background: 'var(--bg)' }}>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Paramètres admin</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgb(var(--accent-rgb)/0.40)' }}>Configuration et diagnostics système</p>
-        </div>
+    <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
+      <div className="mx-auto max-w-3xl">
+        <PageHeader eyebrow="Administration" title="Paramètres admin" description="Configuration et diagnostics du serveur." />
+
+        {error && <ErrorNote>{error}</ErrorNote>}
 
         {loading ? (
-          <div className="py-20 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--velifa-score-poor)' }} /></div>
-        ) : (
-          <>
-            {/* Emails admin */}
-            <Section title="Emails administrateurs" icon={Shield}>
-              <div className="py-2">
-                {(sysData?.adminEmails ?? []).map((email: string) => (
-                  <div key={email} className="flex items-center gap-2 py-2.5" style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.05)' }}>
-                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--velifa-score-good)' }} />
-                    <span className="text-sm font-mono" style={{ color: 'rgb(var(--accent-rgb)/0.75)' }}>{email}</span>
-                  </div>
-                ))}
-                <p className="text-xs py-3" style={{ color: 'rgb(var(--accent-rgb)/0.30)' }}>
-                  Modifiable via la variable d'environnement ADMIN_EMAILS
-                </p>
-              </div>
-            </Section>
+          <div className="space-y-5">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-40 rounded-velifa-lg" />)}</div>
+        ) : sysData && (
+          <div className="space-y-5">
+            <Panel title={title(Shield, 'Emails administrateurs')} actions={<Badge>{admins.length}</Badge>}>
+              {admins.length === 0 ? (
+                <p className="text-sm score-poor">Aucun administrateur configuré.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {admins.map((email) => (
+                    <li key={email} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0" style={{ color: 'var(--velifa-score-good)' }} />
+                      <span className="truncate font-mono text-xs text-text" dir="ltr">{email}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="mt-4 text-xs text-text-subtle">
+                Modifiable via la variable d&apos;environnement <span className="font-mono">ADMIN_EMAILS</span> sur l&apos;hébergeur.
+              </p>
+            </Panel>
 
-            {/* Système */}
-            <Section title="Informations système" icon={Server}>
-              <InfoRow label="Node.js"       value={sysData?.nodeVersion}  mono />
-              <InfoRow label="Plateforme"    value={sysData?.platform}     mono />
-              <InfoRow label="CPU cores"     value={sysData?.cpuCores}          />
-              <InfoRow label="Mémoire RSS"   value={`${sysData?.memoryMb} MB`}  />
-              <InfoRow label="Uptime"        value={`${uptimeH}h ${uptimeM}m`}  />
-              <InfoRow label="Base de données" value={sysData?.dbConnected ? 'Connectée' : 'Hors ligne'}
-                ok={sysData?.dbConnected} />
-              <InfoRow label="Démarré le"    value={sysData?.startedAt ? new Date(sysData.startedAt).toLocaleString('fr-FR') : '—'} />
-            </Section>
+            <Panel title={title(Server, 'Informations système')}>
+              <InfoRow label="Node.js" value={sysData.nodeVersion} mono />
+              <InfoRow label="Plateforme" value={sysData.platform} mono />
+              <InfoRow label="Cœurs CPU" value={sysData.cpuCores} />
+              <InfoRow label="Mémoire RSS" value={`${sysData.memoryMb} Mo`} />
+              <InfoRow label="Disponibilité" value={`${uptimeH} h ${uptimeM} min`} />
+              <InfoRow label="Base de données" value={sysData.dbConnected ? <Badge tone="good">Connectée</Badge> : <Badge tone="poor">Hors ligne</Badge>} />
+              <InfoRow label="Redis" value={sysData.redisConnected ? <Badge tone="good">Joignable</Badge> : <Badge tone="poor">En panne</Badge>} />
+              <InfoRow label="Démarré le" value={sysData.startedAt ? new Date(sysData.startedAt).toLocaleString('fr-FR') : '—'} />
+            </Panel>
 
-            {/* Actions */}
-            <Section title="Actions" icon={Mail}>
-              <div className="py-3 space-y-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: 'rgb(var(--accent-rgb)/0.80)' }}>Email de test Brevo</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>
-                      Envoie un rapport de test à academytechs3@gmail.com
-                    </p>
-                  </div>
-                  <button
-                    onClick={sendTestEmail}
-                    disabled={emailSending}
-                    className="flex items-center gap-2 px-4 py-2 rounded-[10px] text-xs font-semibold transition-all disabled:opacity-50"
-                    style={{ background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.28)', color: 'var(--accent)' }}>
-                    {emailSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
-                    {emailSending ? 'Envoi…' : 'Envoyer test'}
-                  </button>
-                </div>
-                {emailResult && (
-                  <p className="text-xs px-1" style={{ color: emailResult.startsWith('✓') ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
-                    {emailResult}
+            <Panel title={title(Mail, 'Actions')}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-text">Email de test Brevo</p>
+                  <p className="mt-0.5 text-xs text-text-muted">
+                    Envoie un rapport de test au premier email de <span className="font-mono">ADMIN_EMAILS</span>.
                   </p>
-                )}
+                </div>
+                <button type="button" onClick={sendTestEmail} disabled={emailSending} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2 self-start disabled:opacity-50 sm:self-auto">
+                  {emailSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                  {emailSending ? 'Envoi…' : 'Envoyer un test'}
+                </button>
               </div>
-            </Section>
-          </>
+              {emailResult && (
+                <p className="mt-3 text-xs" style={{ color: emailResult.ok ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
+                  {emailResult.text}
+                </p>
+              )}
+            </Panel>
+          </div>
         )}
       </div>
     </div>

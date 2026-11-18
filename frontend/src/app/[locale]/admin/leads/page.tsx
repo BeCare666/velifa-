@@ -2,17 +2,49 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { RefreshCw, ExternalLink, MessageCircle, Mail, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, ExternalLink, MessageCircle, Mail, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 import { api } from '@/lib/api';
+import { scoreBucket, SCORE_COLOR } from '@/lib/score';
+import { PageHeader, Badge, TableShell, Th, Td, SkeletonRows, IconButton, ErrorNote, EmptyState, Skeleton } from '@/components/ui';
 
 const PAGE_SIZE = 50;
+const LOCALE_LABEL: Record<string, string> = { ar: 'Arabe', en: 'Anglais', fr: 'Français' };
 
-const scoreColor = (s: number) => s >= 90 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
 const fmtDate = (v: any) =>
   v ? new Date(v).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
 
-const btn = { height: 36, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.60)' } as const;
-const cell = { padding: '10px 16px', fontSize: 12, color: 'rgb(var(--accent-rgb)/0.70)', verticalAlign: 'top' } as const;
+function Score({ value }: { value: number | null | undefined }) {
+  return <span className="text-sm font-semibold tabular-nums" style={{ color: SCORE_COLOR[scoreBucket(value)] }}>{value ?? '—'}</span>;
+}
+
+function Contact({ l }: { l: any }) {
+  return (
+    <div className="space-y-1 text-xs">
+      {l.name && <p className="font-medium text-text">{l.name}</p>}
+      {l.email && (
+        <a href={`mailto:${l.email}`} className="flex items-center gap-1.5 text-text-muted hover:text-text" dir="ltr">
+          <Mail className="h-3 w-3 flex-shrink-0" /> <span className="truncate">{l.email}</span>
+        </a>
+      )}
+      {l.phone && (
+        <a href={`https://wa.me/${l.phone}`} target="_blank" rel="noopener noreferrer" dir="ltr"
+          className="flex items-center gap-1.5 font-medium" style={{ color: 'var(--velifa-score-good)' }}>
+          <MessageCircle className="h-3 w-3 flex-shrink-0" /> +{l.phone}
+        </a>
+      )}
+    </div>
+  );
+}
+
+function ReportLink({ url }: { url?: string }) {
+  if (!url) return null;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" aria-label="Ouvrir le rapport" title="Ouvrir le rapport"
+      className="inline-grid h-8 w-8 place-items-center rounded-[8px] text-text-subtle transition-colors hover:bg-[color:var(--surface)] hover:text-text">
+      <ExternalLink className="h-3.5 w-3.5" />
+    </a>
+  );
+}
 
 /** Demandes « Je veux corriger » reçues depuis les rapports. */
 export default function AdminLeadsPage() {
@@ -32,87 +64,79 @@ export default function AdminLeadsPage() {
     finally { setLoading(false); }
   }, [getToken, page]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [page]);
 
-  const leads = data?.leads ?? [];
+  const leads: any[] = data?.leads ?? [];
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
     <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-      <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div>
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Demandes</h1>
-            <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
-              {loading ? '…' : `${data?.total ?? 0} demande(s) « Je veux corriger » reçue(s) depuis les rapports`}
-            </p>
-          </div>
-          <button type="button" style={{ ...btn, width: 36, padding: 0, justifyContent: 'center' }} onClick={() => load()} aria-label="Rafraîchir">
-            <RefreshCw style={{ width: 14, height: 14 }} />
-          </button>
-        </div>
+      <div className="mx-auto max-w-[1600px]">
+        <PageHeader
+          eyebrow="Administration"
+          title="Demandes"
+          description={loading ? 'Chargement…' : `${data?.total ?? 0} demande(s) « Je veux corriger » reçue(s) depuis les rapports`}
+          actions={<IconButton icon={RefreshCw} label="Rafraîchir" onClick={() => load()} spinning={loading} />}
+        />
 
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
-            ⚠️ {error}
-          </div>
+        {error && <ErrorNote>{error}</ErrorNote>}
+
+        {!loading && !error && leads.length === 0 ? (
+          <EmptyState icon={Inbox} title="Aucune demande pour l’instant" description="Les demandes envoyées depuis le bouton « Je veux corriger » d’un rapport apparaîtront ici." />
+        ) : (
+          <>
+            {/* Mobile : cartes */}
+            <div className="space-y-3 md:hidden">
+              {loading
+                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-velifa-lg" />)
+                : leads.map((l: any) => (
+                  <article key={l.id} className="rounded-velifa-lg border border-border bg-[color:var(--surface)] p-4">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-text" dir="ltr">{l.urlSite}</p>
+                        <p className="mt-0.5 text-[11px] text-text-subtle">{fmtDate(l.createdAt)}{l.platform ? ` · ${l.platform}` : ''}</p>
+                      </div>
+                      <div className="flex items-center gap-1"><Score value={l.scorePerformance} /><ReportLink url={l.reportUrl} /></div>
+                    </div>
+                    <Contact l={l} />
+                    {l.message && <p className="mt-3 whitespace-pre-wrap border-t border-border pt-3 text-xs leading-relaxed text-text-muted" dir="auto">{l.message}</p>}
+                  </article>
+                ))}
+            </div>
+
+            {/* Ordinateur : tableau */}
+            <div className="hidden md:block">
+              <TableShell minWidth={980}>
+                <thead>
+                  <tr>{['Reçue', 'Site', 'Score', 'Contact', 'Message', 'Langue', ''].map((h, i) => <Th key={i}>{h}</Th>)}</tr>
+                </thead>
+                <tbody>
+                  {loading ? <SkeletonRows rows={6} cols={7} /> : leads.map((l: any) => (
+                    <tr key={l.id} className="align-top transition-colors hover:bg-[color:var(--surface-raised)]">
+                      <Td className="whitespace-nowrap align-top text-xs text-text-muted">{fmtDate(l.createdAt)}</Td>
+                      <Td className="max-w-[280px] align-top">
+                        <p className="truncate text-xs text-text" dir="ltr">{l.urlSite}</p>
+                        {l.platform && <p className="text-[11px] text-text-subtle">{l.platform}</p>}
+                      </Td>
+                      <Td className="align-top"><Score value={l.scorePerformance} /></Td>
+                      <Td className="max-w-[240px] align-top"><Contact l={l} /></Td>
+                      <Td className="max-w-[360px] whitespace-pre-wrap align-top text-xs text-text-muted"><span dir="auto">{l.message ?? '—'}</span></Td>
+                      <Td className="align-top"><Badge>{LOCALE_LABEL[l.locale] ?? l.locale}</Badge></Td>
+                      <Td className="align-top text-end"><ReportLink url={l.reportUrl} /></Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </TableShell>
+            </div>
+          </>
         )}
 
-        <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                {['Reçue', 'Site', 'Score', 'Contact', 'Message', 'Langue', ''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {!loading && leads.length === 0 && (
-                <tr><td colSpan={7} style={{ padding: 24, textAlign: 'center', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucune demande pour l’instant.</td></tr>
-              )}
-              {leads.map((l: any) => (
-                <tr key={l.id} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
-                  <td style={{ ...cell, whiteSpace: 'nowrap', color: 'rgb(var(--accent-rgb)/0.45)' }}>{fmtDate(l.createdAt)}</td>
-                  <td style={{ ...cell, maxWidth: 280 }}>
-                    <div dir="ltr" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'rgb(var(--accent-rgb)/0.85)' }}>{l.urlSite}</div>
-                    {l.platform && <div style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.40)' }}>{l.platform}</div>}
-                  </td>
-                  <td style={{ ...cell, fontWeight: 700, color: l.scorePerformance != null ? scoreColor(l.scorePerformance) : 'rgb(var(--accent-rgb)/0.35)' }}>{l.scorePerformance ?? '—'}</td>
-                  <td style={cell}>
-                    {l.name && <div style={{ color: 'rgb(var(--accent-rgb)/0.85)' }}>{l.name}</div>}
-                    {l.email && (
-                      <a href={`mailto:${l.email}`} style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--accent)', textDecoration: 'none' }}>
-                        <Mail style={{ width: 12, height: 12 }} /> {l.email}
-                      </a>
-                    )}
-                    {l.phone && (
-                      <a href={`https://wa.me/${l.phone}`} target="_blank" rel="noopener noreferrer" dir="ltr"
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--velifa-score-good)', textDecoration: 'none' }}>
-                        <MessageCircle style={{ width: 12, height: 12 }} /> +{l.phone}
-                      </a>
-                    )}
-                  </td>
-                  <td style={{ ...cell, maxWidth: 360, whiteSpace: 'pre-wrap' }} dir="auto">{l.message ?? '—'}</td>
-                  <td style={cell}>{l.locale}</td>
-                  <td style={cell}>
-                    {l.reportUrl && (
-                      <a href={l.reportUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }} aria-label="Ouvrir le rapport">
-                        <ExternalLink style={{ width: 14, height: 14 }} />
-                      </a>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
         {totalPages > 1 && (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center', marginTop: 12 }}>
-            <button type="button" style={btn} disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label="Page précédente"><ChevronLeft style={{ width: 14, height: 14 }} /></button>
-            <span style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.45)' }}>{page} / {totalPages}</span>
-            <button type="button" style={btn} disabled={page >= totalPages} onClick={() => setPage(page + 1)} aria-label="Page suivante"><ChevronRight style={{ width: 14, height: 14 }} /></button>
+          <div className="mt-4 flex items-center justify-end gap-3">
+            <IconButton icon={ChevronLeft} label="Page précédente" disabled={page <= 1} onClick={() => setPage(page - 1)} />
+            <span className="text-xs tabular-nums text-text-muted">{page} / {totalPages}</span>
+            <IconButton icon={ChevronRight} label="Page suivante" disabled={page >= totalPages} onClick={() => setPage(page + 1)} />
           </div>
         )}
       </div>

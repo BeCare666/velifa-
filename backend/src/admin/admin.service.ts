@@ -641,6 +641,14 @@ export class AdminService {
     let dbOk = false;
     try { await pool.query('SELECT 1'); dbOk = true; } catch { /* noop */ }
 
+    // Redis réellement interrogé (avant : affiché « OK » en dur côté admin), délai borné
+    const timeout = <T>(p: Promise<T>) =>
+      Promise.race([p, new Promise<T>((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000))]);
+    const redisOk = await timeout(this.queue.client.ping()).then((r) => r === 'PONG').catch(() => false);
+    const queueCounts = redisOk
+      ? await timeout(this.queue.getJobCounts()).catch(() => null)
+      : null;
+
     const uptimeSeconds = Math.floor((Date.now() - this.startedAt.getTime()) / 1000);
 
     return {
@@ -650,6 +658,11 @@ export class AdminService {
       memoryMb:       Math.round(process.memoryUsage().rss / 1024 / 1024),
       cpuCores:       os.cpus().length,
       dbConnected:    dbOk,
+      redisConnected: redisOk,
+      queue:          queueCounts,
+      // Présence de la configuration uniquement (aucune valeur de clé renvoyée)
+      brevoConfigured: !!process.env.BREVO_API_KEY,
+      clerkConfigured: !!process.env.CLERK_SECRET_KEY,
       startedAt:      this.startedAt.toISOString(),
       adminEmails:    (process.env.ADMIN_EMAILS ?? '').split(',').filter(Boolean),
     };

@@ -2,31 +2,44 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { TrendingUp, TrendingDown, Minus, Download, RefreshCw, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Download, RefreshCw, Globe, AlertTriangle, Gauge, CheckCircle2 } from 'lucide-react';
 import { api } from '@/lib/api';
+import {
+  PageHeader, Badge, StatCard, TableShell, Th, Td, SkeletonRows, Segmented, IconButton, ErrorNote, EmptyState,
+} from '@/components/ui';
 
+// Seuils de cette page = ceux du backend (GET /admin/performance) : < 50, 50–79, ≥ 80
 const scoreColor = (s: number) =>
   s >= 80 ? 'var(--velifa-score-good)' : s >= 50 ? 'var(--velifa-score-average)' : 'var(--velifa-score-poor)';
-
 const scoreBg = (s: number) =>
-  s >= 80 ? 'rgba(34,197,94,0.10)' : s >= 50 ? 'rgba(245,158,11,0.10)' : 'rgba(239,68,68,0.10)';
+  s >= 80 ? 'var(--velifa-score-good-bg)' : s >= 50 ? 'var(--velifa-score-average-bg)' : 'var(--velifa-score-poor-bg)';
 
-const scoreBorder = (s: number) =>
-  s >= 80 ? 'rgba(34,197,94,0.25)' : s >= 50 ? 'rgba(245,158,11,0.25)' : 'rgba(239,68,68,0.25)';
-
-const ISSUE_ICONS: Record<string, string> = {
-  'LCP lent':               '⏱',
-  'Instabilite visuelle':   '📐',
-  'Page peu reactive':      '🐢',
-  'Problemes SEO':          '🔍',
-  'Problemes accessibilite': '♿',
-  'Mauvaises pratiques':    '⚠️',
+// Clés = libellés exacts renvoyés par le backend (sans accents)
+const ISSUES: Record<string, { icon: string; label: string }> = {
+  'LCP lent':                { icon: '⏱', label: 'LCP lent' },
+  'Instabilite visuelle':    { icon: '📐', label: 'Instabilité visuelle' },
+  'Page peu reactive':       { icon: '🐢', label: 'Page peu réactive' },
+  'Problemes SEO':           { icon: '🔍', label: 'Problèmes SEO' },
+  'Problemes accessibilite': { icon: '♿', label: 'Problèmes d’accessibilité' },
+  'Mauvaises pratiques':     { icon: '⚠️', label: 'Mauvaises pratiques' },
 };
 
-function TrendIcon({ trend }: { trend: 'up' | 'down' | 'stable' }) {
-  if (trend === 'up')   return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--velifa-score-good)', fontSize: 11 }}><TrendingUp style={{ width: 12, height: 12 }} /> Amelioration</span>;
-  if (trend === 'down') return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--velifa-score-poor)', fontSize: 11 }}><TrendingDown style={{ width: 12, height: 12 }} /> Degradation</span>;
-  return <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'rgb(var(--accent-rgb)/0.35)', fontSize: 11 }}><Minus style={{ width: 12, height: 12 }} /> Stable</span>;
+type Filter = 'all' | 'critical' | 'average' | 'good';
+
+function Trend({ trend, prev, last }: { trend: 'up' | 'down' | 'stable'; prev?: number | null; last?: number | null }) {
+  const cfg = trend === 'up'
+    ? { Icon: TrendingUp, label: 'Amélioration', color: 'var(--velifa-score-good)' }
+    : trend === 'down'
+      ? { Icon: TrendingDown, label: 'Dégradation', color: 'var(--velifa-score-poor)' }
+      : { Icon: Minus, label: 'Stable', color: 'var(--text-subtle)' };
+  return (
+    <div>
+      <span className="inline-flex items-center gap-1 text-xs font-medium" style={{ color: cfg.color }}>
+        <cfg.Icon className="h-3.5 w-3.5" /> {cfg.label}
+      </span>
+      {prev != null && last != null && <p className="mt-0.5 text-[11px] tabular-nums text-text-subtle" dir="ltr">{prev} → {last}</p>}
+    </div>
+  );
 }
 
 const fmtDate = (v: any) =>
@@ -37,202 +50,130 @@ export default function AdminPerformancePage() {
   const [data, setData]       = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
-  const [filter, setFilter]   = useState<'all' | 'critical' | 'average' | 'good'>('all');
+  const [filter, setFilter]   = useState<Filter>('all');
 
   async function load() {
     setLoading(true); setError('');
     try {
       const token = await getToken().catch(() => null);
       const res = await api.admin.getPerformance(token);
-      const list = Array.isArray(res) ? res : (res?.data ?? []);
-      setData(list);
+      setData(Array.isArray(res) ? res : (res?.data ?? []));
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
-  const filtered = data.filter(r => {
+  const filtered = data.filter((r) => {
     if (filter === 'critical') return r.avgScore < 50;
     if (filter === 'average')  return r.avgScore >= 50 && r.avgScore < 80;
     if (filter === 'good')     return r.avgScore >= 80;
     return true;
   });
 
-  const criticalCount = data.filter(r => r.avgScore < 50).length;
-  const avgCount      = data.filter(r => r.avgScore >= 50 && r.avgScore < 80).length;
-  const goodCount     = data.filter(r => r.avgScore >= 80).length;
+  const criticalCount = data.filter((r) => r.avgScore < 50).length;
+  const avgCount      = data.filter((r) => r.avgScore >= 50 && r.avgScore < 80).length;
+  const goodCount     = data.filter((r) => r.avgScore >= 80).length;
 
   return (
     <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-      <div style={{ maxWidth: 1600, margin: '0 auto' }}>
+      <div className="mx-auto max-w-[1600px]">
+        <PageHeader
+          eyebrow="Administration"
+          title="Performance des sites"
+          description={loading ? 'Chargement…' : `${data.length} sites analysés — classés du moins performant au plus performant`}
+          actions={
+            <>
+              <IconButton icon={RefreshCw} label="Rafraîchir" onClick={load} spinning={loading} />
+              <button
+                type="button"
+                onClick={async () => {
+                  try { await api.admin.exportPerformance(await getToken()); }
+                  catch (e: any) { setError(e.message ?? 'Export impossible'); }
+                }}
+                className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" /> Exporter CSV
+              </button>
+            </>
+          }
+        />
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div>
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Performance des sites</h1>
-            <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
-              {loading ? '...' : `${data.length} sites analyses — tries du moins performant au plus performant`}
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => load()} style={{ height: 34, width: 34, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)' }}>
-              <RefreshCw style={{ width: 14, height: 14 }} />
-            </button>
-            <button type="button"
-              onClick={async () => {
-                try { await api.admin.exportPerformance(await getToken()); }
-                catch (e: any) { setError(e.message ?? 'Export impossible'); }
-              }}
-              style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.55)', textDecoration: 'none' }}>
-              <Download style={{ width: 13, height: 13 }} /> Exporter CSV
-            </button>
-          </div>
+        <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <StatCard icon={Globe} label="Total sites" value={data.length} loading={loading} />
+          <StatCard icon={AlertTriangle} label="Critiques (< 50)" value={<span style={{ color: 'var(--velifa-score-poor)' }}>{criticalCount}</span>} loading={loading} />
+          <StatCard icon={Gauge} label="À améliorer (50–79)" value={<span style={{ color: 'var(--velifa-score-average)' }}>{avgCount}</span>} loading={loading} />
+          <StatCard icon={CheckCircle2} label="Bons (≥ 80)" value={<span style={{ color: 'var(--velifa-score-good)' }}>{goodCount}</span>} loading={loading} />
         </div>
 
-        {/* Summary cards */}
-        {!loading && (
-          <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-            {[
-              { label: 'Total sites', value: data.length, color: 'rgb(var(--accent-rgb)/0.80)' },
-              { label: 'Critiques < 50', value: criticalCount, color: 'var(--velifa-score-poor)' },
-              { label: 'A ameliorer 50-79', value: avgCount, color: 'var(--velifa-score-average)' },
-              { label: 'Bons >= 80', value: goodCount, color: 'var(--velifa-score-good)' },
-            ].map(s => (
-              <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.03)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 18px', minWidth: 120 }}>
-                <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>{s.label}</p>
-                <p style={{ fontSize: 22, fontWeight: 700, color: s.color, margin: 0 }}>{s.value}</p>
-              </div>
-            ))}
+        {/* Répartition visuelle */}
+        {!loading && data.length > 0 && (
+          <div className="mb-6 flex h-2 overflow-hidden rounded-full bg-[color:var(--surface-raised)]" aria-hidden>
+            <span style={{ width: `${(criticalCount / data.length) * 100}%`, background: 'var(--velifa-score-poor)' }} />
+            <span style={{ width: `${(avgCount / data.length) * 100}%`, background: 'var(--velifa-score-average)' }} />
+            <span style={{ width: `${(goodCount / data.length) * 100}%`, background: 'var(--velifa-score-good)' }} />
           </div>
         )}
 
-        {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-          {[
-            { v: 'all',      l: 'Tous' },
-            { v: 'critical', l: 'Critiques < 50' },
-            { v: 'average',  l: 'A ameliorer 50-79' },
-            { v: 'good',     l: 'Bons >= 80' },
-          ].map(f => (
-            <button key={f.v} onClick={() => setFilter(f.v as any)}
-              style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                background: filter === f.v ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)',
-                border: `1px solid ${filter === f.v ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`,
-                color: filter === f.v ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.50)' }}>
-              {f.l}
-            </button>
-          ))}
+        <div className="mb-4">
+          <Segmented<Filter>
+            label="Filtrer par niveau"
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: 'all', label: 'Tous' },
+              { value: 'critical', label: 'Critiques' },
+              { value: 'average', label: 'À améliorer' },
+              { value: 'good', label: 'Bons' },
+            ]}
+          />
         </div>
 
-        {error && (
-          <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
-            ⚠️ {error}
-          </div>
-        )}
+        {error && <ErrorNote>{error}</ErrorNote>}
 
-        <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        {!loading && filtered.length === 0 ? (
+          <EmptyState icon={Globe} title="Aucun site dans cette catégorie" />
+        ) : (
+          <TableShell minWidth={980}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                {['Rang', 'URL du site', 'Score moyen', 'Nb audits', 'Dernière analyse', 'Problèmes détectés', 'Tendance'].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
-                ))}
-              </tr>
+              <tr>{['Rang', 'Site', 'Score moyen', 'Audits', 'Dernière analyse', 'Problèmes détectés', 'Tendance'].map((h) => <Th key={h}>{h}</Th>)}</tr>
             </thead>
             <tbody>
-              {loading
-                ? Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
-                      {Array.from({ length: 7 }).map((_, j) => (
-                        <td key={j} style={{ padding: '14px 16px' }}>
-                          <div style={{ height: 14, borderRadius: 4, background: 'rgb(var(--accent-rgb)/0.06)', width: j === 1 ? '70%' : '40%', animation: 'pulse 1.5s ease-in-out infinite' }} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                : filtered.length === 0
-                  ? (
-                    <tr>
-                      <td colSpan={7} style={{ padding: '40px 20px', textAlign: 'center', color: 'rgb(var(--accent-rgb)/0.30)', fontSize: 13 }}>
-                        Aucun site dans cette categorie
-                      </td>
-                    </tr>
-                  )
-                  : filtered.map((r, i) => (
-                      <tr key={r.url}
-                        style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)', transition: 'background 150ms' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)'; }}>
-
-                        {/* Rang */}
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{
-                            fontSize: 12, fontWeight: 700,
-                            color: i === 0 ? 'var(--velifa-score-poor)' : i === 1 ? '#f97316' : i === 2 ? 'var(--velifa-score-average)' : 'rgb(var(--accent-rgb)/0.40)',
-                          }}>#{i + 1}</span>
-                        </td>
-
-                        {/* URL */}
-                        <td style={{ padding: '12px 16px', maxWidth: 260 }}>
-                          <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={r.url}>
-                            {r.url}
-                          </p>
-                        </td>
-
-                        {/* Score moyen */}
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: scoreColor(r.avgScore), background: scoreBg(r.avgScore), border: `1px solid ${scoreBorder(r.avgScore)}`, borderRadius: 7, padding: '3px 10px' }}>
-                            {r.avgScore}/100
+              {loading ? <SkeletonRows rows={8} cols={7} /> : filtered.map((r, i) => (
+                <tr key={r.url} className="transition-colors hover:bg-[color:var(--surface-raised)]">
+                  <Td className="text-xs font-semibold tabular-nums text-text-muted">#{i + 1}</Td>
+                  <Td className="max-w-[280px] truncate text-xs text-text"><span dir="ltr" title={r.url}>{r.url}</span></Td>
+                  <Td>
+                    <span className="inline-flex rounded-[7px] px-2.5 py-1 text-xs font-semibold tabular-nums" style={{ color: scoreColor(r.avgScore), background: scoreBg(r.avgScore) }}>
+                      {r.avgScore}/100
+                    </span>
+                  </Td>
+                  <Td className="font-semibold tabular-nums text-text">{r.auditCount}</Td>
+                  <Td className="whitespace-nowrap text-xs text-text-muted">{fmtDate(r.lastDate)}</Td>
+                  <Td className="max-w-[300px]">
+                    {r.issues.length === 0 ? (
+                      <Badge tone="good">Aucun problème</Badge>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {r.issues.map((issue: string) => (
+                          <span key={issue} className="whitespace-nowrap rounded-[6px] border border-border px-1.5 py-0.5 text-[11px] text-text-muted">
+                            {ISSUES[issue]?.icon ?? '⚠'} {ISSUES[issue]?.label ?? issue}
                           </span>
-                        </td>
-
-                        {/* Nb audits */}
-                        <td style={{ padding: '12px 16px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.60)', fontWeight: 600 }}>
-                          {r.auditCount}
-                        </td>
-
-                        {/* Dernière analyse */}
-                        <td style={{ padding: '12px 16px', fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>
-                          {fmtDate(r.lastDate)}
-                        </td>
-
-                        {/* Problemes */}
-                        <td style={{ padding: '12px 16px', maxWidth: 200 }}>
-                          {r.issues.length === 0
-                            ? <span style={{ fontSize: 11, color: 'var(--velifa-score-good)' }}>Aucun probleme</span>
-                            : (
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                {r.issues.map((issue: string) => (
-                                  <span key={issue} style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', color: 'var(--velifa-score-poor)', whiteSpace: 'nowrap' }}>
-                                    {ISSUE_ICONS[issue] ?? '⚠'} {issue}
-                                  </span>
-                                ))}
-                              </div>
-                            )
-                          }
-                        </td>
-
-                        {/* Tendance */}
-                        <td style={{ padding: '12px 16px', whiteSpace: 'nowrap' }}>
-                          <TrendIcon trend={r.trend} />
-                          {r.lastScore != null && r.prevScore != null && (
-                            <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.25)', margin: '2px 0 0' }}>
-                              {r.prevScore} → {r.lastScore}
-                            </p>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-              }
+                        ))}
+                      </div>
+                    )}
+                  </Td>
+                  <Td className="whitespace-nowrap"><Trend trend={r.trend} prev={r.prevScore} last={r.lastScore} /></Td>
+                </tr>
+              ))}
             </tbody>
-          </table>
-        </div>
+          </TableShell>
+        )}
 
         {!loading && data.length > 0 && (
-          <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.25)', marginTop: 12, textAlign: 'right' }}>
-            {filtered.length} site{filtered.length > 1 ? 's' : ''} affiches sur {data.length}
+          <p className="mt-3 text-end text-xs text-text-muted tabular-nums">
+            {filtered.length} site{filtered.length > 1 ? 's' : ''} affiché{filtered.length > 1 ? 's' : ''} sur {data.length}
           </p>
         )}
       </div>
