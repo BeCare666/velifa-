@@ -2,237 +2,132 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import {
-  HelpCircle, Mail, MessageCircle, BookOpen,
-  ChevronDown, ChevronUp, Gem, Sparkles, Zap,
+  HelpCircle, Mail, MessageCircle, BookOpen, ChevronDown, Gem, Sparkles,
+  ArrowUpRight, LayoutGrid, CreditCard, MessagesSquare,
 } from 'lucide-react';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { PageHeader, Panel, Badge } from '@/components/ui';
 
-// ── FAQ ──────────────────────────────────────────────────────────────────────
-const FAQ = [
-  {
-    q: 'Comment fonctionne un audit Velifa ?',
-    a: "Velifa analyse votre URL avec Lighthouse (Google) et extrait les métriques de performance (LCP, CLS, TBT), le score SEO, les technologies détectées et les recommandations d'amélioration. L'analyse prend généralement 20 à 40 secondes.",
-  },
-  {
-    q: 'Quelle est la différence entre les plans Gratuit, Pro et Business ?',
-    a: 'Le plan Gratuit donne accès à 3 audits par 24 h et un historique limité. Le plan Pro offre des audits illimités, l\'historique complet et les rapports détaillés. Le plan Business ajoute l\'analyse approfondie et le support prioritaire ; le suivi multi-sites, les alertes et l\'accès API sont en cours de développement.',
-  },
-  {
-    q: 'Mes données sont-elles sécurisées ?',
-    a: 'Oui. Velifa utilise Clerk pour l\'authentification et ne stocke jamais vos mots de passe. Les URLs que vous auditez sont uniquement utilisées pour générer le rapport Lighthouse.',
-  },
-  {
-    q: 'Puis-je relancer un audit sur la même URL ?',
-    a: 'Absolument. Depuis la page "Mes Audits", cliquez sur le bouton "Relancer" à côté de n\'importe quel audit pour obtenir une analyse fraîche de la même URL.',
-  },
-  {
-    q: 'Comment annuler mon abonnement ?',
-    a: 'Rendez-vous dans la section "Abonnement" de votre dashboard et cliquez sur "Contacter le support". Notre équipe traitera votre demande sous 24h et vous conserverez l\'accès jusqu\'à la fin de la période en cours.',
-  },
-];
+const SUPPORT_EMAIL = 'support@velifa.com';
+const FAQ_KEYS = ['1', '2', '3', '4', '5'] as const;
 
-// ── Accordéon ────────────────────────────────────────────────────────────────
-function Accordion({ q, a }: { q: string; a: string }) {
+function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div
-      className="transition-all duration-200"
-      style={{ borderBottom: '1px solid var(--border)' }}
-    >
+    <div className="border-b border-border last:border-b-0">
       <button
+        type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between gap-4 py-4 text-start"
+        aria-expanded={open}
+        className="group flex w-full items-center justify-between gap-4 py-4 text-start"
       >
         <span className="text-sm font-medium text-text">{q}</span>
-        {open
-          ? <ChevronUp className="w-4 h-4 text-accent flex-shrink-0" />
-          : <ChevronDown className="w-4 h-4 text-text-subtle flex-shrink-0" />
-        }
+        <ChevronDown
+          className={`h-4 w-4 flex-shrink-0 text-text-subtle transition-transform duration-200 group-hover:text-text ${open ? 'rotate-180' : ''}`}
+        />
       </button>
-      {open && (
-        <p className="text-sm text-text-muted pb-4 leading-relaxed">{a}</p>
-      )}
-    </div>
-  );
-}
-
-// ── Section wrapper ───────────────────────────────────────────────────────────
-function Section({ title, icon: Icon, children }: {
-  title: string; icon: React.ElementType; children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="rounded-[var(--velifa-radius-lg)] overflow-hidden"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
-    >
-      <div
-        className="flex items-center gap-2 px-6 py-4"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
-        <Icon className="w-4 h-4 text-accent" strokeWidth={1.75} />
-        <h2 className="font-heading font-semibold text-sm text-text tracking-wide">{title}</h2>
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className="overflow-hidden">
+          <p className="pb-4 text-sm leading-relaxed text-text-muted">{a}</p>
+        </div>
       </div>
-      <div className="px-6 py-5">{children}</div>
     </div>
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+function ContactCard({
+  icon: Icon, title, detail, href, disabled,
+}: { icon: React.ElementType; title: string; detail: string; href?: string; disabled?: boolean }) {
+  const body = (
+    <>
+      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-[11px] border border-border bg-[color:var(--bg-subtle)] text-text">
+        <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-medium text-text">{title}</span>
+        <span className="block truncate text-xs text-text-muted" dir="auto">{detail}</span>
+      </span>
+      {!disabled && <ArrowUpRight className="h-4 w-4 flex-shrink-0 text-text-subtle transition-colors group-hover:text-text rtl:-scale-x-100" />}
+    </>
+  );
+  const cls = 'group flex items-center gap-3 rounded-velifa-md border border-border bg-[color:var(--surface-raised)] p-4 transition-colors';
+  if (disabled || !href) return <div className={`${cls} cursor-not-allowed opacity-55`} aria-disabled="true">{body}</div>;
+  return <a href={href} className={`${cls} hover:border-[color:var(--border-strong)]`}>{body}</a>;
+}
+
 export default function SupportPage() {
+  const t = useTranslations('support');
+  const locale = useLocale();
   const { plan } = useSubscription();
   const isBusiness = plan === 'business';
   const isPro = plan === 'pro';
 
+  const links = [
+    { icon: LayoutGrid,     label: t('linkFeatures'), desc: t('linkFeaturesDesc'), href: `/${locale}/fonctionnalites` },
+    { icon: CreditCard,     label: t('linkPricing'),  desc: t('linkPricingDesc'),  href: `/${locale}/tarifs` },
+    { icon: MessagesSquare, label: t('linkFaq'),      desc: t('linkFaqDesc'),      href: `/${locale}/faq` },
+  ];
+
   return (
-    <>
-      <style jsx>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-      `}</style>
+    <div className="min-h-screen bg-bg">
+      <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
+        <PageHeader
+          title={t('title')}
+          description={isBusiness ? t('subtitleBusiness') : isPro ? t('subtitlePro') : t('subtitleFree')}
+          actions={
+            isBusiness ? <Badge><Gem className="h-3 w-3" />{t('badgeBusiness')}</Badge>
+            : isPro ? <Badge><Sparkles className="h-3 w-3" />{t('badgePro')}</Badge>
+            : undefined
+          }
+        />
 
-      <div className="min-h-screen bg-bg">
-        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
-
-          {/* Header + badge plan */}
-          <div className="fade-up">
-            
-            <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
-                Support
-              </h1>
-              {isBusiness && (
-                <span
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-                  style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--text)' }}
-                >
-                  <Gem className="w-3 h-3" />
-                  Support prioritaire 💎
-                </span>
-              )}
-              {isPro && (
-                <span
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-                  style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.35)', color: 'var(--accent)' }}
-                >
-                  <Sparkles className="w-3 h-3" />
-                  Pro
-                </span>
-              )}
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <Panel title={<span className="inline-flex items-center gap-2"><HelpCircle className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{t('faqTitle')}</span>}>
+            <div className="-my-4">
+              {FAQ_KEYS.map((k) => <FaqItem key={k} q={t(`q${k}`)} a={t(`a${k}`)} />)}
             </div>
-            <p className="text-text-muted text-sm">
-              {isBusiness
-                ? 'En tant que client Business, vous bénéficiez d\'un support prioritaire avec réponse sous 4h.'
-                : isPro
-                  ? 'Support inclus dans votre plan Pro — réponse sous 24h.'
-                  : 'Trouvez des réponses ou contactez notre équipe.'}
-            </p>
-          </div>
+          </Panel>
 
-          {/* FAQ */}
-          <div className="fade-up" style={{ animationDelay: '60ms' }}>
-            <Section title="FAQ rapide" icon={HelpCircle}>
-              <div>
-                {FAQ.map((item, i) => (
-                  <Accordion key={i} q={item.q} a={item.a} />
-                ))}
+          <div className="space-y-5">
+            <Panel title={<span className="inline-flex items-center gap-2"><Mail className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{t('contactTitle')}</span>}>
+              <div className="space-y-3">
+                <ContactCard
+                  icon={Mail}
+                  title={t('email')}
+                  detail={SUPPORT_EMAIL}
+                  href={`mailto:${SUPPORT_EMAIL}${isBusiness ? '?subject=BUSINESS' : ''}`}
+                />
+                <ContactCard icon={MessageCircle} title={t('whatsapp')} detail={t('soon')} disabled />
               </div>
-            </Section>
-          </div>
-
-          {/* Contact */}
-          <div className="fade-up" style={{ animationDelay: '100ms' }}>
-            <Section title="Nous contacter" icon={Mail}>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {/* Email */}
-                <a
-                  href="mailto:support@velifa.com"
-                  className="flex items-center gap-3 p-4 rounded-[var(--velifa-radius-md)] transition-all hover:-translate-y-0.5"
-                  style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.25)' }}
-                  >
-                    <Mail className="w-4 h-4 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text">Email</p>
-                    <p className="text-xs text-text-muted">support@velifa.com</p>
-                  </div>
-                </a>
-
-                {/* WhatsApp placeholder */}
-                <div
-                  className="flex items-center gap-3 p-4 rounded-[var(--velifa-radius-md)] opacity-50 cursor-not-allowed"
-                  style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-                  title="Disponible prochainement"
-                >
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(37,211,102,0.10)', border: '1px solid rgba(37,211,102,0.20)' }}
-                  >
-                    <MessageCircle className="w-4 h-4" style={{ color: '#25D366' }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text">WhatsApp</p>
-                    <p className="text-xs text-text-muted">Disponible prochainement</p>
-                  </div>
-                </div>
-              </div>
-
               {isBusiness && (
-                <div
-                  className="mt-4 flex items-center gap-2 px-4 py-3 rounded-[var(--velifa-radius-md)] text-xs"
-                  style={{
-                    background: 'rgb(var(--accent-rgb)/0.06)',
-                    border: '1px solid rgb(var(--accent-rgb)/0.25)',
-                    color: 'var(--text)',
-                  }}
-                >
-                  <Gem className="w-3.5 h-3.5 flex-shrink-0" />
-                  En tant que client Business, mentionnez "BUSINESS" en objet pour un traitement prioritaire.
-                </div>
+                <p className="mt-4 flex items-start gap-2 rounded-velifa-md border border-border bg-[color:var(--bg-subtle)] px-3.5 py-3 text-xs leading-relaxed text-text-muted">
+                  <Gem className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-text" />
+                  {t('businessNote')}
+                </p>
               )}
-            </Section>
-          </div>
+            </Panel>
 
-          {/* Documentation */}
-          <div className="fade-up" style={{ animationDelay: '140ms' }}>
-            <Section title="Documentation & liens utiles" icon={BookOpen}>
-              <div className="space-y-2">
-                {[
-                  { label: 'Fonctionnalités', href: '/#features',   desc: 'Découvrez ce que Velifa peut faire pour vous.' },
-                  { label: 'Tarifs',           href: '/tarifs',      desc: 'Comparez les plans et choisissez le vôtre.' },
-                  { label: 'À propos',         href: '/#about',      desc: 'Notre mission et notre équipe.' },
-                ].map(({ label, href, desc }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="flex items-center gap-3 p-4 rounded-[var(--velifa-radius-md)] transition-all hover:-translate-y-0.5 group"
-                    style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgb(var(--accent-rgb)/0.08)', border: '1px solid rgb(var(--accent-rgb)/0.18)' }}
-                    >
-                      <Zap className="w-3.5 h-3.5 text-accent" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text group-hover:text-accent transition-colors">{label}</p>
-                      <p className="text-xs text-text-muted truncate">{desc}</p>
-                    </div>
-                  </Link>
+            <Panel title={<span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{t('linksTitle')}</span>} padded={false}>
+              <ul className="divide-y divide-[color:var(--border)]">
+                {links.map(({ icon: Icon, label, desc, href }) => (
+                  <li key={href}>
+                    <Link href={href} className="group flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[color:var(--surface-raised)]">
+                      <Icon className="h-4 w-4 flex-shrink-0 text-text-subtle group-hover:text-text" strokeWidth={1.75} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-text">{label}</span>
+                        <span className="block truncate text-xs text-text-muted">{desc}</span>
+                      </span>
+                      <ArrowUpRight className="h-4 w-4 flex-shrink-0 text-text-subtle group-hover:text-text rtl:-scale-x-100" />
+                    </Link>
+                  </li>
                 ))}
-              </div>
-            </Section>
+              </ul>
+            </Panel>
           </div>
-
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { X, ExternalLink, Mail, Ban, CheckCircle2 } from 'lucide-react';
+import { Fragment, useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { X, ExternalLink, Mail, Ban, CheckCircle2, Loader2 } from 'lucide-react';
+import { Badge, TableShell, Th, Td } from '@/components/ui';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@clerk/nextjs';
@@ -34,7 +36,7 @@ const ISSUE_INFO: Record<string, { label: string; severity: 'Critique' | 'Import
     solution: "Ajouter des textes alternatifs aux images, garantir un contraste suffisant des couleurs, rendre le site navigable au clavier et utiliser des attributs ARIA appropriés.",
   },
   best_practices: {
-    label: 'Mauvaises pratiques', severity: 'Mineur', color: 'rgb(var(--accent-rgb)/0.45)', icon: '⚠️',
+    label: 'Mauvaises pratiques', severity: 'Mineur', color: 'var(--text-muted)', icon: '⚠️',
     text: "Mauvaises pratiques web. Problèmes de sécurité ou de performance potentiels.",
     solution: "Utiliser HTTPS partout, mettre à jour les bibliothèques avec failles connues, éviter les erreurs console et corriger les ressources avec un mauvais ratio d'aspect.",
   },
@@ -47,13 +49,14 @@ function scoreColor(score: number) {
 }
 
 function TrendIcon({ trend }: { trend: string }) {
-  if (trend === 'up') return <span style={{ color: 'var(--velifa-score-good)' }}>↑</span>;
-  if (trend === 'down') return <span style={{ color: 'var(--velifa-score-poor)' }}>↓</span>;
-  return <span style={{ color: 'rgb(var(--accent-rgb)/0.35)' }}>→</span>;
+  if (trend === 'up') return <span className="font-semibold" style={{ color: 'var(--velifa-score-good)' }} aria-label="En hausse">↑</span>;
+  if (trend === 'down') return <span className="font-semibold" style={{ color: 'var(--velifa-score-poor)' }} aria-label="En baisse">↓</span>;
+  return <span className="text-text-subtle" aria-label="Stable">→</span>;
 }
 
 export default function SubscriberModal({ subscriber, onClose, onChanged }: { subscriber: any; onClose: () => void; onChanged: () => void }) {
   const { getToken } = useAuth();
+  const locale = useLocale();
   const [tab, setTab] = useState<'header' | 'sites' | 'issues' | 'actions'>('header');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [confirmSuspend, setConfirmSuspend] = useState(false);
@@ -78,7 +81,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
     setBusy(true);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       if (s.suspended) {
         await api.admin.unsuspendUser(token, s.clerkUserId);
         toast('Compte réactivé', 'success');
@@ -97,7 +100,7 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
     setBusy(true);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       await api.admin.updatePlan(token, s.clerkUserId, plan);
       toast(`Plan mis à jour : ${plan}`, 'success');
       onChanged();
@@ -112,176 +115,183 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
     { key: 'actions', label: 'Actions' },
   ];
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-      onClick={onClose}>
-      <div style={{ background: 'var(--surface)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 16, width: '100%', maxWidth: 880, maxHeight: '88vh', display: 'flex', flexDirection: 'column', animation: 'modalIn .22s cubic-bezier(.22,1,.36,1)', overflow: 'hidden' }}
-        onClick={e => e.stopPropagation()}>
+  const tile = 'rounded-velifa-md border border-border bg-[color:var(--bg-subtle)] px-4 py-3.5';
+  const tileLabel = 'mb-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-text-subtle';
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 22px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>
+  return (
+    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-5" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={s.email ?? s.clerkUserId}
+        className="flex max-h-[92vh] w-full max-w-[880px] flex-col overflow-hidden rounded-t-velifa-xl border border-border bg-[color:var(--surface)] shadow-velifa-lg sm:max-h-[88vh] sm:rounded-velifa-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* En-tête */}
+        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg-subtle)] text-sm font-semibold text-text">
               {(s.email ?? s.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.90)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {s.email ?? s.clerkUserId}
-              </div>
-              <div style={{ display: 'flex', gap: 6, marginTop: 4, alignItems: 'center' }}>
-                <span style={{ fontSize: 10, fontWeight: 600, color: s.plan === 'business' ? 'var(--text)' : 'var(--accent)', background: s.plan === 'business' ? 'rgb(var(--accent-rgb)/0.10)' : 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '2px 8px' }}>
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-text" dir="ltr">{s.email ?? s.clerkUserId}</p>
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className="inline-flex items-center rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] font-semibold text-text ring-1 ring-inset ring-[color:var(--border-strong)]">
                   {s.plan === 'business' ? 'Business' : 'Pro'}
                 </span>
-                {s.suspended && (
-                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
-                )}
+                {s.suspended && <Badge tone="poor">Suspendu</Badge>}
               </div>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.50)', cursor: 'pointer', flexShrink: 0 }}>
-            <X style={{ width: 14, height: 14 }} />
+          <button type="button" onClick={onClose} aria-label="Fermer"
+            className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-[8px] border border-border text-text-muted transition-colors hover:text-text">
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: 4, padding: '10px 22px 0', borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ padding: '8px 14px', fontSize: 12, fontWeight: 600, borderRadius: '8px 8px 0 0', cursor: 'pointer', background: tab === t.key ? 'rgb(var(--accent-rgb)/0.10)' : 'transparent', border: 'none', borderBottom: tab === t.key ? '2px solid var(--accent)' : '2px solid transparent', color: tab === t.key ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.45)' }}>
+        {/* Onglets */}
+        <div role="tablist" className="flex gap-1 overflow-x-auto border-b border-border px-5 sm:px-6">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.key}
+              onClick={() => setTab(t.key)}
+              className={`-mb-px whitespace-nowrap border-b-2 px-3 py-3 text-xs font-semibold transition-colors ${
+                tab === t.key ? 'border-[color:var(--text)] text-text' : 'border-transparent text-text-muted hover:text-text'
+              }`}
+            >
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* Body */}
-        <div style={{ padding: 22, overflowY: 'auto', flex: 1 }}>
+        {/* Contenu */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6">
           {tab === 'header' && (
-            <div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {[
                   { label: 'Sites audités', value: s.sitesCount },
                   { label: 'Audits totaux', value: s.auditsCount },
                   { label: 'Score moyen', value: `${s.avgScore}%`, color: scoreColor(s.avgScore) },
                   { label: 'Problèmes', value: s.totalProblems, color: s.totalProblems > 0 ? 'var(--velifa-score-poor)' : 'var(--velifa-score-good)' },
-                ].map(kpi => (
-                  <div key={kpi.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 16px' }}>
-                    <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{kpi.label}</div>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: kpi.color ?? 'rgb(var(--accent-rgb)/0.85)' }}>{kpi.value}</div>
+                ].map((kpi) => (
+                  <div key={kpi.label} className={tile}>
+                    <p className={tileLabel}>{kpi.label}</p>
+                    <p className="font-heading text-2xl font-semibold tabular-nums" style={{ color: kpi.color ?? 'var(--text)' }}>{kpi.value}</p>
                   </div>
                 ))}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+              <div className={tile}>
+                <p className={tileLabel}>Répartition des sites</p>
+                {(() => {
+                  const dist = [
+                    { label: 'Critique (<50)', pct: s.performanceDistribution?.critical ?? 0, color: 'var(--velifa-score-poor)' },
+                    { label: 'À améliorer (50-79)', pct: s.performanceDistribution?.needsImprovement ?? 0, color: 'var(--velifa-score-average)' },
+                    { label: 'Bon (80+)', pct: s.performanceDistribution?.good ?? 0, color: 'var(--velifa-score-good)' },
+                  ];
+                  return (
+                    <>
+                      <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-[color:var(--surface-raised)]">
+                        {dist.map((d) => <span key={d.label} style={{ width: `${d.pct}%`, background: d.color }} />)}
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+                        {dist.map((d) => (
+                          <span key={d.label} className="inline-flex items-center gap-1.5 text-xs text-text-muted">
+                            <span className="h-2 w-2 rounded-full" style={{ background: d.color }} />
+                            {d.label} <span className="font-semibold tabular-nums text-text">{d.pct}%</span>
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  { label: 'Critique (<50)', pct: s.performanceDistribution?.critical ?? 0, color: 'var(--velifa-score-poor)' },
-                  { label: 'À améliorer (50-79)', pct: s.performanceDistribution?.needsImprovement ?? 0, color: 'var(--velifa-score-average)' },
-                  { label: 'Bon (80+)', pct: s.performanceDistribution?.good ?? 0, color: 'var(--velifa-score-good)' },
-                ].map(d => (
-                  <div key={d.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.45)', marginBottom: 6 }}>{d.label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: d.color }}>{d.pct}%</div>
+                  { label: 'Pire site', site: s.worstSite },
+                  { label: 'Meilleur site', site: s.bestSite },
+                ].map(({ label, site }) => (
+                  <div key={label} className={tile}>
+                    <p className={tileLabel}>{label}</p>
+                    {site ? (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="min-w-0 truncate text-xs text-text" dir="ltr">{site.url}</span>
+                        <span className="text-lg font-semibold tabular-nums" style={{ color: scoreColor(site.score) }}>{site.score}%</span>
+                      </div>
+                    ) : <p className="text-xs text-text-subtle">—</p>}
                   </div>
                 ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.18)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Pire site</div>
-                  {s.worstSite ? (
-                    <>
-                      <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.worstSite.url}</div>
-                      <div style={{ fontSize: 18, fontWeight: 700, color: scoreColor(s.worstSite.score) }}>{s.worstSite.score}%</div>
-                    </>
-                  ) : <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.30)' }}>—</div>}
-                </div>
-                <div style={{ background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 10, padding: '12px 14px' }}>
-                  <div style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Meilleur site</div>
-                  {s.bestSite ? (
-                    <>
-                      <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.bestSite.url}</div>
-                      <div style={{ fontSize: 18, fontWeight: 700, color: scoreColor(s.bestSite.score) }}>{s.bestSite.score}%</div>
-                    </>
-                  ) : <div style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.30)' }}>—</div>}
-                </div>
               </div>
             </div>
           )}
 
           {tab === 'sites' && (
-            <div style={{ border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                    {['URL', 'Score moyen', 'Audits', 'Tendance', 'Problèmes'].map(h => (
-                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.30)', textTransform: 'uppercase' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {(s.sites ?? []).map((site: any) => (
-                    <>
-                      <tr key={site.url} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', cursor: 'pointer' }}
-                        onClick={() => setExpanded(expanded === site.url ? null : site.url)}>
-                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgb(var(--accent-rgb)/0.70)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</td>
-                        <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: scoreColor(site.avgScore) }}>{site.avgScore}%</td>
-                        <td style={{ padding: '10px 12px', fontSize: 12, color: 'rgb(var(--accent-rgb)/0.55)' }}>{site.count}</td>
-                        <td style={{ padding: '10px 12px', fontSize: 14 }}><TrendIcon trend={site.trend} /></td>
-                        <td style={{ padding: '10px 12px' }}>
+            <TableShell minWidth={560}>
+              <thead>
+                <tr>{['URL', 'Score moyen', 'Audits', 'Tendance', 'Problèmes'].map((h) => <Th key={h}>{h}</Th>)}</tr>
+              </thead>
+              <tbody>
+                {(s.sites ?? []).map((site: any) => (
+                  <Fragment key={site.url}>
+                    <tr className="cursor-pointer transition-colors hover:bg-[color:var(--surface-raised)]" onClick={() => setExpanded(expanded === site.url ? null : site.url)}>
+                      <Td className="max-w-[240px] truncate text-xs text-text"><span dir="ltr">{site.url}</span></Td>
+                      <Td className="font-semibold tabular-nums"><span style={{ color: scoreColor(site.avgScore) }}>{site.avgScore}%</span></Td>
+                      <Td className="tabular-nums text-text-muted">{site.count}</Td>
+                      <Td><TrendIcon trend={site.trend} /></Td>
+                      <Td>{site.issues?.length ? <Badge tone="poor">{site.issues.length}</Badge> : <Badge tone="good">OK</Badge>}</Td>
+                    </tr>
+                    {expanded === site.url && (
+                      <tr className="bg-[color:var(--bg-subtle)]">
+                        <Td colSpan={5}>
                           {site.issues?.length ? (
-                            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>{site.issues.length}</span>
-                          ) : (
-                            <span style={{ fontSize: 10, color: 'var(--velifa-score-good)' }}>OK</span>
-                          )}
-                        </td>
+                            <div className="flex flex-wrap gap-2">
+                              {site.issues.map((iss: string) => (
+                                <span key={iss} className="rounded-[6px] border border-border px-2 py-1 text-[11px]" style={{ color: ISSUE_INFO[iss]?.color }}>
+                                  {ISSUE_INFO[iss]?.icon} {ISSUE_INFO[iss]?.label}
+                                </span>
+                              ))}
+                            </div>
+                          ) : <span className="text-xs text-text-muted">Aucun problème détecté.</span>}
+                        </Td>
                       </tr>
-                      {expanded === site.url && (
-                        <tr style={{ background: 'rgb(var(--accent-rgb)/0.02)' }}>
-                          <td colSpan={5} style={{ padding: '10px 16px' }}>
-                            {site.issues?.length ? (
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                {site.issues.map((iss: string) => (
-                                  <span key={iss} style={{ fontSize: 11, color: ISSUE_INFO[iss]?.color, background: 'rgb(var(--accent-rgb)/0.04)', borderRadius: 6, padding: '4px 8px' }}>
-                                    {ISSUE_INFO[iss]?.icon} {ISSUE_INFO[iss]?.label}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : <span style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun problème détecté.</span>}
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                    )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </TableShell>
           )}
 
           {tab === 'issues' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div className="space-y-4">
               {Object.keys(issueMap).length === 0 && (
-                <div style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun problème détecté sur les sites de cet utilisateur. 🎉</div>
+                <p className="text-sm text-text-muted">Aucun problème détecté sur les sites de cet utilisateur.</p>
               )}
               {(s.sites ?? []).filter((site: any) => site.issues?.length).map((site: any) => (
-                <div key={site.url} style={{ border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, overflow: 'hidden' }}>
-                  <div style={{ padding: '10px 16px', background: 'rgb(var(--accent-rgb)/0.03)', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.url}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: scoreColor(site.avgScore) }}>{site.avgScore}%</span>
+                <div key={site.url} className="overflow-hidden rounded-velifa-md border border-border">
+                  <div className="flex items-center justify-between gap-3 border-b border-border bg-[color:var(--bg-subtle)] px-4 py-2.5">
+                    <span className="min-w-0 truncate text-xs font-semibold text-text" dir="ltr">{site.url}</span>
+                    <span className="text-xs font-semibold tabular-nums" style={{ color: scoreColor(site.avgScore) }}>{site.avgScore}%</span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 14 }}>
+                  <div className="space-y-3 p-4">
                     {site.issues.map((key: string) => {
                       const info = ISSUE_INFO[key];
                       if (!info) return null;
                       return (
-                        <div key={key} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 16px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                            <span style={{ fontSize: 16 }}>{info.icon}</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.85)' }}>{info.label}</span>
-                            <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99, color: info.color, background: 'rgb(var(--accent-rgb)/0.05)' }}>{info.severity}</span>
+                        <div key={key} className="rounded-velifa-md border border-border p-4">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <span className="text-base">{info.icon}</span>
+                            <span className="text-sm font-semibold text-text">{info.label}</span>
+                            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ color: info.color, background: 'var(--accent-soft)' }}>{info.severity}</span>
                           </div>
-                          <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.55)', lineHeight: 1.6, margin: '0 0 8px' }}>{info.text}</p>
-                          <div style={{ background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: 8, padding: '8px 12px' }}>
-                            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--velifa-score-good)', margin: '0 0 4px' }}>Solution recommandée</p>
-                            <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', lineHeight: 1.6, margin: 0 }}>{info.solution}</p>
+                          <p className="mb-3 text-xs leading-relaxed text-text-muted">{info.text}</p>
+                          <div className="rounded-[8px] px-3 py-2.5" style={{ background: 'var(--velifa-score-good-bg)' }}>
+                            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--velifa-score-good)' }}>Solution recommandée</p>
+                            <p className="text-xs leading-relaxed text-text">{info.solution}</p>
                           </div>
                         </div>
                       );
@@ -293,47 +303,61 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
           )}
 
           {tab === 'actions' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', marginBottom: 10 }}>Statut du compte</div>
+            <div className="space-y-3">
+              <div className={tile}>
+                <p className="mb-3 text-sm font-semibold text-text">Statut du compte</p>
                 {!confirmSuspend ? (
-                  <button onClick={() => setConfirmSuspend(true)} disabled={busy}
-                    style={{ height: 34, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: s.suspended ? 'rgba(34,197,94,0.10)' : 'rgba(239,68,68,0.07)', border: `1px solid ${s.suspended ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.18)'}`, color: s.suspended ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)' }}>
-                    {s.suspended ? <CheckCircle2 style={{ width: 13, height: 13 }} /> : <Ban style={{ width: 13, height: 13 }} />}
+                  <button
+                    type="button"
+                    onClick={() => setConfirmSuspend(true)}
+                    disabled={busy}
+                    className="inline-flex h-9 items-center gap-2 rounded-velifa-md px-4 text-xs font-semibold disabled:opacity-50"
+                    style={{
+                      color: s.suspended ? 'var(--velifa-score-good)' : 'var(--velifa-score-poor)',
+                      background: s.suspended ? 'var(--velifa-score-good-bg)' : 'var(--velifa-score-poor-bg)',
+                    }}
+                  >
+                    {s.suspended ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
                     {s.suspended ? 'Réactiver le compte' : 'Suspendre le compte'}
                   </button>
                 ) : (
                   <div>
-                    <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', marginBottom: 10 }}>
+                    <p className="mb-3 text-xs text-text-muted">
                       {s.suspended ? 'Réactiver ce compte ?' : 'Suspendre ce compte ? L\'utilisateur ne pourra plus lancer d\'audits.'}
                     </p>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setConfirmSuspend(false)} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.60)' }}>Annuler</button>
-                      <button onClick={doSuspend} disabled={busy} style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--velifa-score-poor)' }}>Confirmer</button>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setConfirmSuspend(false)} className="h-9 rounded-velifa-md border border-border px-4 text-xs text-text-muted hover:text-text">Annuler</button>
+                      <button type="button" onClick={doSuspend} disabled={busy} className="inline-flex h-9 items-center gap-2 rounded-velifa-md px-4 text-xs font-semibold disabled:opacity-50"
+                        style={{ color: 'var(--velifa-score-poor)', background: 'var(--velifa-score-poor-bg)' }}>
+                        {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Confirmer
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.80)', marginBottom: 10 }}>Changer le plan</div>
-                <select defaultValue={s.plan} disabled={busy} onChange={e => changePlan(e.target.value)}
-                  style={{ height: 34, padding: '0 12px', borderRadius: 8, fontSize: 12, background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.12)', color: 'rgb(var(--accent-rgb)/0.75)', cursor: 'pointer', outline: 'none' }}>
+              <div className={tile}>
+                <label htmlFor="sub-plan" className="mb-3 block text-sm font-semibold text-text">Changer le plan</label>
+                <select
+                  id="sub-plan"
+                  defaultValue={s.plan}
+                  disabled={busy}
+                  onChange={(e) => changePlan(e.target.value)}
+                  className="h-9 cursor-pointer rounded-velifa-md border border-border bg-[color:var(--surface)] px-3 text-xs text-text focus:outline-none disabled:opacity-50"
+                >
                   <option value="free">Gratuit</option>
                   <option value="pro">Pro</option>
                   <option value="business">Business</option>
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <Link href={`/admin/audits?user=${s.clerkUserId}`}
-                  style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.25)', color: 'var(--accent)', textDecoration: 'none' }}>
-                  <ExternalLink style={{ width: 13, height: 13 }} /> Voir tous ses audits
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Link href={`/${locale}/admin/audits?user=${s.clerkUserId}`} className="velifa-btn inline-flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" /> Voir tous ses audits
                 </Link>
                 {s.email && (
-                  <a href={`mailto:${s.email}`}
-                    style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.65)', textDecoration: 'none' }}>
-                    <Mail style={{ width: 13, height: 13 }} /> Envoyer un email
+                  <a href={`mailto:${s.email}`} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
+                    <Mail className="h-4 w-4" /> Envoyer un email
                   </a>
                 )}
               </div>
@@ -341,7 +365,6 @@ export default function SubscriberModal({ subscriber, onClose, onChanged }: { su
           )}
         </div>
       </div>
-      <style>{`@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}`}</style>
     </div>
   );
 }

@@ -5,16 +5,15 @@ import { useAuth } from '@clerk/nextjs';
 import { RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
 import SubscriberModal from './SubscriberModal';
-
-function scoreColor(score: number) {
-  if (score >= 80) return 'var(--velifa-score-good)';
-  if (score >= 50) return 'var(--velifa-score-average)';
-  return 'var(--velifa-score-poor)';
-}
+import { Badge, TableShell, Th, Td, SkeletonRows, Segmented, IconButton, ErrorNote } from '@/components/ui';
+import { scoreBucket, SCORE_COLOR } from '@/lib/score';
 
 function PlanBadge({ plan }: { plan: string }) {
-  if (plan === 'business') return <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text)', background: 'rgb(var(--accent-rgb)/0.10)', borderRadius: 99, padding: '3px 8px' }}>Business</span>;
-  return <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', background: 'rgb(var(--accent-rgb)/0.12)', borderRadius: 99, padding: '3px 8px' }}>Pro</span>;
+  return (
+    <span className="inline-flex items-center rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] font-semibold text-text ring-1 ring-inset ring-[color:var(--border-strong)]">
+      {plan === 'business' ? 'Business' : 'Pro'}
+    </span>
+  );
 }
 
 type SortKey = 'avgScore' | 'totalProblems' | null;
@@ -61,118 +60,98 @@ export default function SubscribersTable() {
     else { setSortKey(key); setSortDir('asc'); }
   }
 
+  const sortMark = (key: SortKey) => (sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '');
+
   return (
-    <div style={{ marginBottom: 32 }}>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'rgb(var(--accent-rgb)/0.85)', margin: 0 }}>Utilisateurs abonnés</h2>
-        <button onClick={load} style={{ height: 32, width: 32, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)' }}>
-          <RefreshCw style={{ width: 13, height: 13 }} />
-        </button>
-      </div>
-
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
-        {([['all', 'Tous'], ['pro', 'Pro'], ['business', 'Business'], ['suspended', 'Suspendus']] as const).map(([key, label]) => (
-          <button key={key} onClick={() => setFilter(key)}
-            style={{ height: 32, padding: '0 14px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: filter === key ? 'rgb(var(--accent-rgb)/0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${filter === key ? 'rgb(var(--accent-rgb)/0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: filter === key ? 'var(--accent)' : 'rgb(var(--accent-rgb)/0.55)' }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {error && (
-        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
-          ⚠️ {error}
+    <div className="mb-10">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-base font-semibold text-text">Utilisateurs abonnés</h2>
+          <p className="text-xs text-text-muted">{loading ? '…' : `${data.length} abonnés Pro et Business`}</p>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <Segmented
+            label="Filtrer les abonnés"
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: 'all', label: 'Tous' },
+              { value: 'pro', label: 'Pro' },
+              { value: 'business', label: 'Business' },
+              { value: 'suspended', label: 'Suspendus' },
+            ]}
+          />
+          <IconButton icon={RefreshCw} label="Rafraîchir" onClick={load} spinning={loading} />
+        </div>
+      </div>
 
-      <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Utilisateur</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Plan</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Sites</th>
-              <th onClick={() => toggleSort('avgScore')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
-                Score moyen {sortKey === 'avgScore' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
-              </th>
-              <th onClick={() => toggleSort('totalProblems')} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', cursor: 'pointer' }}>
-                Problèmes {sortKey === 'totalProblems' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
-              </th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Statut</th>
-              <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
-                  {Array.from({ length: 7 }).map((_, j) => (
-                    <td key={j} style={{ padding: '14px 16px' }}>
-                      <div style={{ height: 14, borderRadius: 4, background: 'rgb(var(--accent-rgb)/0.06)', width: j === 0 ? '70%' : '50%', animation: 'pulse 1.5s ease-in-out infinite' }} />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ padding: '24px 16px', textAlign: 'center', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.35)' }}>Aucun abonné trouvé.</td></tr>
-            ) : filtered.map((u, i) => (
-              <tr key={u.clerkUserId} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)', transition: 'background 150ms' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)'; }}>
+      {error && <ErrorNote>{error}</ErrorNote>}
 
-                <td style={{ padding: '11px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'rgb(var(--accent-rgb)/0.12)', border: '1px solid rgb(var(--accent-rgb)/0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--accent)' }}>
+      <TableShell minWidth={820}>
+        <thead>
+          <tr>
+            <Th>Utilisateur</Th>
+            <Th>Plan</Th>
+            <Th>Sites</Th>
+            <Th>
+              <button type="button" onClick={() => toggleSort('avgScore')} className="uppercase tracking-[0.14em] hover:text-text">
+                Score moyen{sortMark('avgScore')}
+              </button>
+            </Th>
+            <Th>
+              <button type="button" onClick={() => toggleSort('totalProblems')} className="uppercase tracking-[0.14em] hover:text-text">
+                Problèmes{sortMark('totalProblems')}
+              </button>
+            </Th>
+            <Th>Statut</Th>
+            <Th />
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <SkeletonRows rows={4} cols={7} />
+          ) : filtered.length === 0 ? (
+            <tr><Td className="py-8 text-center text-sm text-text-muted" colSpan={7}>Aucun abonné trouvé.</Td></tr>
+          ) : filtered.map((u) => {
+            const b = scoreBucket(u.avgScore);
+            return (
+              <tr key={u.clerkUserId} className="transition-colors hover:bg-[color:var(--surface-raised)]">
+                <Td>
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg-subtle)] text-[11px] font-semibold text-text">
                       {(u.email ?? u.clerkUserId ?? '?').slice(0, 1).toUpperCase()}
-                    </div>
-                    <span style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.65)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {u.email ?? u.clerkUserId}
+                    </span>
+                    <span className="max-w-[220px] truncate text-xs text-text" dir="ltr">{u.email ?? u.clerkUserId}</span>
+                  </div>
+                </Td>
+                <Td><PlanBadge plan={u.plan} /></Td>
+                <Td className="font-semibold tabular-nums text-text">{u.sitesCount}</Td>
+                <Td>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-10 text-sm font-semibold tabular-nums" style={{ color: SCORE_COLOR[b] }}>{u.avgScore}%</span>
+                    <span className="h-1 w-14 overflow-hidden rounded-full bg-[color:var(--surface-raised)]">
+                      <span className="block h-full rounded-full" style={{ width: `${u.avgScore}%`, background: SCORE_COLOR[b] }} />
                     </span>
                   </div>
-                </td>
-
-                <td style={{ padding: '11px 16px' }}><PlanBadge plan={u.plan} /></td>
-
-                <td style={{ padding: '11px 16px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.60)', fontWeight: 600 }}>{u.sitesCount}</td>
-
-                <td style={{ padding: '11px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: scoreColor(u.avgScore) }}>{u.avgScore}%</span>
-                    <div style={{ width: 50, height: 4, borderRadius: 2, background: 'rgb(var(--accent-rgb)/0.06)', overflow: 'hidden' }}>
-                      <div style={{ width: `${u.avgScore}%`, height: '100%', background: scoreColor(u.avgScore) }} />
-                    </div>
-                  </div>
-                </td>
-
-                <td style={{ padding: '11px 16px' }}>
-                  {u.totalProblems > 0 ? (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>{u.totalProblems}</span>
-                  ) : (
-                    <span style={{ fontSize: 10, color: 'var(--velifa-score-good)' }}>0</span>
-                  )}
-                </td>
-
-                <td style={{ padding: '11px 16px' }}>
-                  {u.suspended ? (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(239,68,68,0.10)', color: 'var(--velifa-score-poor)' }}>Suspendu</span>
-                  ) : (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, background: 'rgba(34,197,94,0.10)', color: 'var(--velifa-score-good)' }}>Actif</span>
-                  )}
-                </td>
-
-                <td style={{ padding: '11px 16px' }}>
-                  <button onClick={() => setSelected(u)}
-                    style={{ height: 28, padding: '0 12px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.10)', border: '1px solid rgb(var(--accent-rgb)/0.25)', color: 'var(--accent)' }}>
+                </Td>
+                <Td>
+                  {u.totalProblems > 0 ? <Badge tone="poor">{u.totalProblems}</Badge> : <Badge tone="good">0</Badge>}
+                </Td>
+                <Td>{u.suspended ? <Badge tone="poor">Suspendu</Badge> : <Badge tone="good">Actif</Badge>}</Td>
+                <Td className="text-end">
+                  <button
+                    type="button"
+                    onClick={() => setSelected(u)}
+                    className="h-8 rounded-[8px] border border-border px-3 text-xs font-medium text-text transition-colors hover:border-[color:var(--border-strong)]"
+                  >
                     Détails
                   </button>
-                </td>
+                </Td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            );
+          })}
+        </tbody>
+      </TableShell>
 
       {selected && <SubscriberModal subscriber={selected} onClose={() => setSelected(null)} onChanged={load} />}
     </div>

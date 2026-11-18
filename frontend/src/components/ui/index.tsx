@@ -193,3 +193,177 @@ export function Badge({ children, tone = 'neutral' }: { children: React.ReactNod
     </span>
   );
 }
+
+/* ── Contrôles ────────────────────────────────────────────────────────────── */
+
+/** Interrupteur accessible (role="switch"), sens RTL respecté. */
+export function Switch({
+  checked, onChange, label, disabled,
+}: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onChange}
+      className={cx(
+        'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50',
+        checked ? 'border-transparent bg-accent' : 'border-border bg-[color:var(--surface-raised)]',
+      )}
+    >
+      <span
+        className={cx(
+          'inline-block h-[18px] w-[18px] rounded-full shadow-sm transition-transform duration-200',
+          checked
+            ? 'bg-[color:var(--text-on-accent)] ltr:translate-x-[22px] rtl:-translate-x-[22px]'
+            : 'bg-[color:var(--text-subtle)] ltr:translate-x-[2px] rtl:-translate-x-[2px]',
+        )}
+      />
+    </button>
+  );
+}
+
+/** Ligne de réglage : libellé + description à gauche, contrôle à droite. */
+export function SettingRow({ label, description, children }: { label: React.ReactNode; description?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-6 border-b border-border py-4 last:border-b-0 first:pt-0 last:pb-0">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-text">{label}</p>
+        {description && <p className="mt-0.5 text-xs leading-relaxed text-text-muted">{description}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ── Données tabulaires ───────────────────────────────────────────────────── */
+
+/** Conteneur de tableau : défilement horizontal sur mobile, en-têtes discrets. */
+export function TableShell({ children, minWidth = 720 }: { children: React.ReactNode; minWidth?: number }) {
+  return (
+    <div className="overflow-hidden rounded-velifa-lg border border-border bg-[color:var(--surface)]">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm" style={{ minWidth }}>{children}</table>
+      </div>
+    </div>
+  );
+}
+
+export function Th({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return (
+    <th className={cx('whitespace-nowrap border-b border-border px-4 py-3 text-start text-[10px] font-semibold uppercase tracking-[0.14em] text-text-subtle', className)}>
+      {children}
+    </th>
+  );
+}
+
+export function Td({ children, className, colSpan }: { children?: React.ReactNode; className?: string; colSpan?: number }) {
+  return <td colSpan={colSpan} className={cx('border-b border-border px-4 py-3 align-middle', className)}>{children}</td>;
+}
+
+/** Lignes fantômes pendant le chargement. */
+export function SkeletonRows({ rows = 6, cols }: { rows?: number; cols: number }) {
+  return (
+    <>
+      {Array.from({ length: rows }).map((_, i) => (
+        <tr key={i}>
+          {Array.from({ length: cols }).map((__, j) => (
+            <Td key={j}><Skeleton className={cx('h-3.5', j === 0 ? 'w-3/4' : 'w-1/2')} /></Td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+}
+
+/** Sélecteur segmenté (filtres exclusifs). */
+export function Segmented<T extends string>({
+  value, onChange, options, label,
+}: { value: T; onChange: (v: T) => void; options: { value: T; label: React.ReactNode }[]; label?: string }) {
+  return (
+    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-velifa-md border border-border bg-[color:var(--surface)] p-1">
+      {options.map((o) => {
+        const active = o.value === value;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onChange(o.value)}
+            className={cx(
+              'h-8 rounded-[8px] px-3 text-xs font-medium transition-colors',
+              active ? 'bg-accent text-[color:var(--text-on-accent)]' : 'text-text-muted hover:bg-[color:var(--surface-raised)] hover:text-text',
+            )}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Bouton icône carré (actions de ligne, rafraîchir). */
+export function IconButton({
+  icon: Icon, label, onClick, href, disabled, spinning,
+}: { icon: React.ElementType; label: string; onClick?: () => void; href?: string; disabled?: boolean; spinning?: boolean }) {
+  const cls = 'grid h-8 w-8 flex-shrink-0 place-items-center rounded-[8px] border border-border bg-[color:var(--surface)] text-text-muted transition-colors hover:border-[color:var(--border-strong)] hover:text-text disabled:cursor-not-allowed disabled:opacity-40';
+  const icon = <Icon className={cx('h-3.5 w-3.5', spinning && 'animate-spin')} strokeWidth={1.75} />;
+  if (href) return <a href={href} title={label} aria-label={label} className={cls}>{icon}</a>;
+  return <button type="button" title={label} aria-label={label} onClick={onClick} disabled={disabled} className={cls}>{icon}</button>;
+}
+
+/** Message d'erreur en ligne. */
+export function ErrorNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div role="alert" className="mb-4 rounded-velifa-md px-4 py-3 text-sm" style={{ color: 'var(--velifa-score-poor)', background: 'var(--velifa-score-poor-bg)' }}>
+      {children}
+    </div>
+  );
+}
+
+/* ── Confirmation ─────────────────────────────────────────────────────────── */
+
+/** Boîte de confirmation modale (Échap pour annuler, clic à l'extérieur). */
+export function ConfirmDialog({
+  message, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true,
+}: {
+  message: React.ReactNode; confirmLabel: string; cancelLabel: string;
+  onConfirm: () => void; onCancel: () => void; danger?: boolean;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onCancel}>
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        className="w-full max-w-sm rounded-velifa-lg border border-border bg-[color:var(--surface)] p-6 shadow-velifa-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-sm leading-relaxed text-text">{message}</p>
+        <div className="mt-6 flex justify-end gap-2">
+          <button type="button" onClick={onCancel} className="h-9 rounded-velifa-md border border-border px-4 text-sm text-text-muted transition-colors hover:text-text">
+            {cancelLabel}
+          </button>
+          <button
+            type="button"
+            autoFocus
+            onClick={onConfirm}
+            className={cx('h-9 rounded-velifa-md px-4 text-sm font-semibold', !danger && 'bg-accent text-[color:var(--text-on-accent)]')}
+            style={danger ? { color: 'var(--velifa-score-poor)', background: 'var(--velifa-score-poor-bg)' } : undefined}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

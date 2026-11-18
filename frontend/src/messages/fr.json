@@ -1096,5 +1096,36 @@
       "title": "PDF à votre marque",
       "desc": "Rapport PDF arabe ou anglais au logo et aux couleurs de votre agence (plan Business)."
     }
+  },
+  "support": {
+    "title": "Support",
+    "subtitleBusiness": "Votre plan Business inclut le support prioritaire avancé.",
+    "subtitlePro": "Votre plan Pro inclut le support prioritaire.",
+    "subtitleFree": "Trouvez une réponse ou écrivez-nous.",
+    "badgeBusiness": "Support prioritaire avancé",
+    "badgePro": "Support prioritaire",
+    "faqTitle": "Questions rapides",
+    "q1": "Comment fonctionne un audit VELIFA ?",
+    "a1": "VELIFA analyse votre adresse avec Google Lighthouse, sur mobile et sur ordinateur : performance, accessibilité, SEO, bonnes pratiques et Core Web Vitals (LCP, CLS, TBT). Le rapport indique aussi la plateforme détectée et des recommandations classées par priorité.",
+    "q2": "Quelle différence entre Gratuit, Pro et Business ?",
+    "a2": "Gratuit : 3 audits par 24 h avec un compte (1 sans compte). Pro : audits illimités et historique complet. Business : en plus, suivi multi-sites avec audits programmés et alertes email, rapport PDF à la marque de votre agence et API REST.",
+    "q3": "Mes données sont-elles sécurisées ?",
+    "a3": "Oui. L'authentification passe par Clerk : VELIFA ne stocke jamais vos mots de passe. Les adresses analysées servent uniquement à produire le rapport.",
+    "q4": "Puis-je relancer un audit sur la même adresse ?",
+    "a4": "Oui. Dans « Mes audits », le bouton « Relancer » lance une nouvelle analyse de la même adresse.",
+    "q5": "Comment annuler mon abonnement ?",
+    "a5": "Dans « Abonnement », cliquez sur « Contacter le support ». Vous gardez l'accès jusqu'à la fin de la période en cours.",
+    "contactTitle": "Nous contacter",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "soon": "Bientôt disponible",
+    "businessNote": "Client Business : indiquez « BUSINESS » dans l'objet pour un traitement prioritaire.",
+    "linksTitle": "Liens utiles",
+    "linkFeatures": "Fonctionnalités",
+    "linkFeaturesDesc": "Ce que VELIFA vérifie sur votre site.",
+    "linkPricing": "Tarifs",
+    "linkPricingDesc": "Comparez les plans.",
+    "linkFaq": "FAQ",
+    "linkFaqDesc": "Toutes les questions fréquentes."
   }
 }

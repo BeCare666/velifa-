@@ -4,58 +4,21 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
+import { useLocale, useTranslations } from 'next-intl';
 import {
-  Loader2, CreditCard, Sparkles, Gem, ArrowRight,
-  Calendar, History, ExternalLink,
+  Loader2, CreditCard, Sparkles, Gem, ArrowRight, Calendar, History, ExternalLink, ShieldCheck,
 } from 'lucide-react';
 import { useSubscription } from '@/context/SubscriptionContext';
-import { useTranslations } from 'next-intl';
+import { PageHeader, Panel, EmptyState } from '@/components/ui';
 
-// ── Plan badge ────────────────────────────────────────────────────────────────
-function PlanBadge({ plan, freeLabel }: { plan: 'pro' | 'business' | null; freeLabel: string }) {
-  if (plan === 'pro') return (
-    <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-      style={{
-        background: 'rgb(var(--accent-rgb)/0.15)',
-        border: '1px solid rgb(var(--accent-rgb)/0.40)',
-        color: 'var(--accent)',
-      }}
-    >
-      <Sparkles className="w-3 h-3" />
-      Pro
-    </span>
-  );
-  if (plan === 'business') return (
-    <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase"
-      style={{
-        background: 'rgb(var(--accent-rgb)/0.12)',
-        border: '1px solid rgb(var(--accent-rgb)/0.40)',
-        color: 'var(--text)',
-      }}
-    >
-      <Gem className="w-3 h-3" />
-      Business
-    </span>
-  );
-  return (
-    <span
-      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase"
-      style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-subtle)' }}
-    >
-      {freeLabel}
-    </span>
-  );
-}
-
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default function BillingPage() {
   const router = useRouter();
+  const locale = useLocale();
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const { plan, isActive } = useSubscription();
   const t = useTranslations('billing');
+  const tP = useTranslations('pricing');
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) router.push('/sign-in');
@@ -63,184 +26,111 @@ export default function BillingPage() {
 
   if (!isLoaded || !isSignedIn) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-bg">
+        <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
       </div>
     );
   }
 
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
   const isPaid = plan === 'pro' || plan === 'business';
+  const planKey = plan === 'pro' ? 'pro' : plan === 'business' ? 'business' : 'free';
   const planLabel = plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : t('freePlan');
+  const PlanIcon = plan === 'business' ? Gem : plan === 'pro' ? Sparkles : CreditCard;
+  const features = tP.raw(`${planKey}.features`) as string[];
+  const cancelHref = `mailto:support@velifa.com?subject=${encodeURIComponent(t('cancelTitle'))}&body=${encodeURIComponent(`Email: ${email}`)}`;
 
   return (
-    <>
-      <style jsx>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-      `}</style>
+    <div className="min-h-screen bg-bg">
+      <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 sm:py-12">
+        <PageHeader title={t('title')} description={t('subtitle')} />
 
-      <div className="min-h-screen bg-bg">
-        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
-
-          {/* Header */}
-          <div className="fade-up">
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
-              {t('title')}
-            </h1>
-            <p className="text-text-muted mt-2 text-sm">{t('subtitle')}</p>
-          </div>
-
-          {/* Plan actuel */}
+        {/* Plan actuel */}
+        <section
+          className={`relative overflow-hidden rounded-velifa-xl border p-6 sm:p-8 ${
+            isPaid ? 'border-[color:var(--border-strong)] bg-[color:var(--surface-raised)]' : 'border-border bg-[color:var(--surface)]'
+          }`}
+        >
           <div
-            className="fade-up rounded-[var(--velifa-radius-lg)] p-6"
-            style={{
-              background: isPaid
-                ? plan === 'business'
-                  ? 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.07) 0%, var(--surface) 100%)'
-                  : 'linear-gradient(135deg, rgb(var(--accent-rgb)/0.10) 0%, var(--surface) 100%)'
-                : 'var(--surface)',
-              border: isPaid
-                ? plan === 'business' ? '1px solid rgb(var(--accent-rgb)/0.38)' : '1px solid rgb(var(--accent-rgb)/0.35)'
-                : '1px solid var(--border)',
-              boxShadow: 'var(--shadow-sm)',
-              animationDelay: '60ms',
-            }}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{
-                    background: plan === 'business' ? 'rgb(var(--accent-rgb)/0.12)' : 'rgb(var(--accent-rgb)/0.12)',
-                    border: plan === 'business' ? '1px solid rgb(var(--accent-rgb)/0.30)' : '1px solid rgb(var(--accent-rgb)/0.28)',
-                  }}
-                >
-                  {plan === 'business'
-                    ? <Gem className="w-5 h-5" style={{ color: 'var(--text)' }} />
-                    : plan === 'pro'
-                      ? <Sparkles className="w-5 h-5 text-accent" />
-                      : <CreditCard className="w-5 h-5 text-text-subtle" />
-                  }
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-widest uppercase text-text-subtle mb-1">
-                    {t('currentPlan')}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="font-heading font-bold text-xl text-text">{planLabel}</span>
-                    <PlanBadge plan={plan} freeLabel={t('freePlan')} />
-                  </div>
-                </div>
-              </div>
-
-              {!isPaid && (
-                <Link
-                  href="/tarifs"
-                  className="velifa-btn inline-flex items-center gap-2 self-start sm:self-auto"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  {t('changePlan')}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              )}
-              {isPaid && (
-                <Link
-                  href="/tarifs"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--velifa-radius-md)] text-xs font-medium transition-all"
-                  style={{
-                    background: 'var(--surface-raised)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  {t('managePlan')}
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              )}
-            </div>
-
-            {/* Renouvellement */}
-            {isPaid && isActive && (
-              <div
-                className="mt-5 flex items-center gap-2 text-sm"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span>
-                  {t('renewalNote')}
+            aria-hidden
+            className="pointer-events-none absolute -top-32 end-[-10%] h-72 w-72 rounded-full opacity-60 blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgb(var(--accent-rgb)/0.10), transparent 70%)' }}
+          />
+          <div className="relative grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div>
+              <p className="velifa-eyebrow mb-4">{t('currentPlan')}</p>
+              <div className="flex items-center gap-4">
+                <span className="grid h-12 w-12 place-items-center rounded-[13px] border border-border bg-[color:var(--bg-subtle)] text-text">
+                  <PlanIcon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-              </div>
-            )}
-          </div>
-
-          {/* Historique */}
-          <div
-            className="fade-up rounded-[var(--velifa-radius-lg)] overflow-hidden"
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              boxShadow: 'var(--shadow-sm)',
-              animationDelay: '100ms',
-            }}
-          >
-            <div
-              className="flex items-center gap-2 px-6 py-4"
-              style={{ borderBottom: '1px solid var(--border)' }}
-            >
-              <History className="w-4 h-4 text-accent" strokeWidth={1.75} />
-              <h2 className="font-heading font-semibold text-sm text-text">{t('historyTitle')}</h2>
-            </div>
-            <div className="px-6 py-10 flex flex-col items-center gap-3 text-center">
-              <History className="w-8 h-8 text-text-subtle" strokeWidth={1.25} />
-              <p className="text-sm font-medium text-text-muted">
-                {t('historyEmpty')}
-              </p>
-              <p className="text-xs text-text-subtle max-w-xs">
-                {t('historyEmptyDesc')}
-              </p>
-            </div>
-          </div>
-
-          {/* Annuler */}
-          {isPaid && (
-            <div
-              className="fade-up rounded-[var(--velifa-radius-lg)] p-6"
-              style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                boxShadow: 'var(--shadow-sm)',
-                animationDelay: '140ms',
-              }}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-text mb-0.5">{t('cancelTitle')}</p>
-                  <p className="text-xs text-text-muted">
-                    {t('cancelDesc')}
-                  </p>
+                  <span className="font-heading text-2xl font-semibold tracking-tight text-text">{planLabel}</span>
+                  {isPaid && isActive && <p className="mt-0.5 text-xs text-text-muted">{tP('activeSubscription')}</p>}
                 </div>
-                <a
-                  href={`mailto:support@velifa.com?subject=Annulation abonnement&body=Email: ${email}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--velifa-radius-md)] text-xs font-medium transition-all self-start sm:self-auto"
-                  style={{
-                    background: 'rgba(255,78,66,0.08)',
-                    border: '1px solid rgba(255,78,66,0.25)',
-                    color: 'var(--velifa-score-poor)',
-                  }}
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  {t('contactSupport')}
-                </a>
               </div>
+              <p className="mt-5 max-w-sm text-sm leading-relaxed text-text-muted">{tP(`${planKey}.desc`)}</p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {isPaid ? (
+                  <Link href={`/${locale}/tarifs`} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
+                    {t('managePlan')}
+                    <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+                  </Link>
+                ) : (
+                  <Link href={`/${locale}/tarifs`} className="velifa-btn inline-flex items-center gap-2">
+                    <Sparkles className="h-4 w-4" />
+                    {t('changePlan')}
+                    <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <ul className="space-y-2.5 self-center border-t border-border pt-6 md:border-s md:border-t-0 md:ps-8 md:pt-0">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-sm text-text">
+                  <span className="mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[color:var(--text-subtle)]" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {isPaid && isActive && (
+            <div className="relative mt-8 flex items-center gap-2 border-t border-border pt-5 text-sm text-text-muted">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              {t('renewalNote')}
             </div>
           )}
+        </section>
 
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <Panel title={<span className="inline-flex items-center gap-2"><History className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{t('historyTitle')}</span>}>
+            <EmptyState icon={History} title={t('historyEmpty')} description={t('historyEmptyDesc')} />
+          </Panel>
+
+          <div className="space-y-5">
+            <div className="flex items-start gap-3 rounded-velifa-lg border border-border bg-[color:var(--surface)] p-5 text-xs leading-relaxed text-text-muted">
+              <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-text" strokeWidth={1.75} />
+              {tP('securePayment')}
+            </div>
+
+            {isPaid && (
+              <Panel title={t('cancelTitle')}>
+                <p className="text-sm text-text-muted">{t('cancelDesc')}</p>
+                <a
+                  href={cancelHref}
+                  className="mt-4 inline-flex items-center gap-2 rounded-velifa-md border px-4 py-2 text-xs font-medium transition-colors"
+                  style={{ color: 'var(--velifa-score-poor)', background: 'var(--velifa-score-poor-bg)', borderColor: 'transparent' }}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  {t('contactSupport')}
+                </a>
+              </Panel>
+            )}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -715,7 +715,7 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
   Badge) + `lib/score.ts` ; tableau de bord, audits, vue générale admin refaits ; tiroirs mobiles RTL.
 - Bugs corrigés : liens de l'admin jamais actifs (chemin avec préfixe de langue) ; **l'admin affichait dans la
   console du navigateur l'email, l'identifiant et la liste des emails administrateurs** (retiré) ; textes en dur.
-- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
+- Preuves : `tsc` exit 0 ; `next build` exit 0.
 - Reste : paramètres, abonnement, support, 9 pages admin ; sections de l'accueil sous le hero ; vérification
   visuelle mobile et arabe.
 
@@ -726,7 +726,7 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - « Mes audits » refaite avec `components/ui` (filtres en pastilles, tableau, pagination RTL). Vérifié : le statut
   « Terminé » est exact (`/analyses/mine` ne renvoie que `status = 'completed'`).
 - Paramètres, Abonnement, Support : largeur, marges, titres et ombres alignés sur le tableau de bord.
-- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
+- Preuves : `tsc` exit 0 ; `next build` exit 0.
 
 ### 2026-11-17 — 5.5 (suite) : accueil sous le hero et pages admin
 - Accueil : carrousel supprimé (texte français en dur jamais traduit, 4 photos de banque d'images, affirmations
@@ -736,4 +736,21 @@ Chaque entrée : date, tâche, ce qui a été fait, **preuve** (commande + résu
 - Admin (11 pages) : conteneur responsive, titres de la charte, grille fixe 2 colonnes → adaptative, 13 textes sans
   accents corrigés, pastilles de score locales → `ScoreBadge` partagée (score absent ≠ 0 rouge), 119 couleurs de
   statut → variables de score.
-- Preuves : `tsc` exit 0 ; `next build` exit 0 (87 pages).
+- Preuves : `tsc` exit 0 ; `next build` exit 0.
+
+### 2026-11-18 — 5.5 (suite) : pages compte restantes et Utilisateurs (admin)
+- Kit `components/ui` complété : `Switch` (role="switch", RTL), `SettingRow`, `TableShell` (défilement horizontal
+  sur mobile), `Th`/`Td`, `SkeletonRows`, `Segmented`, `IconButton`, `ErrorNote`, `ConfirmDialog` (Échap, clic
+  extérieur).
+- Support : textes français en dur → namespace `support` AR/EN/FR. FAQ corrigée d'après le code : limites
+  3 audits / 24 h avec compte et 1 sans compte (`analyses.service.ts`), multi-sites, alertes et API livrés (2.3, 2.6)
+  au lieu de « en cours de développement » ; durée « 20 à 40 s » et délais de réponse « 4 h / 24 h » retirés
+  (non mesurés). Liens `/#features` et `/#about` (ancres inexistantes) → `/fonctionnalites`, `/tarifs`, `/faq`.
+- Abonnement : carte du plan avec la liste de ses fonctions (traductions `pricing`), prix non affiché (les prix
+  réels viennent de `GET /plans`), liens avec la langue courante, objet du mail d'annulation encodé et traduit.
+- Paramètres : navigation latérale par sections, vrais interrupteurs accessibles, photo du compte Clerk si présente.
+- Admin Utilisateurs, abonnés, fenêtre abonné et fiche utilisateur : 220 styles en dur → kit. Corrigé : rouge
+  « erreur » utilisé comme couleur de sélection et d'avatar ; tableaux qui débordaient sur mobile ; liens sans la
+  langue ; `window.confirm()` natif → `ConfirmDialog` ; squelette 6 colonnes pour 7 ; clé React manquante
+  (fragment) dans la liste des sites ; statuts d'audit bruts (`completed`) → libellés français.
+- Preuves : `tsc` exit 0 ; `next build` exit 0.

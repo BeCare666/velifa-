@@ -1093,5 +1093,36 @@
       "title": "PDF with your brand",
       "desc": "Arabic or English PDF report with your agency's logo and colours (Business plan)."
     }
+  },
+  "support": {
+    "title": "Support",
+    "subtitleBusiness": "Your Business plan includes advanced priority support.",
+    "subtitlePro": "Your Pro plan includes priority support.",
+    "subtitleFree": "Find an answer or write to us.",
+    "badgeBusiness": "Advanced priority support",
+    "badgePro": "Priority support",
+    "faqTitle": "Quick questions",
+    "q1": "How does a VELIFA audit work?",
+    "a1": "VELIFA analyses your address with Google Lighthouse, on mobile and desktop: performance, accessibility, SEO, best practices and Core Web Vitals (LCP, CLS, TBT). The report also shows the detected platform and recommendations ranked by priority.",
+    "q2": "What's the difference between Free, Pro and Business?",
+    "a2": "Free: 3 audits per 24 h with an account (1 without). Pro: unlimited audits and full history. Business adds multi-site tracking with scheduled audits and email alerts, a PDF report with your agency brand, and the REST API.",
+    "q3": "Is my data secure?",
+    "a3": "Yes. Sign-in is handled by Clerk: VELIFA never stores your passwords. Analysed addresses are only used to produce the report.",
+    "q4": "Can I re-run an audit on the same address?",
+    "a4": "Yes. In \"My Audits\", the \"Relaunch\" button starts a new analysis of the same address.",
+    "q5": "How do I cancel my subscription?",
+    "a5": "In \"Subscription\", click \"Contact support\". You keep access until the end of the current period.",
+    "contactTitle": "Contact us",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "soon": "Coming soon",
+    "businessNote": "Business customer: put \"BUSINESS\" in the subject for priority handling.",
+    "linksTitle": "Useful links",
+    "linkFeatures": "Features",
+    "linkFeaturesDesc": "What VELIFA checks on your site.",
+    "linkPricing": "Pricing",
+    "linkPricingDesc": "Compare the plans.",
+    "linkFaq": "FAQ",
+    "linkFaqDesc": "All frequently asked questions."
   }
 }

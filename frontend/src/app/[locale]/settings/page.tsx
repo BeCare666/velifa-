@@ -3,56 +3,22 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
-import {
-  Loader2, User, Bell, AlertTriangle, Mail, Shield,
-  ToggleLeft, ToggleRight, Building2, KeyRound,
-} from 'lucide-react';
+import { Loader2, User, Bell, AlertTriangle, Mail, Shield, Building2, KeyRound } from 'lucide-react';
+import { PageHeader, Panel, Switch, SettingRow, Skeleton } from '@/components/ui';
 import WorkspaceSection from '@/components/settings/WorkspaceSection';
 import ApiKeysSection from '@/components/settings/ApiKeysSection';
 import { api } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 
-// ── Toggle ────────────────────────────────────────────────────────────────────
-function Toggle({ on, onToggle, label, description, enableLabel, disableLabel }: {
-  on: boolean; onToggle: () => void; label: string; description: string; enableLabel: string; disableLabel: string;
+// ── Section ancrée (navigation latérale) ─────────────────────────────────────
+function Section({ id, title, icon: Icon, children }: {
+  id: string; title: string; icon: React.ElementType; children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
-      <div>
-        <p className="text-sm font-medium text-text">{label}</p>
-        <p className="text-xs text-text-muted mt-0.5">{description}</p>
-      </div>
-      <button
-        onClick={onToggle}
-        aria-label={`${on ? disableLabel : enableLabel} ${label}`}
-        className="flex-shrink-0 transition-all"
-      >
-        {on
-          ? <ToggleRight className="w-8 h-8" style={{ color: 'var(--accent)' }} />
-          : <ToggleLeft  className="w-8 h-8 text-text-subtle" />
-        }
-      </button>
-    </div>
-  );
-}
-
-// ── Section wrapper ───────────────────────────────────────────────────────────
-function Section({ title, icon: Icon, children }: {
-  title: string; icon: React.ElementType; children: React.ReactNode;
-}) {
-  return (
-    <div
-      className="rounded-[var(--velifa-radius-lg)] overflow-hidden"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
-    >
-      <div
-        className="flex items-center gap-2 px-6 py-4"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
-        <Icon className="w-4 h-4 text-accent" strokeWidth={1.75} />
-        <h2 className="font-heading font-semibold text-sm text-text tracking-wide">{title}</h2>
-      </div>
-      <div className="px-6 py-5">{children}</div>
+    <div id={id} className="scroll-mt-24">
+      <Panel title={<span className="inline-flex items-center gap-2"><Icon className="h-4 w-4 text-text-muted" strokeWidth={1.75} />{title}</span>}>
+        {children}
+      </Panel>
     </div>
   );
 }
@@ -98,7 +64,7 @@ export default function SettingsPage() {
   if (!isLoaded || !isSignedIn) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-accent animate-spin" />
+        <Loader2 className="w-6 h-6 text-text-muted animate-spin" />
       </div>
     );
   }
@@ -107,145 +73,115 @@ export default function SettingsPage() {
   const email    = user?.primaryEmailAddress?.emailAddress ?? '';
   const initial  = (user?.firstName?.[0] ?? user?.username?.[0] ?? 'U').toUpperCase();
 
+  const sections = [
+    { id: 'profile',       label: t('profileTitle'),       icon: User },
+    { id: 'notifications', label: t('notificationsTitle'), icon: Bell },
+    { id: 'workspace',     label: t('workspace.title'),    icon: Building2 },
+    { id: 'api-keys',      label: t('apiKeys.title'),      icon: KeyRound },
+    { id: 'danger',        label: t('dangerTitle'),        icon: AlertTriangle },
+  ];
+
   return (
-    <>
-      <style jsx>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-      `}</style>
+    <div className="min-h-screen bg-bg">
+      <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+        <PageHeader title={t('title')} description={t('subtitle')} />
 
-      <div className="min-h-screen bg-bg">
-        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12 space-y-5">
+        <div className="grid gap-8 lg:grid-cols-[200px_minmax(0,1fr)]">
+          {/* Navigation des sections */}
+          <nav aria-label={t('title')} className="hidden lg:block">
+            <ul className="sticky top-8 space-y-0.5">
+              {sections.map(({ id, label, icon: Icon }) => (
+                <li key={id}>
+                  <a href={`#${id}`} className="flex items-center gap-2.5 rounded-velifa-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-[color:var(--surface)] hover:text-text">
+                    <Icon className="h-4 w-4" strokeWidth={1.75} />
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-          {/* Header */}
-          <div className="fade-up">
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">
-              {t('title')}
-            </h1>
-            <p className="text-text-muted mt-2 text-sm">{t('subtitle')}</p>
-          </div>
-
-          {/* Profil */}
-          <div className="fade-up" style={{ animationDelay: '60ms' }}>
-            <Section title={t('profileTitle')} icon={User}>
-              <div className="flex items-center gap-5">
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0"
-                  style={{
-                    background: 'rgb(var(--accent-rgb)/0.15)',
-                    color: 'var(--accent)',
-                    border: '2px solid rgb(var(--accent-rgb)/0.30)',
-                  }}
-                >
-                  {initial}
-                </div>
-                <div className="flex-1 min-w-0 space-y-3">
-                  <div>
-                    <label className="text-[10px] font-semibold tracking-widest uppercase text-text-subtle block mb-1">
-                      {t('fullName')}
-                    </label>
-                    <div
-                      className="px-3 py-2 rounded-[var(--velifa-radius-md)] text-sm text-text"
-                      style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-                    >
-                      {fullName}
-                    </div>
+          <div className="min-w-0 space-y-5">
+            <Section id="profile" title={t('profileTitle')} icon={User}>
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                {user?.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.imageUrl} alt="" className="h-16 w-16 flex-shrink-0 rounded-full border border-border object-cover" />
+                ) : (
+                  <div className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--surface-raised)] font-heading text-xl font-semibold text-text">
+                    {initial}
                   </div>
-                  <div>
-                    <label className="text-[10px] font-semibold tracking-widest uppercase text-text-subtle block mb-1">
-                      {t('email')}
-                    </label>
-                    <div
-                      className="flex items-center gap-2 px-3 py-2 rounded-[var(--velifa-radius-md)] text-sm"
-                      style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
-                    >
-                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-                      {email}
-                    </div>
-                    <p className="text-[11px] text-text-subtle mt-1">
-                      {t('emailNote')}
-                    </p>
+                )}
+                <dl className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2">
+                  <div className="min-w-0">
+                    <dt className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-text-subtle">{t('fullName')}</dt>
+                    <dd className="truncate rounded-velifa-md border border-border bg-[color:var(--surface-raised)] px-3 py-2 text-sm text-text">{fullName}</dd>
                   </div>
-                </div>
+                  <div className="min-w-0">
+                    <dt className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-text-subtle">{t('email')}</dt>
+                    <dd className="flex items-center gap-2 rounded-velifa-md border border-border bg-[color:var(--surface-raised)] px-3 py-2 text-sm text-text-muted">
+                      <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span className="truncate" dir="ltr">{email}</span>
+                    </dd>
+                  </div>
+                  <p className="text-xs text-text-subtle sm:col-span-2">{t('emailNote')}</p>
+                </dl>
               </div>
             </Section>
-          </div>
 
-          {/* Notifications (enregistrées côté serveur) */}
-          <div className="fade-up" style={{ animationDelay: '80ms' }}>
-            <Section title={t('notificationsTitle')} icon={Bell}>
+            <Section id="notifications" title={t('notificationsTitle')} icon={Bell}>
               {!prefs ? (
-                prefsError ? <p className="text-sm score-poor">{t('notifError')}</p> : <Loader2 className="w-5 h-5 text-accent animate-spin" />
+                prefsError
+                  ? <p className="text-sm score-poor">{t('notifError')}</p>
+                  : <div className="space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div>
               ) : (
                 <>
-                  <Toggle on={prefs.reports} onToggle={() => toggle('reports')} label={t('notif1Label')} description={t('notif1Desc')}
-                    enableLabel={t('enable')} disableLabel={t('disable')} />
-                  <Toggle on={prefs.alerts} onToggle={() => toggle('alerts')} label={t('notif2Label')} description={t('notif2Desc')}
-                    enableLabel={t('enable')} disableLabel={t('disable')} />
-                  {prefsError && <p className="text-sm score-poor mt-3">{t('notifError')}</p>}
+                  <SettingRow label={t('notif1Label')} description={t('notif1Desc')}>
+                    <Switch checked={prefs.reports} onChange={() => toggle('reports')} label={`${prefs.reports ? t('disable') : t('enable')} ${t('notif1Label')}`} />
+                  </SettingRow>
+                  <SettingRow label={t('notif2Label')} description={t('notif2Desc')}>
+                    <Switch checked={prefs.alerts} onChange={() => toggle('alerts')} label={`${prefs.alerts ? t('disable') : t('enable')} ${t('notif2Label')}`} />
+                  </SettingRow>
+                  {prefsError && <p className="mt-3 text-sm score-poor">{t('notifError')}</p>}
                 </>
               )}
             </Section>
-          </div>
 
-          {/* Mon agence (offre B) */}
-          <div className="fade-up" style={{ animationDelay: '100ms' }}>
-            <Section title={t('workspace.title')} icon={Building2}>
+            <Section id="workspace" title={t('workspace.title')} icon={Building2}>
               <WorkspaceSection />
             </Section>
-          </div>
 
-          {/* Clés API (API publique v1) */}
-          <div className="fade-up" style={{ animationDelay: '120ms' }}>
-            <Section title={t('apiKeys.title')} icon={KeyRound}>
+            <Section id="api-keys" title={t('apiKeys.title')} icon={KeyRound}>
               <ApiKeysSection />
             </Section>
-          </div>
 
-          {/* Danger zone */}
-          <div className="fade-up" style={{ animationDelay: '140ms' }}>
-            <Section title={t('dangerTitle')} icon={AlertTriangle}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div id="danger" className="scroll-mt-24 rounded-velifa-lg border p-5 sm:p-6" style={{ borderColor: 'var(--velifa-score-poor-bg)' }}>
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                  <p className="text-sm font-medium text-text">{t('deleteAccount')}</p>
-                  <p className="text-xs text-text-muted mt-0.5">
-                    {t('deleteAccountDesc')}
+                  <p className="inline-flex items-center gap-2 text-sm font-semibold score-poor">
+                    <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
+                    {t('dangerTitle')}
                   </p>
+                  <p className="mt-2 text-sm font-medium text-text">{t('deleteAccount')}</p>
+                  <p className="mt-0.5 text-xs text-text-muted">{t('deleteAccountDesc')}</p>
                 </div>
-                <div className="relative group">
+                <div className="flex flex-col items-start gap-1.5 sm:items-end">
                   <button
+                    type="button"
                     disabled
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--velifa-radius-md)] text-xs font-semibold cursor-not-allowed opacity-50"
-                    style={{
-                      background: 'rgba(255,78,66,0.10)',
-                      border: '1px solid rgba(255,78,66,0.30)',
-                      color: 'var(--velifa-score-poor)',
-                    }}
+                    className="inline-flex cursor-not-allowed items-center gap-2 rounded-velifa-md px-4 py-2 text-xs font-semibold opacity-60"
+                    style={{ background: 'var(--velifa-score-poor-bg)', color: 'var(--velifa-score-poor)' }}
                   >
-                    <Shield className="w-3.5 h-3.5" />
+                    <Shield className="h-3.5 w-3.5" />
                     {t('deleteAccount')}
                   </button>
-                  <div
-                    className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 text-xs rounded-[8px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{
-                      background: 'var(--surface-raised)',
-                      color: 'var(--text)',
-                      border: '1px solid var(--border)',
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.55)',
-                    }}
-                  >
-                    {t('deleteTooltip')}
-                  </div>
+                  <p className="text-[11px] text-text-subtle">{t('deleteTooltip')}</p>
                 </div>
               </div>
-            </Section>
+            </div>
           </div>
-
         </div>
       </div>
-    </>
+    </div>
   );
 }

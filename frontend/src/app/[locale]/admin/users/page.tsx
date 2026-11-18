@@ -2,79 +2,65 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { Search, ChevronLeft, ChevronRight, RefreshCw, Download, BarChart2, Ban, CheckCircle2, User } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import { Search, ChevronLeft, ChevronRight, RefreshCw, Download, BarChart2, Ban, CheckCircle2, User, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { ToastContainer, toast } from '@/components/admin/AdminToast';
 import SubscribersTable from '@/components/admin/SubscribersTable';
+import {
+  PageHeader, Badge, TableShell, Th, Td, SkeletonRows, Segmented, IconButton, ErrorNote, ConfirmDialog, EmptyState,
+} from '@/components/ui';
+
+const PAGE_SIZE = 20;
+const PLAN_LABEL: Record<string, string> = { free: 'Gratuit', pro: 'Pro', business: 'Business' };
+type PlanFilter = 'all' | 'free' | 'pro' | 'business';
 
 function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
-  const cfg: Record<string, { label: string; color: string; bg: string }> = {
-    pro:      { label: 'Pro',      color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.12)' },
-    business: { label: 'Business', color: 'var(--text)', bg: 'rgb(var(--accent-rgb)/0.10)' },
-    free:     { label: 'Gratuit',  color: 'rgb(var(--accent-rgb)/0.35)', bg: 'rgb(var(--accent-rgb)/0.05)' },
-  };
-  const { label, color, bg } = cfg[p] ?? cfg.free;
-  return <span style={{ fontSize: 10, fontWeight: 600, color, background: bg, borderRadius: 99, padding: '3px 8px' }}>{label}</span>;
+  if (p === 'free') return <Badge>{PLAN_LABEL.free}</Badge>;
+  return (
+    <span className="inline-flex items-center rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] font-semibold text-text ring-1 ring-inset ring-[color:var(--border-strong)]">
+      {PLAN_LABEL[p] ?? p}
+    </span>
+  );
 }
 
 const fmtDate = (v: any) =>
   v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
-// ── Confirm dialog ────────────────────────────────────────────────────────────
-function ConfirmDialog({ msg, onConfirm, onCancel }: { msg: string; onConfirm: () => void; onCancel: () => void }) {
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      onClick={onCancel}>
-      <div style={{ background: 'var(--surface)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 14, padding: 28, maxWidth: 380, width: '90%', animation: 'popIn .2s cubic-bezier(.22,1,.36,1)' }}
-        onClick={e => e.stopPropagation()}>
-        <p style={{ fontSize: 15, color: 'rgb(var(--accent-rgb)/0.85)', marginBottom: 20, lineHeight: 1.5 }}>{msg}</p>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-          <button onClick={onCancel} style={{ height: 34, padding: '0 18px', borderRadius: 8, fontSize: 13, cursor: 'pointer', background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.10)', color: 'rgb(var(--accent-rgb)/0.60)' }}>
-            Annuler
-          </button>
-          <button onClick={onConfirm} style={{ height: 34, padding: '0 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--velifa-score-poor)' }}>
-            Confirmer
-          </button>
-        </div>
-      </div>
-      <style>{`@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}`}</style>
-    </div>
-  );
-}
-
 export default function AdminUsersPage() {
   const { getToken } = useAuth();
+  const locale = useLocale();
   const [data, setData]         = useState<any>(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
   const [page, setPage]         = useState(1);
   const [search, setSearch]     = useState('');
-  const [planFilter, setPlan]   = useState('all');
+  const [planFilter, setPlan]   = useState<PlanFilter>('all');
   const [changing, setChanging]   = useState<string | null>(null);
   const [suspending, setSuspending] = useState<string | null>(null);
   const [confirm, setConfirm]   = useState<{ clerkId: string; plan: string; msg: string } | null>(null);
   const [confirmSuspend, setConfirmSuspend] = useState<{ clerkId: string; action: 'suspend' | 'unsuspend'; msg: string } | null>(null);
 
-  const load = useCallback(async (p = page, s = search, pl = planFilter) => {
+  const load = useCallback(async (p = page, s = search, pl: string = planFilter) => {
     setLoading(true); setError('');
     try {
       const token = await getToken().catch(() => null);
-      const res = await api.admin.getUsers(token, { page: String(p), search: s, plan: pl, limit: '20' });
+      const res = await api.admin.getUsers(token, { page: String(p), search: s, plan: pl, limit: String(PAGE_SIZE) });
       setData(res?.data ?? res);
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }, [getToken, page, search, planFilter]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [page, planFilter]);
 
   function requestPlanChange(clerkId: string, newPlan: string, currentPlan: string) {
     if (newPlan === (currentPlan ?? 'free')) return;
-    const planLabel: Record<string, string> = { free: 'Gratuit', pro: 'Pro', business: 'Business' };
     setConfirm({
       clerkId, plan: newPlan,
-      msg: `Changer le plan de cet utilisateur de "${planLabel[currentPlan ?? 'free']}" vers "${planLabel[newPlan]}" ?`,
+      msg: `Changer le plan de cet utilisateur de « ${PLAN_LABEL[currentPlan ?? 'free']} » vers « ${PLAN_LABEL[newPlan]} » ?`,
     });
   }
 
@@ -85,9 +71,9 @@ export default function AdminUsersPage() {
     setChanging(clerkId);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       await api.admin.updatePlan(token, clerkId, plan);
-      toast(`Plan mis a jour : ${plan}`, 'success');
+      toast(`Plan mis à jour : ${PLAN_LABEL[plan] ?? plan}`, 'success');
       await load();
     } catch (e: any) { toast(e.message ?? 'Erreur', 'error'); }
     finally { setChanging(null); }
@@ -100,200 +86,183 @@ export default function AdminUsersPage() {
     setSuspending(clerkId);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       if (action === 'suspend') {
         await api.admin.suspendUser(token, clerkId);
         toast('Compte suspendu', 'success');
       } else {
         await api.admin.unsuspendUser(token, clerkId);
-        toast('Compte reactive', 'success');
+        toast('Compte réactivé', 'success');
       }
       await load();
     } catch (e: any) { toast(e.message ?? 'Erreur', 'error'); }
     finally { setSuspending(null); }
   }
 
-  const totalPages = data ? Math.ceil(data.total / 20) : 1;
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
+  const users: any[] = data?.users ?? [];
 
   return (
     <>
       <ToastContainer />
-      {confirm && <ConfirmDialog msg={confirm.msg} onConfirm={executePlanChange} onCancel={() => setConfirm(null)} />}
-      {confirmSuspend && <ConfirmDialog msg={confirmSuspend.msg} onConfirm={executeSuspend} onCancel={() => setConfirmSuspend(null)} />}
+      {confirm && (
+        <ConfirmDialog message={confirm.msg} confirmLabel="Confirmer" cancelLabel="Annuler" danger={false}
+          onConfirm={executePlanChange} onCancel={() => setConfirm(null)} />
+      )}
+      {confirmSuspend && (
+        <ConfirmDialog message={confirmSuspend.msg} confirmLabel="Confirmer" cancelLabel="Annuler" danger={confirmSuspend.action === 'suspend'}
+          onConfirm={executeSuspend} onCancel={() => setConfirmSuspend(null)} />
+      )}
 
       <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-        <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
-            <div>
-              <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-[28px]">Utilisateurs</h1>
-              <p style={{ fontSize: 13, color: 'rgb(var(--accent-rgb)/0.38)', marginTop: 4 }}>
-                {data ? `${data.total} utilisateurs au total` : '...'}
-              </p>
-            </div>
-            <button type="button"
-              onClick={async () => {
-                try { await api.admin.exportUsers(await getToken()); }
-                catch (e: any) { toast(e.message ?? 'Export impossible', 'error'); }
-              }}
-              style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.55)', textDecoration: 'none' }}>
-              <Download style={{ width: 13, height: 13 }} /> Exporter CSV
-            </button>
-          </div>
+        <div className="mx-auto max-w-[1600px]">
+          <PageHeader
+            eyebrow="Administration"
+            title="Utilisateurs"
+            description={data ? `${data.total} utilisateurs au total` : 'Chargement…'}
+            actions={
+              <button
+                type="button"
+                onClick={async () => {
+                  try { await api.admin.exportUsers(await getToken()); }
+                  catch (e: any) { toast(e.message ?? 'Export impossible', 'error'); }
+                }}
+                className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" /> Exporter CSV
+              </button>
+            }
+          />
 
           <SubscribersTable />
 
-          {/* Toolbar */}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: '1 1 240px', maxWidth: 360 }}>
-              <Search style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 13, height: 13, color: 'rgb(var(--accent-rgb)/0.30)' }} />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { setPage(1); load(1, search, planFilter); } }}
-                placeholder="Rechercher par Clerk ID..."
-                style={{ width: '100%', paddingLeft: 32, paddingRight: 12, height: 36, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, color: 'rgb(var(--accent-rgb)/0.80)', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-            {['all', 'free', 'pro', 'business'].map(p => (
-              <button key={p} onClick={() => { setPlan(p); setPage(1); load(1, search, p); }}
-                style={{ height: 36, padding: '0 16px', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', background: planFilter === p ? 'rgba(239,68,68,0.12)' : 'rgb(var(--accent-rgb)/0.04)', border: `1px solid ${planFilter === p ? 'rgba(239,68,68,0.30)' : 'rgb(var(--accent-rgb)/0.09)'}`, color: planFilter === p ? 'var(--velifa-score-poor)' : 'rgb(var(--accent-rgb)/0.55)', transition: 'all 150ms' }}>
-                {p === 'all' ? 'Tous' : p.charAt(0).toUpperCase() + p.slice(1)}
-              </button>
-            ))}
-            <button onClick={() => load()} style={{ height: 36, width: 36, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)' }}>
-              <RefreshCw style={{ width: 14, height: 14 }} />
-            </button>
+          {/* Barre d'outils */}
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <form
+              className="relative w-full sm:max-w-sm sm:flex-1"
+              onSubmit={(e) => { e.preventDefault(); setPage(1); load(1, search, planFilter); }}
+            >
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-subtle" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher par Clerk ID… (Entrée)"
+                dir="ltr"
+                className="h-10 w-full rounded-velifa-md border border-border bg-[color:var(--surface)] pe-3 ps-9 text-sm text-text placeholder:text-text-subtle focus:border-[color:var(--border-strong)] focus:outline-none"
+              />
+            </form>
+            <Segmented<PlanFilter>
+              label="Filtrer par plan"
+              value={planFilter}
+              onChange={(p) => { setPlan(p); setPage(1); }}
+              options={[
+                { value: 'all', label: 'Tous' },
+                { value: 'free', label: 'Gratuit' },
+                { value: 'pro', label: 'Pro' },
+                { value: 'business', label: 'Business' },
+              ]}
+            />
+            <IconButton icon={RefreshCw} label="Rafraîchir" onClick={() => load()} spinning={loading} />
           </div>
 
-          {error && (
-            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '10px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 16 }}>
-              ⚠️ {error}
-            </div>
-          )}
+          {error && <ErrorNote>{error}</ErrorNote>}
 
-          {/* Table */}
-          <div style={{ background: 'rgb(var(--accent-rgb)/0.02)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          {!loading && !error && users.length === 0 ? (
+            <EmptyState icon={User} title="Aucun utilisateur" description="Aucun compte ne correspond à ces critères." />
+          ) : (
+            <TableShell minWidth={900}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.07)' }}>
-                  {['Utilisateur', 'Plan', 'Statut', 'Audits', 'Dernière activité', 'Suspension', 'Actions'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.28)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
-                  ))}
+                <tr>
+                  {['Utilisateur', 'Plan', 'Statut', 'Audits', 'Dernière activité', 'Suspension', 'Actions'].map((h) => <Th key={h}>{h}</Th>)}
                 </tr>
               </thead>
               <tbody>
-                {loading
-                  ? Array.from({ length: 8 }).map((_, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
-                        {Array.from({ length: 6 }).map((_, j) => (
-                          <td key={j} style={{ padding: '14px 16px' }}>
-                            <div style={{ height: 14, borderRadius: 4, background: 'rgb(var(--accent-rgb)/0.06)', width: j === 0 ? '70%' : '50%', animation: 'pulse 1.5s ease-in-out infinite' }} />
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  : (data?.users ?? []).map((u: any, i: number) => (
-                      <tr key={u.clerkUserId} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', background: i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)', transition: 'background 150ms' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = i % 2 === 0 ? 'transparent' : 'rgb(var(--accent-rgb)/0.01)'; }}>
-
-                        <td style={{ padding: '11px 16px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: u.suspended ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.10)', border: `1px solid ${u.suspended ? 'rgba(239,68,68,0.35)' : 'rgba(239,68,68,0.18)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'var(--velifa-score-poor)' }}>
-                              {(u.clerkUserId ?? 'U').slice(-2).toUpperCase()}
-                            </div>
-                            <div style={{ minWidth: 0 }}>
-                              <span style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.55)', fontFamily: 'monospace', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-                                {u.clerkUserId}
-                              </span>
-                              {u.suspended && (
-                                <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)' }}>SUSPENDU</span>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-
-                        <td style={{ padding: '11px 16px' }}><PlanBadge plan={u.plan} /></td>
-
-                        <td style={{ padding: '11px 16px' }}>
-                          <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 8px', background: u.status === 'active' ? 'rgba(34,197,94,0.10)' : 'rgb(var(--accent-rgb)/0.05)', color: u.status === 'active' ? 'var(--velifa-score-good)' : 'rgb(var(--accent-rgb)/0.35)' }}>
-                            {u.status ?? 'inactive'}
-                          </span>
-                        </td>
-
-                        <td style={{ padding: '11px 16px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.60)', fontWeight: 600 }}>{u.auditCount}</td>
-
-                        <td style={{ padding: '11px 16px', fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>{fmtDate(u.updatedAt)}</td>
-
-                        {/* Suspension */}
-                        <td style={{ padding: '11px 16px' }}>
-                          {u.suspended ? (
-                            <button onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'unsuspend', msg: `Reactiver le compte ${u.clerkUserId.slice(-8)} ?` })}
-                              disabled={suspending === u.clerkUserId}
-                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: 'var(--velifa-score-good)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <CheckCircle2 style={{ width: 10, height: 10 }} /> Reactiver
-                            </button>
-                          ) : (
-                            <button onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'suspend', msg: `Suspendre ${u.clerkUserId.slice(-8)} ? Il ne pourra plus lancer d'audits.` })}
-                              disabled={suspending === u.clerkUserId}
-                              style={{ height: 26, padding: '0 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, cursor: 'pointer', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.18)', color: 'var(--velifa-score-poor)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <Ban style={{ width: 10, height: 10 }} /> Suspendre
-                            </button>
-                          )}
-                        </td>
-
-                        <td style={{ padding: '11px 16px' }}>
-                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                            {/* Changer plan */}
-                            <div style={{ position: 'relative' }}>
-                              <select value={u.plan ?? 'free'} disabled={changing === u.clerkUserId}
-                                onChange={e => requestPlanChange(u.clerkUserId, e.target.value, u.plan)}
-                                style={{ background: 'rgb(var(--accent-rgb)/0.05)', border: '1px solid rgb(var(--accent-rgb)/0.12)', borderRadius: 6, color: 'rgb(var(--accent-rgb)/0.70)', fontSize: 11, padding: '4px 8px', cursor: 'pointer', outline: 'none' }}>
-                                <option value="free">Gratuit</option>
-                                <option value="pro">Pro</option>
-                                <option value="business">Business</option>
-                              </select>
-                              {changing === u.clerkUserId && (
-                                <div style={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)', width: 12, height: 12, borderRadius: '50%', border: '2px solid rgb(var(--accent-rgb)/0.30)', borderTopColor: 'var(--accent)', animation: 'spin 0.8s linear infinite' }} />
-                              )}
-                            </div>
-                            {/* Profil utilisateur */}
-                            <Link href={`/admin/users/${u.clerkUserId}`}
-                              style={{ height: 28, width: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', textDecoration: 'none', transition: 'all 150ms', flexShrink: 0 }}
-                              title="Profil utilisateur"
-                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgba(239,68,68,0.30)'; e.currentTarget.style.color = 'var(--velifa-score-poor)'; }}
-                              onMouseLeave={(e: any) => { e.currentTarget.style.borderColor = 'rgb(var(--accent-rgb)/0.09)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'; }}>
-                              <User style={{ width: 12, height: 12 }} />
-                            </Link>
-                            {/* Voir audits */}
-                            <Link href={`/admin/audits?user=${u.clerkUserId}`}
-                              style={{ height: 28, width: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.40)', textDecoration: 'none', transition: 'all 150ms', flexShrink: 0 }}
-                              title="Voir ses audits"
-                              onMouseEnter={(e: any) => { e.currentTarget.style.borderColor = 'rgb(var(--accent-rgb)/0.30)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                              onMouseLeave={(e: any) => { e.currentTarget.style.borderColor = 'rgb(var(--accent-rgb)/0.09)'; e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'; }}>
-                              <BarChart2 style={{ width: 12, height: 12 }} />
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                }
+                {loading ? <SkeletonRows rows={8} cols={7} /> : users.map((u: any) => (
+                  <tr key={u.clerkUserId} className="transition-colors hover:bg-[color:var(--surface-raised)]">
+                    <Td>
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg-subtle)] text-[10px] font-semibold text-text-muted">
+                          {(u.clerkUserId ?? 'U').slice(-2).toUpperCase()}
+                        </span>
+                        <div className="min-w-0">
+                          <Link
+                            href={`/${locale}/admin/users/${u.clerkUserId}`}
+                            className="block max-w-[200px] truncate font-mono text-xs text-text hover:underline"
+                            dir="ltr"
+                          >
+                            {u.clerkUserId}
+                          </Link>
+                          {u.suspended && <span className="mt-1 inline-block"><Badge tone="poor">Suspendu</Badge></span>}
+                        </div>
+                      </div>
+                    </Td>
+                    <Td><PlanBadge plan={u.plan} /></Td>
+                    <Td>
+                      {u.status === 'active' ? <Badge tone="good">Actif</Badge> : <Badge>{u.status ?? 'inactif'}</Badge>}
+                    </Td>
+                    <Td className="font-semibold tabular-nums text-text">{u.auditCount}</Td>
+                    <Td className="whitespace-nowrap text-xs text-text-muted">{fmtDate(u.updatedAt)}</Td>
+                    <Td>
+                      {u.suspended ? (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'unsuspend', msg: `Réactiver le compte …${u.clerkUserId.slice(-8)} ?` })}
+                          disabled={suspending === u.clerkUserId}
+                          className="inline-flex h-7 items-center gap-1.5 rounded-[7px] px-2.5 text-[11px] font-semibold disabled:opacity-50"
+                          style={{ color: 'var(--velifa-score-good)', background: 'var(--velifa-score-good-bg)' }}
+                        >
+                          {suspending === u.clerkUserId ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />} Réactiver
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmSuspend({ clerkId: u.clerkUserId, action: 'suspend', msg: `Suspendre …${u.clerkUserId.slice(-8)} ? Ce compte ne pourra plus lancer d'audits.` })}
+                          disabled={suspending === u.clerkUserId}
+                          className="inline-flex h-7 items-center gap-1.5 rounded-[7px] border border-border px-2.5 text-[11px] font-medium text-text-muted transition-colors hover:text-[color:var(--velifa-score-poor)] disabled:opacity-50"
+                        >
+                          {suspending === u.clerkUserId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Ban className="h-3 w-3" />} Suspendre
+                        </button>
+                      )}
+                    </Td>
+                    <Td>
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <select
+                            aria-label="Changer le plan"
+                            value={u.plan ?? 'free'}
+                            disabled={changing === u.clerkUserId}
+                            onChange={(e) => requestPlanChange(u.clerkUserId, e.target.value, u.plan)}
+                            className="h-8 cursor-pointer rounded-[8px] border border-border bg-[color:var(--surface)] px-2 text-xs text-text focus:outline-none disabled:opacity-50"
+                          >
+                            <option value="free">Gratuit</option>
+                            <option value="pro">Pro</option>
+                            <option value="business">Business</option>
+                          </select>
+                        </div>
+                        {changing === u.clerkUserId && <Loader2 className="h-3.5 w-3.5 animate-spin text-text-muted" />}
+                        <Link href={`/${locale}/admin/users/${u.clerkUserId}`} title="Profil utilisateur" aria-label="Profil utilisateur"
+                          className="grid h-8 w-8 place-items-center rounded-[8px] border border-border text-text-muted transition-colors hover:border-[color:var(--border-strong)] hover:text-text">
+                          <User className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        </Link>
+                        <Link href={`/${locale}/admin/audits?user=${u.clerkUserId}`} title="Voir ses audits" aria-label="Voir ses audits"
+                          className="grid h-8 w-8 place-items-center rounded-[8px] border border-border text-text-muted transition-colors hover:border-[color:var(--border-strong)] hover:text-text">
+                          <BarChart2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        </Link>
+                      </div>
+                    </Td>
+                  </tr>
+                ))}
               </tbody>
-            </table>
-          </div>
+            </TableShell>
+          )}
 
           {/* Pagination */}
           {!loading && totalPages > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-              <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.35)' }}>Page {page} / {totalPages} — {data?.total} utilisateurs</p>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
-                  style={{ height: 32, width: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: page <= 1 ? 'rgb(var(--accent-rgb)/0.18)' : 'rgb(var(--accent-rgb)/0.55)', cursor: page <= 1 ? 'not-allowed' : 'pointer' }}>
-                  <ChevronLeft style={{ width: 14, height: 14 }} />
-                </button>
-                <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}
-                  style={{ height: 32, width: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: page >= totalPages ? 'rgb(var(--accent-rgb)/0.18)' : 'rgb(var(--accent-rgb)/0.55)', cursor: page >= totalPages ? 'not-allowed' : 'pointer' }}>
-                  <ChevronRight style={{ width: 14, height: 14 }} />
-                </button>
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-xs text-text-muted tabular-nums">Page {page} / {totalPages} — {data?.total} utilisateurs</p>
+              <div className="flex gap-2">
+                <IconButton icon={ChevronLeft} label="Page précédente" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} />
+                <IconButton icon={ChevronRight} label="Page suivante" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} />
               </div>
             </div>
           )}

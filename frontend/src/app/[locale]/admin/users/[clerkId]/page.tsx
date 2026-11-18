@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { ChevronLeft, TrendingUp, AlertTriangle, BarChart2, Ban, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, BarChart2, Ban, CheckCircle2, Loader2, Globe, UserX } from 'lucide-react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { api } from '@/lib/api';
-import { ScoreBadge } from '@/components/ui';
+import {
+  ScoreBadge, Panel, StatCard, Badge, Skeleton, EmptyState, TableShell, Th, Td, ErrorNote, ConfirmDialog,
+} from '@/components/ui';
 import { ToastContainer, toast } from '@/components/admin/AdminToast';
 
 const scoreColor = (s: number) =>
@@ -22,35 +24,29 @@ const fmtDate = (v: any) =>
 const fmtDay = (v: any) =>
   v ? new Date(v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
 
+const STATUS: Record<string, { label: string; tone: 'good' | 'poor' | 'average' }> = {
+  completed:  { label: 'Terminé',  tone: 'good' },
+  failed:     { label: 'Échoué',   tone: 'poor' },
+  pending:    { label: 'En attente', tone: 'average' },
+  processing: { label: 'En cours', tone: 'average' },
+};
 
 function PlanBadge({ plan }: { plan: string | null }) {
   const p = plan ?? 'free';
-  const cfg: Record<string, { label: string; color: string; bg: string }> = {
-    pro:      { label: 'Pro',      color: 'var(--accent)', bg: 'rgb(var(--accent-rgb)/0.12)' },
-    business: { label: 'Business', color: 'var(--text)', bg: 'rgb(var(--accent-rgb)/0.10)' },
-    free:     { label: 'Gratuit',  color: 'rgb(var(--accent-rgb)/0.35)', bg: 'rgb(var(--accent-rgb)/0.05)' },
-  };
-  const { label, color, bg } = cfg[p] ?? cfg.free;
-  return <span style={{ fontSize: 11, fontWeight: 600, color, background: bg, borderRadius: 99, padding: '4px 10px' }}>{label}</span>;
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  if (p === 'free') return <Badge>Gratuit</Badge>;
   return (
-    <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ padding: '12px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
-        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgb(var(--accent-rgb)/0.35)', margin: 0 }}>{title}</p>
-      </div>
-      {children}
-    </div>
+    <span className="inline-flex items-center rounded-full bg-[color:var(--surface-raised)] px-2 py-0.5 text-[11px] font-semibold text-text ring-1 ring-inset ring-[color:var(--border-strong)]">
+      {p === 'business' ? 'Business' : 'Pro'}
+    </span>
   );
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'var(--surface-raised)', border: '1px solid rgb(var(--accent-rgb)/0.10)', borderRadius: 8, padding: '10px 14px', fontSize: 12 }}>
-      <p style={{ color: 'rgb(var(--accent-rgb)/0.55)', margin: '0 0 4px' }}>{fmtDay(label)}</p>
-      <p style={{ color: 'var(--accent)', margin: 0 }}>Score : <strong>{payload[0]?.value}</strong></p>
+    <div className="rounded-[8px] border border-border bg-[color:var(--surface-raised)] px-3 py-2 text-xs shadow-velifa-md">
+      <p className="mb-1 text-text-muted">{fmtDay(label)}</p>
+      <p className="text-text">Score : <strong className="tabular-nums">{payload[0]?.value}</strong></p>
     </div>
   );
 };
@@ -58,10 +54,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function UserDetailPage() {
   const { clerkId } = useParams<{ clerkId: string }>();
   const { getToken } = useAuth();
+  const locale = useLocale();
   const [data, setData]         = useState<any>(null);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [askSuspend, setAskSuspend] = useState(false);
 
   async function load() {
     setLoading(true); setError('');
@@ -73,14 +71,15 @@ export default function UserDetailPage() {
     finally { setLoading(false); }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [clerkId]);
 
   async function handleSuspend() {
-    if (!confirm(`Suspendre ce compte ? L'utilisateur ne pourra plus lancer d'audits.`)) return;
+    setAskSuspend(false);
     setActionLoading(true);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       await api.admin.suspendUser(token, clerkId);
       toast('Compte suspendu', 'success');
       load();
@@ -92,9 +91,9 @@ export default function UserDetailPage() {
     setActionLoading(true);
     try {
       const token = await getToken();
-      if (!token) { toast('Token manquant', 'error'); return; }
+      if (!token) { toast('Session expirée, reconnectez-vous', 'error'); return; }
       await api.admin.unsuspendUser(token, clerkId);
-      toast('Compte reactive', 'success');
+      toast('Compte réactivé', 'success');
       load();
     } catch (e: any) { toast(e.message, 'error'); }
     finally { setActionLoading(false); }
@@ -109,177 +108,145 @@ export default function UserDetailPage() {
   return (
     <>
       <ToastContainer />
+      {askSuspend && (
+        <ConfirmDialog
+          message="Suspendre ce compte ? L'utilisateur ne pourra plus lancer d'audits."
+          confirmLabel="Suspendre" cancelLabel="Annuler"
+          onConfirm={handleSuspend} onCancel={() => setAskSuspend(false)}
+        />
+      )}
       <div className="min-h-screen bg-bg px-5 pb-16 pt-8 sm:px-8">
-        <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
-        <div style={{ maxWidth: 1600, margin: '0 auto' }}>
-
-          {/* Back */}
-          <Link href="/admin/users" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgb(var(--accent-rgb)/0.40)', fontSize: 12, textDecoration: 'none', marginBottom: 20, transition: 'color 150ms' }}
-            onMouseEnter={(e: any) => e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.70)'}
-            onMouseLeave={(e: any) => e.currentTarget.style.color = 'rgb(var(--accent-rgb)/0.40)'}>
-            <ChevronLeft style={{ width: 14, height: 14 }} /> Retour aux utilisateurs
+        <div className="mx-auto max-w-[1600px]">
+          <Link href={`/${locale}/admin/users`} className="mb-6 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-text">
+            <ChevronLeft className="h-3.5 w-3.5 rtl:-scale-x-100" /> Retour aux utilisateurs
           </Link>
 
-          {error && (
-            <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.22)', borderRadius: 10, padding: '12px 16px', color: 'var(--velifa-score-poor)', fontSize: 13, marginBottom: 20 }}>
-              ⚠️ {error}
-            </div>
-          )}
+          {error && <ErrorNote>{error}</ErrorNote>}
 
           {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {[100, 120, 200].map((h, i) => (
-                <div key={i} style={{ height: h, borderRadius: 12, background: 'rgb(var(--accent-rgb)/0.04)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-              ))}
+            <div className="space-y-4">
+              <Skeleton className="h-28 w-full rounded-velifa-lg" />
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-5">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-velifa-lg" />)}</div>
+              <Skeleton className="h-64 w-full rounded-velifa-lg" />
             </div>
           ) : user ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-              {/* Header utilisateur */}
-              <div style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 12, padding: '20px 24px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: 'var(--velifa-score-poor)', flexShrink: 0 }}>
-                      {clerkId.slice(-2).toUpperCase()}
+            <div className="space-y-5">
+              {/* En-tête utilisateur */}
+              <section className="flex flex-col gap-5 rounded-velifa-xl border border-border bg-[color:var(--surface)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                <div className="flex min-w-0 items-center gap-4">
+                  <span className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-full border border-border bg-[color:var(--bg-subtle)] font-heading text-lg font-semibold text-text">
+                    {clerkId.slice(-2).toUpperCase()}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate font-mono text-sm font-semibold text-text" dir="ltr">{clerkId}</p>
+                      {user.suspended && <Badge tone="poor">Suspendu</Badge>}
                     </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.85)', margin: 0, fontFamily: 'monospace' }}>{clerkId}</p>
-                        {user.suspended && (
-                          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(239,68,68,0.15)', color: 'var(--velifa-score-poor)', border: '1px solid rgba(239,68,68,0.30)', letterSpacing: '0.06em' }}>SUSPENDU</span>
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <PlanBadge plan={user.plan} />
-                        <span style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.35)' }}>
-                          Dernière activité : {fmtDate(user.updatedAt)}
-                        </span>
-                        {user.suspended && user.suspendedAt && (
-                          <span style={{ fontSize: 11, color: 'var(--velifa-score-poor)' }}>
-                            Suspendu le {fmtDate(user.suspendedAt)}
-                          </span>
-                        )}
-                      </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      <PlanBadge plan={user.plan} />
+                      <span className="text-xs text-text-muted">Dernière activité : {fmtDate(user.updatedAt)}</span>
+                      {user.suspended && user.suspendedAt && (
+                        <span className="text-xs score-poor">Suspendu le {fmtDate(user.suspendedAt)}</span>
+                      )}
                     </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <Link href={`/admin/audits?user=${clerkId}`}
-                      style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgb(var(--accent-rgb)/0.04)', border: '1px solid rgb(var(--accent-rgb)/0.09)', color: 'rgb(var(--accent-rgb)/0.55)', textDecoration: 'none' }}>
-                      <BarChart2 style={{ width: 13, height: 13 }} /> Voir audits
-                    </Link>
-                    {user.suspended ? (
-                      <button onClick={handleUnsuspend} disabled={actionLoading}
-                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)', color: 'var(--velifa-score-good)' }}>
-                        <CheckCircle2 style={{ width: 13, height: 13 }} /> Reactiver
-                      </button>
-                    ) : (
-                      <button onClick={handleSuspend} disabled={actionLoading}
-                        style={{ height: 34, padding: '0 14px', borderRadius: 8, fontSize: 12, cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: 'var(--velifa-score-poor)' }}>
-                        <Ban style={{ width: 13, height: 13 }} /> Suspendre
-                      </button>
-                    )}
                   </div>
                 </div>
-              </div>
-
-              {/* Stats KPIs */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
-                {[
-                  { label: 'Total audits',  value: stats?.totalAudits ?? 0,    color: 'rgb(var(--accent-rgb)/0.80)' },
-                  { label: 'Réussis',       value: stats?.completedAudits ?? 0, color: 'var(--velifa-score-good)' },
-                  { label: 'Échoués',       value: stats?.failedAudits ?? 0,    color: 'var(--velifa-score-poor)' },
-                  { label: 'Score moyen',   value: stats?.avgScore ? `${stats.avgScore}/100` : '—', color: stats?.avgScore ? scoreColor(stats.avgScore) : 'rgb(var(--accent-rgb)/0.40)' },
-                  { label: 'Sites analyses', value: sites.length, color: 'var(--accent)' },
-                ].map(s => (
-                  <div key={s.label} style={{ background: 'rgb(var(--accent-rgb)/0.025)', border: '1px solid rgb(var(--accent-rgb)/0.07)', borderRadius: 10, padding: '14px 18px' }}>
-                    <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>{s.label}</p>
-                    <p style={{ fontSize: 22, fontWeight: 700, color: s.color, margin: 0 }}>{s.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-                {/* Sites */}
-                <Card title="Sites analyses">
-                  {sites.length === 0 ? (
-                    <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun site analyse</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href={`/${locale}/admin/audits?user=${clerkId}`} className="velifa-btn velifa-btn--ghost inline-flex items-center gap-2">
+                    <BarChart2 className="h-4 w-4" /> Voir audits
+                  </Link>
+                  {user.suspended ? (
+                    <button type="button" onClick={handleUnsuspend} disabled={actionLoading}
+                      className="inline-flex h-10 items-center gap-2 rounded-velifa-md px-4 text-sm font-semibold disabled:opacity-50"
+                      style={{ color: 'var(--velifa-score-good)', background: 'var(--velifa-score-good-bg)' }}>
+                      {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />} Réactiver
+                    </button>
                   ) : (
-                    <div>
-                      {sites.slice(0, 10).map((site: any, i: number) => (
-                        <div key={site.url} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)' }}>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 12, color: 'rgb(var(--accent-rgb)/0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }} title={site.url}>{site.url}</p>
-                            <p style={{ fontSize: 10, color: 'rgb(var(--accent-rgb)/0.28)', margin: '2px 0 0' }}>{site.count} audit{site.count > 1 ? 's' : ''} — derniere fois le {fmtDate(site.lastDate)}</p>
+                    <button type="button" onClick={() => setAskSuspend(true)} disabled={actionLoading}
+                      className="inline-flex h-10 items-center gap-2 rounded-velifa-md px-4 text-sm font-semibold disabled:opacity-50"
+                      style={{ color: 'var(--velifa-score-poor)', background: 'var(--velifa-score-poor-bg)' }}>
+                      {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />} Suspendre
+                    </button>
+                  )}
+                </div>
+              </section>
+
+              {/* Indicateurs */}
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+                <StatCard label="Total audits" value={stats?.totalAudits ?? 0} />
+                <StatCard label="Réussis" value={<span style={{ color: 'var(--velifa-score-good)' }}>{stats?.completedAudits ?? 0}</span>} />
+                <StatCard label="Échoués" value={<span style={{ color: (stats?.failedAudits ?? 0) > 0 ? 'var(--velifa-score-poor)' : undefined }}>{stats?.failedAudits ?? 0}</span>} />
+                <StatCard label="Score moyen" value={stats?.avgScore ? <span style={{ color: scoreColor(stats.avgScore) }}>{stats.avgScore}</span> : '—'} sub={stats?.avgScore ? '/ 100' : undefined} />
+                <StatCard label="Sites analysés" value={sites.length} />
+              </div>
+
+              <div className="grid gap-5 lg:grid-cols-2">
+                <Panel title="Sites analysés" padded={false}>
+                  {sites.length === 0 ? (
+                    <div className="p-5"><EmptyState icon={Globe} title="Aucun site analysé" /></div>
+                  ) : (
+                    <ul className="divide-y divide-[color:var(--border)]">
+                      {sites.slice(0, 10).map((site: any) => (
+                        <li key={site.url} className="flex items-center gap-3 px-5 py-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs text-text" title={site.url} dir="ltr">{site.url}</p>
+                            <p className="mt-0.5 text-[11px] text-text-subtle">
+                              {site.count} audit{site.count > 1 ? 's' : ''} — dernière fois le {fmtDate(site.lastDate)}
+                            </p>
                           </div>
                           <ScoreBadge score={site.avgScore} />
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   )}
-                </Card>
+                </Panel>
 
-                {/* Score evolution */}
-                <Card title="Evolution des scores (30j)">
+                <Panel title="Évolution des scores (30 j)">
                   {history.length < 2 ? (
-                    <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Pas assez de donnees</p>
+                    <EmptyState title="Pas assez de données" description="Au moins deux audits sont nécessaires pour tracer une évolution." />
                   ) : (
-                    <div style={{ padding: '16px 8px 8px' }}>
-                      <ResponsiveContainer width="100%" height={180}>
-                        <LineChart data={history} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
-                          <CartesianGrid stroke="rgb(var(--accent-rgb)/0.04)" strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="day" tick={{ fill: 'rgb(var(--accent-rgb)/0.28)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtDay} />
-                          <YAxis domain={[0, 100]} tick={{ fill: 'rgb(var(--accent-rgb)/0.28)', fontSize: 10 }} axisLine={false} tickLine={false} />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Line dataKey="score" stroke="var(--accent)" strokeWidth={2} dot={{ fill: 'var(--accent)', r: 3 }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <LineChart data={history} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                        <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fill: 'var(--text-subtle)', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtDay} />
+                        <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-subtle)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--border-strong)' }} />
+                        <Line dataKey="score" stroke="var(--text)" strokeWidth={2} dot={{ fill: 'var(--text)', r: 3 }} activeDot={{ r: 5 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
                   )}
-                </Card>
+                </Panel>
               </div>
 
-              {/* Historique audits */}
-              <Card title="Historique des audits">
+              <div>
+                <h2 className="mb-3 text-sm font-semibold text-text">Historique des audits</h2>
                 {audits.length === 0 ? (
-                  <p style={{ padding: '20px', fontSize: 13, color: 'rgb(var(--accent-rgb)/0.30)', textAlign: 'center' }}>Aucun audit</p>
+                  <EmptyState title="Aucun audit" />
                 ) : (
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <TableShell minWidth={640}>
                     <thead>
-                      <tr style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.06)' }}>
-                        {['URL', 'Score', 'SEO', 'Statut', 'Date'].map(h => (
-                          <th key={h} style={{ padding: '8px 16px', textAlign: 'left', fontSize: 9, fontWeight: 600, color: 'rgb(var(--accent-rgb)/0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</th>
-                        ))}
-                      </tr>
+                      <tr>{['URL', 'Score', 'SEO', 'Statut', 'Date'].map((h) => <Th key={h}>{h}</Th>)}</tr>
                     </thead>
                     <tbody>
-                      {audits.map((a: any, i: number) => (
-                        <tr key={a.id} style={{ borderBottom: '1px solid rgb(var(--accent-rgb)/0.04)', transition: 'background 120ms' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'rgb(var(--accent-rgb)/0.04)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = ''; }}>
-                          <td style={{ padding: '9px 16px', maxWidth: 220 }}>
-                            <p style={{ fontSize: 11, color: 'rgb(var(--accent-rgb)/0.70)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>{a.url}</p>
-                          </td>
-                          <td style={{ padding: '9px 16px' }}><ScoreBadge score={a.score} /></td>
-                          <td style={{ padding: '9px 16px' }}><ScoreBadge score={a.scoreSeo} /></td>
-                          <td style={{ padding: '9px 16px' }}>
-                            <span style={{ fontSize: 10, fontWeight: 600, borderRadius: 99, padding: '2px 7px',
-                              background: a.status === 'completed' ? 'rgba(34,197,94,0.10)' : a.status === 'failed' ? 'rgba(239,68,68,0.10)' : 'rgba(245,158,11,0.10)',
-                              color: a.status === 'completed' ? 'var(--velifa-score-good)' : a.status === 'failed' ? 'var(--velifa-score-poor)' : 'var(--velifa-score-average)' }}>
-                              {a.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: '9px 16px', fontSize: 10, color: 'rgb(var(--accent-rgb)/0.35)', whiteSpace: 'nowrap' }}>{fmtDate(a.createdAt)}</td>
-                        </tr>
-                      ))}
+                      {audits.map((a: any) => {
+                        const st = STATUS[a.status];
+                        return (
+                          <tr key={a.id} className="transition-colors hover:bg-[color:var(--surface-raised)]">
+                            <Td className="max-w-[260px] truncate text-xs text-text"><span dir="ltr">{a.url}</span></Td>
+                            <Td><ScoreBadge score={a.score} /></Td>
+                            <Td><ScoreBadge score={a.scoreSeo} /></Td>
+                            <Td>{st ? <Badge tone={st.tone}>{st.label}</Badge> : <Badge>{a.status}</Badge>}</Td>
+                            <Td className="whitespace-nowrap text-xs text-text-muted">{fmtDate(a.createdAt)}</Td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
-                  </table>
+                  </TableShell>
                 )}
-              </Card>
+              </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgb(var(--accent-rgb)/0.35)', fontSize: 14 }}>
-              Utilisateur introuvable
-            </div>
+            <EmptyState icon={UserX} title="Utilisateur introuvable" />
           )}
         </div>
       </div>
